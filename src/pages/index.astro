@@ -6,6 +6,10 @@ import Icon from '../components/Icon.astro';
 import { categories } from '../data/categories';
 import { tools, toolsInCategory } from '../data/tools';
 import { site } from '../site.config';
+import { getCollection } from 'astro:content';
+import GuideCard from '../components/GuideCard.astro';
+
+const guides = (await getCollection('guides')).sort((a, b) => b.data.updated.localeCompare(a.data.updated)).slice(0, 6);
 
 const featured = tools.filter((t) => t.featured);
 const jsonLd = [
@@ -78,6 +82,19 @@ const jsonLd = [
         </section>
       ))
     }
+
+    <section class="category-block" data-hide-when-searching>
+      <div class="category-head">
+        <div>
+          <h2>Guides</h2>
+          <p>Plain-English explanations of the rules behind the numbers.</p>
+        </div>
+        <a href="/guides/" class="btn btn-sm">All guides <Icon name="arrow-right" size={16} /></a>
+      </div>
+      <div class="guide-list">
+        {guides.map((g) => <GuideCard entry={g} />)}
+      </div>
+    </section>
 
     <section class="section" data-hide-when-searching>
       <h2 style="text-align:center">Why people trust {site.name}</h2>

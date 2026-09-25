@@ -14,6 +14,16 @@ A fast, static website of **21 free financial calculators**, built to rank in Go
 | **Tax Deductions 2025–2026** | Schedule 1-A (all four combined) · Car loan interest · No tax on overtime · No tax on tips · Senior $6,000 deduction |
 | **Health & Benefits** | ACA subsidy 2026 · IRMAA 2026 · SSDI back pay |
 
+Plus **8 in-depth guides** in `src/content/guides/`, written in Markdown. Each is linked from the home page, its category hub and its related calculators:
+- 2026 ACA subsidy cliff
+- Factor rate vs APR
+- HELOC vs cash-out refinance
+- Schedule 1-A explained
+- Avalanche vs snowball
+- How to appeal IRMAA
+- How lenders calculate DTI
+- DSCR loans explained
+
 Plus the trust pages AdSense reviewers look for:
 - **Company:** About, Editorial policy, Contact.
 - **Legal:** Privacy policy (with Google's required advertising-cookie disclosures), Cookie policy, Terms of use, Disclaimer.
@@ -122,6 +132,21 @@ docs/DATA-SOURCES.md      ← every official figure used, with its source
 reports/, research_notes/ ← the niche research behind this site
 ```
 
+## Adding a guide
+
+Create `src/content/guides/<slug>.md` with this frontmatter, then write the article in Markdown. Tables are wrapped for mobile automatically.
+
+```yaml
+---
+title: 'Your title'
+description: 'A 140–160 character summary.'
+category: debt-credit          # a category id from src/data/categories.ts
+related: ['debt-payoff-calculator']   # tool slugs; the first gets a call-to-action box
+published: '2026-10-01'
+updated: '2026-10-01'
+---
+```
+
 ## Adding a calculator
 
 1. Add an entry to `src/data/tools.ts` (slug, title, SEO title and description, category, icon, date).
@@ -149,7 +174,7 @@ The 2025–2028 deductions (tips, overtime, car loan interest, seniors) expire a
 These come from the research report's backlog:
 - **v1.1:**
   - A reverse mortgage (HECM) calculator. It needs HUD's principal limit factor tables, which you download from HUD and load as JSON.
-  - 10–20 guide articles.
+  - More guides, for 15–20 in total.
 - **v2:**
   - Legal cost estimators (divorce, DUI, alimony).
   - Heat pump vs gas and EV vs gas savings.

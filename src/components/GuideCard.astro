@@ -1,0 +1,17 @@
+---
+import { categoryById } from '../data/categories';
+import { readingMinutes } from '../lib/reading';
+
+interface Props {
+  entry: { id: string; body?: string; data: { title: string; description: string; category: string } };
+}
+const { entry } = Astro.props;
+const cat = categoryById(entry.data.category);
+---
+
+<a class="guide-card" href={`/guides/${entry.id}/`}>
+  <span class="pill" style="align-self:flex-start">{cat.nav}</span>
+  <h3>{entry.data.title}</h3>
+  <p>{entry.data.description}</p>
+  <span class="meta">{readingMinutes(entry.body ?? '')} min read</span>
+</a>

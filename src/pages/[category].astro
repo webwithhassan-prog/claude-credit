@@ -5,6 +5,8 @@ import ToolCard from '../components/ToolCard.astro';
 import { categories, type Category } from '../data/categories';
 import { toolsInCategory } from '../data/tools';
 import { site } from '../site.config';
+import { getCollection } from 'astro:content';
+import GuideCard from '../components/GuideCard.astro';
 
 export function getStaticPaths() {
   return categories.map((c) => ({ params: { category: c.id }, props: { category: c } }));
@@ -15,6 +17,7 @@ interface Props {
 }
 const { category } = Astro.props;
 const list = toolsInCategory(category.id);
+const guides = (await getCollection('guides')).filter((g) => g.data.category === category.id);
 const path = `/${category.id}/`;
 
 const jsonLd = [
@@ -56,6 +59,18 @@ const jsonLd = [
       {list.map((t) => <ToolCard tool={t} />)}
     </div>
     <section class="prose section" set:html={category.guide} />
+    {
+      guides.length > 0 && (
+        <section class="section" style="padding-top:0">
+          <h2>Guides</h2>
+          <div class="guide-list">
+            {guides.map((g) => (
+              <GuideCard entry={g} />
+            ))}
+          </div>
+        </section>
+      )
+    }
     <section class="section" style="padding-top:0">
       <h2>Other calculator categories</h2>
       <ul class="side-links" style="max-width:520px">

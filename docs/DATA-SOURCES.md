@@ -89,3 +89,12 @@ You can list every external link with:
 ```bash
 grep -rhoE "url: '[^']+'" src/pages | sort -u
 ```
+
+## Additional facts stated in the guides (`src/content/guides/`)
+
+- ACA: 400% FPL limits by household size (derived from the poverty guidelines above).
+- ACA: repayment caps on excess advance premium tax credits no longer apply from tax year 2026 (OBBBA).
+- ACA: bronze and catastrophic Marketplace plans are treated as HSA-eligible starting in 2026 (OBBBA).
+- DTI guide, student loan payments used when no payment is reported: FHA 0.5% of balance, Freddie Mac 0.5%, Fannie Mae 1% (or a calculated payment); VA uses its own threshold. Check the current seller/servicer guides.
+- IRMAA guide: SSA-44 life-changing events list; SSA-561 for reconsideration.
+- Debt guide research citations: Gal & McShane (2012), *Journal of Marketing Research*; Trudel (2016), *Harvard Business Review*.

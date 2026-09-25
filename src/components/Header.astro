@@ -23,6 +23,7 @@ const navCats = categories.slice(0, 5);
           </a>
         ))
       }
+      <a href="/guides/" aria-current={current.startsWith('/guides/') ? 'page' : undefined}>Guides</a>
       <a href="/calculators/" aria-current={current === '/calculators/' ? 'page' : undefined}>All tools</a>
     </nav>
 
@@ -38,6 +39,7 @@ const navCats = categories.slice(0, 5);
         <nav class="mobile-menu-panel" aria-label="Mobile">
           {categories.map((c) => <a href={`/${c.id}/`}>{c.name}</a>)}
           <a href="/calculators/">All calculators</a>
+          <a href="/guides/">Guides</a>
           <a href="/about/">About</a>
           <a href="/contact/">Contact</a>
         </nav>

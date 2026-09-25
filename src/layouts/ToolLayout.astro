@@ -12,6 +12,7 @@ import AdSlot from '../components/AdSlot.astro';
 import Icon from '../components/Icon.astro';
 import { categoryOf, relatedTools, toolBySlug } from '../data/tools';
 import { site } from '../site.config';
+import { getCollection } from 'astro:content';
 
 export interface Source {
   title: string;
@@ -35,6 +36,7 @@ const url = new URL(path, site.url).href;
 const updated = new Date(`${tool.updated}T12:00:00Z`);
 const updatedLabel = updated.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
 const relatedList = relatedTools(slug, related, 6);
+const guides = (await getCollection('guides')).filter((g) => g.data.related.includes(slug)).slice(0, 3);
 
 const stripHtml = (s: string) => s.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
 
@@ -159,6 +161,25 @@ const jsonLd = [
               <a href={`/${category.id}/`}>All {category.name.toLowerCase()} tools →</a>
             </p>
           </section>
+          {
+            guides.length > 0 && (
+              <section class="side-card">
+                <h2>Guides</h2>
+                <ul class="side-links">
+                  {guides.map((g) => (
+                    <li>
+                      <a href={`/guides/${g.id}/`}>
+                        <span class="ico">
+                          <Icon name="book" />
+                        </span>
+                        {g.data.title}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )
+          }
           <AdSlot slot="sidebar" variant="sidebar" />
         </div>
       </aside>
