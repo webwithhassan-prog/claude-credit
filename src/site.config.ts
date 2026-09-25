@@ -95,5 +95,5 @@ export const site: SiteConfig = {
   },
 
   /** Optional Google Search Console HTML-tag verification token. */
-  googleSiteVerification: '',
+  googleSiteVerification: 'ODg-9tkmYDHZkNpYapIxbOK5eCKOsYuFxFuq1qoghms',
 };
