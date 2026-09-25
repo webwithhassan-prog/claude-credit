@@ -58,7 +58,7 @@ import { site } from '../site.config';
       </div>
     ) : (
       <p>
-        {site.name} is an independent publisher. Our calculators and guides are researched, written and maintained by the
+        {site.name} is an independent publisher{site.owner !== site.name && ` operated by ${site.owner}`}. Our calculators and guides are researched, written and maintained by the
         {site.name} editorial team, following the standards in our <a href="/editorial-policy/">editorial policy</a>.
       </p>
     )

@@ -46,7 +46,7 @@ export const site: SiteConfig = {
   /** Public contact address (shown on Contact / Privacy pages). */
   email: 'hello@calcvera.net',
   /** Legal entity or owner name used in the Terms and Privacy Policy. */
-  owner: 'Calcvera',
+  owner: 'Creative Developer',
   /** Country whose law governs the Terms of Use (e.g. 'Pakistan'). Empty = generic wording. */
   jurisdiction: '',
   /** Year the site launched (footer copyright range). */
