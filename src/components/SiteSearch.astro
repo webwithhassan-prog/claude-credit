@@ -1,0 +1,209 @@
+---
+/**
+ * Header search: a button (or "/" and Ctrl/⌘+K) opens a dialog that searches
+ * calculators, guides, topics, glossary terms and key pages. The index
+ * (/search.json, built by src/pages/search.json.ts) is fetched the first time
+ * search opens, so pages don't pay for it up front.
+ */
+import Icon from './Icon.astro';
+import { tools } from '../data/tools';
+
+const popular = tools.filter((t) => t.featured).slice(0, 6);
+---
+
+<button class="icon-btn" type="button" aria-label="Search the site" aria-haspopup="dialog" data-site-search-open>
+  <Icon name="search" />
+</button>
+
+<dialog class="search-dialog" aria-label="Search the site" data-site-search-dialog>
+  <div class="search-head">
+    <label class="search-field">
+      <Icon name="search" size={20} />
+      <span class="visually-hidden">Search calculators, guides and terms</span>
+      <input
+        type="search"
+        placeholder="Search calculators, guides and terms"
+        autocomplete="off"
+        spellcheck="false"
+        enterkeyhint="search"
+        data-site-search-input
+      />
+    </label>
+    <button class="icon-btn" type="button" aria-label="Close search" data-site-search-close>
+      <Icon name="x" />
+    </button>
+  </div>
+  <p class="visually-hidden" role="status" aria-live="polite" data-site-search-status></p>
+  <div class="search-body">
+    <div data-site-search-start>
+      <p class="search-caption">Popular calculators</p>
+      <ul class="search-results">
+        {
+          popular.map((t) => (
+            <li>
+              <a class="search-hit" href={`/${t.slug}/`}>
+                <span class="search-kind">Calculator</span>
+                <span class="search-title">{t.title}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+    <ul class="search-results" data-site-search-results hidden></ul>
+    <p class="search-empty" data-site-search-empty hidden>No results. Try a broader word, such as “loan”, “tax” or “Medicare”.</p>
+  </div>
+  <p class="search-foot">Tip: press <kbd>/</kbd> to search from any page.</p>
+</dialog>
+
+<script>
+  interface Item {
+    t: string;
+    u: string;
+    k: string;
+    d: string;
+    x?: string;
+  }
+
+  const dialog = document.querySelector<HTMLDialogElement>('[data-site-search-dialog]');
+  const input = document.querySelector<HTMLInputElement>('[data-site-search-input]');
+  const results = document.querySelector<HTMLUListElement>('[data-site-search-results]');
+  const start = document.querySelector<HTMLElement>('[data-site-search-start]');
+  const empty = document.querySelector<HTMLElement>('[data-site-search-empty]');
+  const status = document.querySelector<HTMLElement>('[data-site-search-status]');
+
+  if (dialog && input && results && start && empty && status) {
+    let index: Item[] | null = null;
+    let failed = false;
+    let loading: Promise<void> | null = null;
+    const load = () =>
+      (loading ??= fetch('/search.json')
+        .then((r) => {
+          if (!r.ok) throw new Error(String(r.status));
+          return r.json();
+        })
+        .then((data: Item[]) => {
+          index = data;
+          failed = false;
+        })
+        .catch(() => {
+          failed = true;
+          loading = null; // allow a retry on the next keystroke
+        }));
+    const noResults = empty.textContent ?? '';
+
+    const norm = (s: string) => s.toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '');
+    const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const escapeHtml = (s: string) =>
+      s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    const boost: Record<string, number> = { Calculator: 1.5, Guide: 1, Topic: 0.8, Glossary: 0.5, Page: 0 };
+    const stopWords = new Set(
+      'a an and are can do does for how i in is it my of on or should the to what whats when which who why with you your much many'.split(' '),
+    );
+    /** Rough singular form, so "taxes" finds "tax" and "loans" finds "loan". */
+    const stem = (w: string) =>
+      w.length > 3 ? w.replace(/(xes|ses|ches|shes)$/, (m) => m.slice(0, -2)).replace(/ies$/, 'y').replace(/([^s])s$/, '$1') : w;
+    function queryTerms(raw: string): string[] {
+      const words = norm(raw).replace(/[^a-z0-9$%.\-\s]/g, ' ').split(/\s+/).filter(Boolean);
+      const meaningful = words.filter((w) => !stopWords.has(w));
+      return (meaningful.length ? meaningful : words).map(stem);
+    }
+
+    /** Every term must match somewhere; title matches count most. 0 = no match. */
+    function score(item: Item, terms: string[]): number {
+      const title = norm(item.t);
+      const extra = norm(item.x ?? '');
+      const desc = norm(item.d);
+      let total = 0;
+      for (const term of terms) {
+        if (title.startsWith(term)) total += 6;
+        else if (new RegExp(`\\b${escapeRe(term)}`).test(title)) total += 4;
+        else if (title.includes(term)) total += 3;
+        else if (extra.includes(term)) total += 2;
+        else if (desc.includes(term)) total += 1;
+        else return 0;
+      }
+      return total + (boost[item.k] ?? 0);
+    }
+
+    function render() {
+      const terms = queryTerms(input!.value);
+      const searching = terms.length > 0;
+      start!.hidden = searching;
+      if (!searching) {
+        results!.hidden = true;
+        empty!.hidden = true;
+        status!.textContent = '';
+        return;
+      }
+      if (!index) {
+        results!.hidden = true;
+        empty!.textContent = 'Search couldn’t load. Check your connection and try again.';
+        empty!.hidden = !failed;
+        status!.textContent = failed ? empty!.textContent : 'Loading…';
+        load().then(() => render());
+        return;
+      }
+      const hits = index
+        .map((item) => ({ item, s: score(item, terms) }))
+        .filter((h) => h.s > 0)
+        .sort((a, b) => b.s - a.s)
+        .slice(0, 8);
+      results!.innerHTML = hits
+        .map(
+          ({ item }) =>
+            `<li><a class="search-hit" href="${escapeHtml(item.u)}"><span class="search-kind">${escapeHtml(item.k)}</span>` +
+            `<span class="search-title">${escapeHtml(item.t)}</span><span class="search-desc">${escapeHtml(item.d)}</span></a></li>`,
+        )
+        .join('');
+      results!.hidden = hits.length === 0;
+      empty!.textContent = noResults;
+      empty!.hidden = hits.length > 0;
+      status!.textContent = hits.length ? `${hits.length} result${hits.length === 1 ? '' : 's'}` : 'No results';
+    }
+
+    function open() {
+      if (dialog!.open) return;
+      input!.value = '';
+      render();
+      dialog!.showModal();
+      input!.focus();
+      load();
+    }
+
+    document.querySelectorAll('[data-site-search-open]').forEach((b) => b.addEventListener('click', open));
+    document.querySelector('[data-site-search-close]')?.addEventListener('click', () => dialog.close());
+    // A click on the backdrop lands on the dialog element itself.
+    dialog.addEventListener('click', (e) => {
+      if (e.target === dialog) dialog.close();
+    });
+    input.addEventListener('input', render);
+    // In a search box, Escape would only clear the text; close the dialog in one press instead.
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        dialog.close();
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      const typing = (e.target as HTMLElement).closest?.('input, textarea, select, [contenteditable="true"]');
+      if ((e.key === '/' && !typing) || ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k')) {
+        e.preventDefault();
+        open();
+      }
+    });
+
+    // Arrow keys move between the visible results; Enter follows the focused link.
+    dialog.addEventListener('keydown', (e) => {
+      if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+      const links = [...dialog.querySelectorAll<HTMLAnchorElement>('a.search-hit')].filter((a) => a.offsetParent !== null);
+      if (!links.length) return;
+      e.preventDefault();
+      const i = links.indexOf(document.activeElement as HTMLAnchorElement);
+      if (e.key === 'ArrowDown') links[i < 0 ? 0 : Math.min(i + 1, links.length - 1)].focus();
+      else if (i <= 0) input.focus();
+      else links[i - 1].focus();
+    });
+  }
+</script>

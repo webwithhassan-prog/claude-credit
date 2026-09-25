@@ -154,7 +154,7 @@ const sources = [
     most approvals.
   </p>
 
-  <AdSlot slot="inContent" />
+  <AdSlot unit="inContent" />
 
   <h2 id="limits">DTI limits by loan type</h2>
   <p>Limits vary by program, lender and the strength of the rest of your application (credit score, down payment, cash reserves). These are the typical benchmarks:</p>
@@ -222,17 +222,9 @@ const sources = [
 <script>
   import { bindCalculator, outputs, verdict } from '../lib/ui/form';
   import { money, percent } from '../lib/ui/format';
-  import { debtToIncome } from '../lib/calc/debt';
+  import { DTI_PROGRAMS as programs, debtToIncome } from '../lib/calc/debt';
 
   const out = outputs('dti');
-  const programs = [
-    { name: 'Conventional (automated)', back: 50, front: null },
-    { name: 'Conventional (manual)', back: 45, front: null },
-    { name: 'FHA', back: 43, front: 31 },
-    { name: 'VA (guideline)', back: 41, front: null },
-    { name: 'USDA', back: 41, front: 29 },
-    { name: 'Typical HELOC lender', back: 43, front: null },
-  ];
 
   bindCalculator('dti', {
     compute(f) {

@@ -1,0 +1,288 @@
+---
+/**
+ * Methodology and data sources. The tables are generated from the same
+ * constants the calculators use (src/lib/calc/*), so what this page publishes
+ * always matches what the calculators compute.
+ */
+import ProseLayout from '../layouts/ProseLayout.astro';
+import { tools } from '../data/tools';
+import { site } from '../site.config';
+import { ADDITIONAL_65, BRACKETS, RATES, STANDARD_DEDUCTION } from '../lib/calc/tax';
+import { APPLICABLE_2026, FPL_2025, IRMAA, SSDI_FEE_CAP } from '../lib/calc/benefits';
+import { DTI_PROGRAMS } from '../lib/calc/debt';
+
+const updated = tools.map((t) => t.updated).sort().at(-1);
+const usd = (n: number, digits = 0) =>
+  n.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: digits, maximumFractionDigits: digits });
+const pct = (n: number) => `${n.toFixed(2)}%`;
+
+/** "Up to $12,400", "$12,400 to $50,400", …, "Over $640,600" */
+function bracketRows(bounds: number[]) {
+  return RATES.map((rate, i) => ({
+    rate,
+    range: i === 0 ? `Up to ${usd(bounds[0])}` : i < bounds.length ? `${usd(bounds[i - 1])} to ${usd(bounds[i])}` : `Over ${usd(bounds[i - 1])}`,
+  }));
+}
+const single2026 = bracketRows(BRACKETS[2026].single);
+const joint2026 = bracketRows(BRACKETS[2026].mfj);
+
+const irmaa = IRMAA[2026];
+const irmaaRange = (key: 'individualMax' | 'jointMax', i: number) => {
+  const tiers = irmaa.tiers;
+  const max = tiers[i][key];
+  const prev = i > 0 ? tiers[i - 1][key] : 0;
+  if (i === 0) return `${usd(max)} or less`;
+  if (!Number.isFinite(max)) return `${usd(Math.ceil(prev))} or more`;
+  if (max % 1 !== 0) return `Over ${usd(prev)} and under ${usd(Math.ceil(max))}`;
+  return `Over ${usd(prev)} to ${usd(max)}`;
+};
+
+const acaBands = APPLICABLE_2026.map(([lo, hi, a, b]) => ({
+  income: lo === 0 ? `Under ${hi}%` : `${lo}% to ${hi}%`,
+  share: a === b ? pct(a) : `${pct(a)} to ${pct(b)}`,
+}));
+
+const regions = [
+  { name: '48 contiguous states and DC', g: FPL_2025.contiguous },
+  { name: 'Alaska', g: FPL_2025.alaska },
+  { name: 'Hawaii', g: FPL_2025.hawaii },
+];
+
+const calendar = [
+  ['August–September', 'IRS applicable percentages for next year’s ACA premium tax credits', 'ACA subsidy calculator'],
+  ['October', 'IRS tax brackets and standard deduction for the next tax year', 'Tax deduction calculators'],
+  ['October', 'Social Security cost-of-living adjustment and earnings limits', 'SSDI back pay calculator'],
+  ['October–November', 'CMS Medicare Part B premium and IRMAA brackets', 'IRMAA calculator'],
+  ['January', 'HHS poverty guidelines, used for the next ACA coverage year', 'ACA subsidy calculator'],
+];
+---
+
+<ProseLayout
+  title="Methodology and data sources"
+  seoTitle="How Our Calculators Work: Methodology and Official Data"
+  description={`How ${site.name}'s calculators work: the formulas, the official IRS, CMS, HHS and SSA figures behind them, how we test the math and when we update it.`}
+  path="/methodology/"
+  updated={updated}
+  lede={`Every result on ${site.name} comes from published rules and standard financial math. This page lists the official figures our calculators use, where they come from, and how we check them.`}
+>
+  <h2 id="how-it-works">How our calculators work</h2>
+  <ul>
+    <li><strong>They run in your browser.</strong> The numbers you enter are never sent to our servers.</li>
+    <li><strong>Every calculator shows its work.</strong> Each page explains the formula, walks through a worked example and lists its official sources.</li>
+    <li><strong>Loans use standard amortization.</strong> Monthly payments apply your APR monthly (APR ÷ 12) to the remaining balance, the way installment loans are normally quoted.</li>
+    <li>
+      <strong>APRs follow the federal method.</strong> For merchant cash advances, invoice factoring and equipment financing, we find
+      the rate at which your payments exactly repay the cash you receive, then annualize it, as Regulation Z describes for
+      consumer loans.
+    </li>
+    <li><strong>Tax estimates are federal only,</strong> using the brackets and deductions below. State income taxes, credits and other deductions aren’t included unless a page says so.</li>
+  </ul>
+
+  <h2 id="tax">Federal income tax (2026)</h2>
+  <p>
+    Used by the <a href="/new-tax-deductions-calculator/">Schedule 1-A</a>, <a href="/no-tax-on-tips-calculator/">tips</a>,
+    <a href="/no-tax-on-overtime-calculator/">overtime</a>, <a href="/car-loan-interest-deduction-calculator/">car loan interest</a>
+    and <a href="/senior-deduction-calculator/">senior deduction</a> calculators. The 2025 figures are also built in for 2025 returns.
+  </p>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Rate</th><th>Single: taxable income</th><th>Married filing jointly</th></tr></thead>
+      <tbody>
+        {
+          single2026.map((row, i) => (
+            <tr>
+              <td>{row.rate}%</td>
+              <td>{row.range}</td>
+              <td>{joint2026[i].range}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Standard deduction</th><th>2025</th><th>2026</th></tr></thead>
+      <tbody>
+        <tr><td>Single or married filing separately</td><td>{usd(STANDARD_DEDUCTION[2025].single)}</td><td>{usd(STANDARD_DEDUCTION[2026].single)}</td></tr>
+        <tr><td>Married filing jointly</td><td>{usd(STANDARD_DEDUCTION[2025].mfj)}</td><td>{usd(STANDARD_DEDUCTION[2026].mfj)}</td></tr>
+        <tr><td>Head of household</td><td>{usd(STANDARD_DEDUCTION[2025].hoh)}</td><td>{usd(STANDARD_DEDUCTION[2026].hoh)}</td></tr>
+        <tr><td>Extra amount per person 65+ or blind (married)</td><td>{usd(ADDITIONAL_65[2025].married)}</td><td>{usd(ADDITIONAL_65[2026].married)}</td></tr>
+        <tr><td>Extra amount per person 65+ or blind (unmarried)</td><td>{usd(ADDITIONAL_65[2025].unmarried)}</td><td>{usd(ADDITIONAL_65[2026].unmarried)}</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="deductions">New deductions for 2025–2028</h2>
+  <p>Created by the 2025 tax law (Public Law 119-21) and claimed on Schedule 1-A:</p>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Deduction</th><th>Maximum</th><th>Phase-out</th></tr></thead>
+      <tbody>
+        <tr><td>Qualified tips</td><td>$25,000 per return</td><td>−$100 per $1,000 of MAGI over $150,000 ($300,000 joint)</td></tr>
+        <tr><td>Qualified overtime (FLSA premium only)</td><td>$12,500 ($25,000 joint)</td><td>−$100 per $1,000 of MAGI over $150,000 ($300,000 joint)</td></tr>
+        <tr><td>Car loan interest</td><td>$10,000 per return</td><td>−$200 per $1,000, or part of $1,000, of MAGI over $100,000 ($200,000 joint)</td></tr>
+        <tr><td>Senior deduction</td><td>$6,000 per person 65+</td><td>−6% of MAGI over $75,000 ($150,000 joint)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    Married people filing separately can’t claim the tips, overtime or senior deductions. For the tips and overtime deductions,
+    the phase-out counts whole $1,000 steps. The car loan interest phase-out counts any part of $1,000 as a full step, as the law’s
+    wording provides.
+  </p>
+
+  <h2 id="aca">ACA premium tax credit (2026 coverage)</h2>
+  <p>
+    Used by the <a href="/aca-subsidy-calculator/">ACA subsidy calculator</a>. Marketplace subsidies for 2026 use the 2025 federal
+    poverty guidelines:
+  </p>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Region</th><th>1 person</th><th>Each additional person</th></tr></thead>
+      <tbody>
+        {
+          regions.map((r) => (
+            <tr>
+              <td>{r.name}</td>
+              <td>{usd(r.g.base)}</td>
+              <td>{usd(r.g.perPerson)}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+  <p>Your expected contribution toward the benchmark silver plan is a share of your household income that rises with income:</p>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Household income (% of poverty line)</th><th>Share of income you pay (2026)</th></tr></thead>
+      <tbody>
+        {
+          acaBands.map((b) => (
+            <tr>
+              <td>{b.income}</td>
+              <td>{b.share}</td>
+            </tr>
+          ))
+        }
+        <tr><td>Above 400%</td><td>No premium tax credit</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    Within each band, the percentage rises in a straight line from the lower to the higher figure. The enhanced credits of
+    2021–2025 expired at the end of 2025, which is why a cliff returns at 400% for 2026.
+  </p>
+
+  <h2 id="irmaa">Medicare IRMAA (2026)</h2>
+  <p>
+    Used by the <a href="/irmaa-calculator/">IRMAA calculator</a>. The standard Part B premium for 2026 is
+    {usd(irmaa.standardB, 2)} a month, with a {usd(irmaa.deductibleB)} deductible. Higher-income beneficiaries pay more, based on
+    their modified AGI from two years earlier (their 2024 tax return for 2026):
+  </p>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>MAGI, individual return</th><th>MAGI, joint return</th><th>Part B premium</th><th>Part D surcharge</th></tr></thead>
+      <tbody>
+        {
+          irmaa.tiers.map((t, i) => (
+            <tr>
+              <td>{irmaaRange('individualMax', i)}</td>
+              <td>{irmaaRange('jointMax', i)}</td>
+              <td>{usd(t.partB, 2)}</td>
+              <td>{t.partD ? `+${usd(t.partD, 2)}` : '—'}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="ssdi">SSDI back pay</h2>
+  <p>Used by the <a href="/ssdi-back-pay-calculator/">SSDI back pay calculator</a>:</p>
+  <ul>
+    <li>Benefits start after a <strong>five-month waiting period</strong> of full calendar months from the established onset date. There is no waiting period for ALS.</li>
+    <li>Benefits can be paid for up to <strong>12 months before the month you applied</strong>.</li>
+    <li>A representative’s fee under a fee agreement is <strong>25% of past-due benefits, capped at {usd(SSDI_FEE_CAP)}</strong>.</li>
+  </ul>
+
+  <h2 id="lending">Lending and business calculators</h2>
+  <p>The <a href="/debt-to-income-ratio-calculator/">DTI calculator</a> compares your ratios with these program limits:</p>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Program</th><th>Front-end (housing)</th><th>Back-end (all debts)</th></tr></thead>
+      <tbody>
+        {
+          DTI_PROGRAMS.map((p) => (
+            <tr>
+              <td>{p.name}</td>
+              <td>{p.front ? `${p.front}%` : '—'}</td>
+              <td>{p.back}%</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+  <p>
+    Home equity limits, DSCR requirements, merchant cash advance factor rates and invoice factoring fees vary by lender. Our
+    calculators let you enter the terms you’re quoted. Where pages mention typical ranges, those are industry norms, not legal
+    limits.
+  </p>
+
+  <h2 id="testing">How we test the math</h2>
+  <ul>
+    <li>Every calculation engine is covered by automated tests that run on every change to the site.</li>
+    <li>Tests check results against known values, such as standard amortization results and published premium tables.</li>
+    <li>Tests also check that official tables are internally consistent. For example, each IRMAA Part B amount must equal the standard premium times 1.4, 2.0, 2.6, 3.2 or 3.4.</li>
+    <li>Every build is checked automatically for broken links and missing page information before it goes live.</li>
+  </ul>
+
+  <h2 id="updates">When we update</h2>
+  <p>Agencies publish new figures on a regular calendar. We update the affected calculators when they do, and change each page’s date only when its content changes.</p>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>When</th><th>What changes</th><th>Where</th></tr></thead>
+      <tbody>
+        {
+          calendar.map(([when, what, where]) => (
+            <tr>
+              <td>{when}</td>
+              <td>{what}</td>
+              <td>{where}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="limits">Limitations</h2>
+  <p>
+    Our results are estimates for education. Your actual tax, premium, benefit or loan terms can depend on details our calculators
+    don’t ask about, such as state rules, other credits and deductions, or a lender’s own requirements. Check important numbers
+    with the agency or lender involved, or with a qualified professional.
+  </p>
+
+  <h2 id="sources">Official sources</h2>
+  <ul>
+    <li><a href="https://www.irs.gov/newsroom/irs-releases-tax-inflation-adjustments-for-tax-year-2026-including-amendments-from-the-one-big-beautiful-bill" rel="noopener" target="_blank">IRS, tax inflation adjustments for tax year 2026</a></li>
+    <li><a href="https://www.irs.gov/newsroom/one-big-beautiful-bill-provisions" rel="noopener" target="_blank">IRS, One, Big, Beautiful Bill provisions</a></li>
+    <li><a href="https://www.congress.gov/bill/119th-congress/house-bill/1" rel="noopener" target="_blank">Public Law 119-21 (H.R. 1)</a></li>
+    <li><a href="https://www.irs.gov/pub/irs-drop/rp-25-25.pdf" rel="noopener" target="_blank">IRS Rev. Proc. 2025-25, 2026 applicable percentage table</a></li>
+    <li><a href="https://aspe.hhs.gov/topics/poverty-economic-mobility/poverty-guidelines" rel="noopener" target="_blank">HHS, poverty guidelines</a></li>
+    <li><a href="https://www.cms.gov/newsroom/fact-sheets/2026-medicare-parts-b-premiums-and-deductibles" rel="noopener" target="_blank">CMS, 2026 Medicare Parts A and B premiums and deductibles</a></li>
+    <li><a href="https://www.ssa.gov/benefits/medicare/medicare-premiums.html" rel="noopener" target="_blank">SSA, Medicare premiums for higher-income beneficiaries</a></li>
+    <li><a href="https://www.ssa.gov/representation/fee_agreements.htm" rel="noopener" target="_blank">SSA, fee agreements</a></li>
+    <li><a href="https://selling-guide.fanniemae.com/sel/b3-6-02/debt-income-ratios" rel="noopener" target="_blank">Fannie Mae Selling Guide B3-6-02, debt-to-income ratios</a></li>
+    <li><a href="https://www.consumerfinance.gov/rules-policy/regulations/1026/22/" rel="noopener" target="_blank">CFPB, Regulation Z §1026.22 (APR calculation)</a></li>
+  </ul>
+
+  <h2 id="corrections">Corrections</h2>
+  <p>
+    If you think a figure or a result is wrong, email <a href={`mailto:${site.email}`}>{site.email}</a> with the page and the numbers
+    you entered. We check every report against the official source, fix confirmed errors promptly and update the page’s date. Read
+    more in our <a href="/editorial-policy/">editorial policy</a>.
+  </p>
+</ProseLayout>

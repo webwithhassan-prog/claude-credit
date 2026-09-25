@@ -60,7 +60,8 @@ These niches were chosen from the research in [`reports/AdSense tool site niches
   - `npm run seo` checks all of this on every build, and CI fails if something breaks.
 - **AdSense-ready.**
   - Add your publisher ID and the site automatically adds the AdSense verification tag and loader script, and generates `ads.txt`.
-  - Manual ad slots sit well away from calculator buttons, per AdSense's accidental-click policy.
+  - Manual ad slots sit well away from calculator buttons, per AdSense's accidental-click policy. Guides get one in-article unit mid-article (the `inContent` slot).
+  - Ad slots reserve their space so pages don't jump when ads load, and unfilled units collapse.
 - **Private.** Inputs never leave the browser. "Copy link to results" stores the inputs after the `#` in the URL, which browsers never send to servers.
 - **Accessible.**
   - Every input has a label, and the controls are standard buttons and inputs, so keyboard use works.

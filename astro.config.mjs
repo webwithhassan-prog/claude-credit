@@ -36,6 +36,7 @@ function lastmodFor(pathname) {
   if (slug === 'guides') return newest(Object.values(guides).map((g) => g.updated));
   if (slug === 'calculators') return newest(tools.map((t) => t.updated));
   if (slug === 'glossary') return glossaryUpdated;
+  if (slug === 'methodology') return newest(tools.map((t) => t.updated));
   if (slug === '' || slug === 'sitemap') return newest([...tools.map((t) => t.updated), ...Object.values(guides).map((g) => g.updated)]);
   return site.legalUpdated;
 }
@@ -55,6 +56,35 @@ function rehypeWrapTables() {
   return (tree) => walk(tree);
 }
 
+/**
+ * In-article ad for guides: one manual AdSense unit before the third H2, only in articles with at least
+ * five sections and only when the publisher ID and the inContent slot are set in site.config.ts.
+ * Mirrors src/components/AdSlot.astro, which markdown content can't use directly.
+ */
+function rehypeInArticleAd() {
+  const client = site.adsense.client;
+  const slot = site.adsense.slots.inContent;
+  const el = (tagName, properties, children = []) => ({ type: 'element', tagName, properties, children });
+  return (tree) => {
+    if (!client || !slot) return;
+    const h2s = tree.children.filter((n) => n.type === 'element' && n.tagName === 'h2');
+    if (h2s.length < 5) return;
+    const ad = el('aside', { className: ['ad-slot'], ariaLabel: 'Advertisement' }, [
+      el('span', { className: ['ad-label'] }, [{ type: 'text', value: 'Advertisement' }]),
+      el('ins', {
+        className: ['adsbygoogle'],
+        style: 'display:block',
+        dataAdClient: client,
+        dataAdSlot: slot,
+        dataAdFormat: 'auto',
+        dataFullWidthResponsive: 'true',
+      }),
+      el('script', {}, [{ type: 'text', value: '(window.adsbygoogle = window.adsbygoogle || []).push({});' }]),
+    ]);
+    tree.children.splice(tree.children.indexOf(h2s[2]), 0, ad);
+  };
+}
+
 export default defineConfig({
   site: site.url,
   trailingSlash: 'always',
@@ -63,7 +93,7 @@ export default defineConfig({
   // ("an error?Tell us"). `true` compresses HTML while keeping the spaces that affect rendering.
   compressHTML: true,
   markdown: {
-    processor: unified({ rehypePlugins: [rehypeWrapTables] }),
+    processor: unified({ rehypePlugins: [rehypeWrapTables, rehypeInArticleAd] }),
   },
   integrations: [
     sitemap({

@@ -1,6 +1,7 @@
 ---
 import Icon from './Icon.astro';
 import Logo from './Logo.astro';
+import SiteSearch from './SiteSearch.astro';
 import { categories } from '../data/categories';
 import { site } from '../site.config';
 
@@ -28,6 +29,7 @@ const navCats = categories.slice(0, 5);
     </nav>
 
     <div class="header-actions">
+      <SiteSearch />
       <button class="icon-btn theme-toggle" type="button" aria-label="Toggle dark mode" data-theme-toggle>
         <Icon name="moon" class="moon" />
         <Icon name="sun" class="sun" />
@@ -40,6 +42,7 @@ const navCats = categories.slice(0, 5);
           {categories.map((c) => <a href={`/${c.id}/`}>{c.name}</a>)}
           <a href="/calculators/">All calculators</a>
           <a href="/guides/">Guides</a>
+          <a href="/glossary/">Glossary</a>
           <a href="/about/">About</a>
           <a href="/contact/">Contact</a>
         </nav>

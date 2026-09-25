@@ -114,7 +114,7 @@ const jsonLd = [
             <span><Icon name="shield" size={15} />Reviewed by <a href="/about/#team">{site.reviewer.name}</a>{site.reviewer.jobTitle && `, ${site.reviewer.jobTitle}`}</span>
           )
         }
-        <span><Icon name="check-circle" size={15} /><a href="/editorial-policy/">How we build & check our calculators</a></span>
+        <span><Icon name="check-circle" size={15} /><a href="/methodology/">How we build & check our calculators</a></span>
       </div>
     </header>
 
@@ -136,7 +136,7 @@ const jsonLd = [
 
         <Faq items={faq} />
 
-        <AdSlot slot="endOfContent" />
+        <AdSlot unit="endOfContent" />
 
         <h2 id="sources">Sources</h2>
         <ul class="sources">
@@ -171,7 +171,8 @@ const jsonLd = [
             <strong>About this calculator.</strong> Written and maintained by {site.author.name || `the ${site.name} editorial team`}{site.reviewer.name && `, reviewed by ${site.reviewer.name}${site.reviewer.jobTitle ? `, ${site.reviewer.jobTitle}` : ''},`} and last
             reviewed on {updatedLabel}. Rules and figures are checked against the official sources listed above.
             Results are estimates for education — not financial, tax or legal advice. Found an error?
-            <a href="/contact/">Tell us</a> and we'll fix it. Read our <a href="/editorial-policy/">editorial policy</a>.
+            <a href="/contact/">Tell us</a> and we'll fix it. See our <a href="/methodology/">methodology</a> and
+            <a href="/editorial-policy/">editorial policy</a>.
           </div>
         </div>
       </article>
@@ -217,7 +218,7 @@ const jsonLd = [
               </section>
             )
           }
-          <AdSlot slot="sidebar" variant="sidebar" />
+          <AdSlot unit="sidebar" variant="sidebar" />
         </div>
       </aside>
     </div>

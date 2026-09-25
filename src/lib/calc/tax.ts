@@ -20,10 +20,10 @@ export const FILING_STATUS_LABELS: Record<FilingStatus, string> = {
   mfs: 'Married filing separately',
 };
 
-const RATES = [10, 12, 22, 24, 32, 35, 37];
+export const RATES = [10, 12, 22, 24, 32, 35, 37];
 
 /** Upper bound of each bracket except the last (37%) one. */
-const BRACKETS: Record<TaxYear, Record<FilingStatus, number[]>> = {
+export const BRACKETS: Record<TaxYear, Record<FilingStatus, number[]>> = {
   2025: {
     single: [11925, 48475, 103350, 197300, 250525, 626350],
     mfj: [23850, 96950, 206700, 394600, 501050, 751600],

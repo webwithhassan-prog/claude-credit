@@ -406,3 +406,17 @@ export function debtToIncome(grossMonthlyIncome: number, housing: number, otherD
 }
 
 export { monthsToPayoff, payoffWithFixedPayment };
+
+/**
+ * Maximum debt-to-income ratios (%) by loan program: back-end (all debts) and, where the program
+ * sets one, front-end (housing only). Fannie Mae Selling Guide B3-6-02, FHA, VA and USDA guidelines;
+ * the HELOC figure is a typical lender limit, not a rule.
+ */
+export const DTI_PROGRAMS: { name: string; back: number; front: number | null }[] = [
+  { name: 'Conventional (automated)', back: 50, front: null },
+  { name: 'Conventional (manual)', back: 45, front: null },
+  { name: 'FHA', back: 43, front: 31 },
+  { name: 'VA (guideline)', back: 41, front: null },
+  { name: 'USDA', back: 41, front: 29 },
+  { name: 'Typical HELOC lender', back: 43, front: null },
+];

@@ -23,5 +23,9 @@ https://:version.:project.pages.dev/*
 /og/*
   Cache-Control: public, max-age=604800
 
+/search.json
+  X-Robots-Tag: noindex
+  Cache-Control: public, max-age=3600
+
 /favicon.*
   Cache-Control: public, max-age=604800

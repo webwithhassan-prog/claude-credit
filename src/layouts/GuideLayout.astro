@@ -3,6 +3,8 @@ import BaseLayout from './BaseLayout.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import AdSlot from '../components/AdSlot.astro';
 import Icon from '../components/Icon.astro';
+import GuideCard from '../components/GuideCard.astro';
+import { getCollection } from 'astro:content';
 import { categoryById } from '../data/categories';
 import { toolBySlug } from '../data/tools';
 import { termsForGuide } from '../data/glossary';
@@ -31,6 +33,14 @@ const fmt = (d: string) =>
   new Date(`${d}T12:00:00Z`).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
 const toc = headings.filter((h) => h.depth === 2);
 const terms = termsForGuide(slug);
+// Other guides on the same topic or about the same calculators, strongest overlap first.
+const relatedGuides = (await getCollection('guides'))
+  .filter((g) => g.id !== slug)
+  .map((g) => ({ g, score: (g.data.category === category ? 2 : 0) + g.data.related.filter((r) => related.includes(r)).length }))
+  .filter((x) => x.score > 0)
+  .sort((a, b) => b.score - a.score || a.g.data.title.localeCompare(b.g.data.title))
+  .slice(0, 4)
+  .map((x) => x.g);
 
 const jsonLd = [
   webPageNode({
@@ -135,7 +145,19 @@ const jsonLd = [
             </>
           )
         }
-        <AdSlot slot="endOfContent" />
+        {
+          relatedGuides.length > 0 && (
+            <>
+              <h2 id="related-guides">Related guides</h2>
+              <div class="guide-list related-guides">
+                {relatedGuides.map((g) => (
+                  <GuideCard entry={g} />
+                ))}
+              </div>
+            </>
+          )
+        }
+        <AdSlot unit="endOfContent" />
         <div class="author-box">
           <div class="avatar"><Icon name="book" /></div>
           <div>
@@ -164,7 +186,7 @@ const jsonLd = [
               }
             </ul>
           </section>
-          <AdSlot slot="sidebar" variant="sidebar" />
+          <AdSlot unit="sidebar" variant="sidebar" />
         </div>
       </aside>
     </div>

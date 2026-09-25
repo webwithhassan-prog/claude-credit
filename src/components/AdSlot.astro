@@ -7,14 +7,15 @@
  */
 import { site } from '../site.config';
 
-type SlotName = keyof typeof site.adsense.slots;
+type UnitName = keyof typeof site.adsense.slots;
 interface Props {
-  slot: SlotName;
+  /** Which configured ad unit to show. (Not called `slot`: Astro reserves that attribute for layout slots.) */
+  unit: UnitName;
   variant?: 'inline' | 'sidebar';
 }
-const { slot, variant = 'inline' } = Astro.props;
+const { unit, variant = 'inline' } = Astro.props;
 const client = site.adsense.client;
-const slotId = site.adsense.slots[slot];
+const slotId = site.adsense.slots[unit];
 const enabled = Boolean(client && slotId);
 ---
 
