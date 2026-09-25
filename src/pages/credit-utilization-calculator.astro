@@ -1,0 +1,288 @@
+---
+import ToolLayout from '../layouts/ToolLayout.astro';
+import Calc from '../components/calc/Calc.astro';
+import NumberField from '../components/calc/NumberField.astro';
+import TextField from '../components/calc/TextField.astro';
+import RowCard from '../components/calc/RowCard.astro';
+import SelectField from '../components/calc/SelectField.astro';
+import AdSlot from '../components/AdSlot.astro';
+import Meter from '../components/calc/Meter.astro';
+import Icon from '../components/Icon.astro';
+
+const cards = [
+  { name: 'Rewards card', balance: 2400, limit: 6000 },
+  { name: 'Cash-back card', balance: 600, limit: 4000 },
+  { name: 'Store card', balance: 0, limit: 5000 },
+];
+
+const sections = [
+  { id: 'how-to-use', title: 'How to use this calculator' },
+  { id: 'what-is-utilization', title: 'What is credit utilization?' },
+  { id: 'good-ratio', title: 'What is a good credit utilization ratio?' },
+  { id: 'example', title: 'Worked example' },
+  { id: 'lower-utilization', title: '8 ways to lower your utilization fast' },
+  { id: 'myths', title: 'Common utilization myths' },
+];
+
+const faq = [
+  {
+    q: 'Is 30% credit utilization good?',
+    a: '30% is a widely used ceiling, not a target. Staying under 30% avoids most of the score damage from high balances, but people with the highest credit scores typically use less than 10% of their available credit. Lower is better, as long as your cards show some activity.',
+  },
+  {
+    q: 'Does per-card utilization matter or just the total?',
+    a: 'Both. Scoring models look at your overall utilization across all revolving accounts and at the utilization on each individual card. A single maxed-out card can hurt your score even when your overall ratio is low, so it pays to spread balances or pay down the fullest card first.',
+  },
+  {
+    q: 'When do card issuers report my balance?',
+    a: 'Most issuers report the balance on your statement closing date — not your payment due date. Paying down the card a few days <em>before</em> the statement closes lowers the balance that reaches the credit bureaus, even if you pay in full every month.',
+  },
+  {
+    q: 'How fast does my score improve after paying down cards?',
+    a: 'Usually within one or two billing cycles — as soon as the lower balances are reported. In most widely used scoring models (such as FICO 8), utilization has no memory: last month’s high balance stops mattering once a lower one is reported. Newer “trended data” models like FICO 10T and VantageScore 4.0 also look at how your balances have moved over time.',
+  },
+  {
+    q: 'Should I close a credit card I don’t use?',
+    a: 'Closing a card removes its credit limit from your total, which raises your utilization ratio immediately. If the card has no annual fee, it’s usually better to keep it open and use it lightly. The calculator can show the effect: set that card’s limit to zero and compare.',
+  },
+  {
+    q: 'Do installment loans count toward utilization?',
+    a: 'Credit utilization usually refers to revolving accounts — credit cards and lines of credit. Installment loans such as car loans and mortgages are scored differently, based on how much of the original balance remains. This calculator focuses on revolving credit.',
+  },
+];
+
+const sources = [
+  {
+    title: 'What’s in my FICO Scores? — amounts owed',
+    url: 'https://www.myfico.com/credit-education/whats-in-your-credit-score',
+    publisher: 'FICO',
+  },
+  {
+    title: 'Credit reports and scores',
+    url: 'https://www.consumerfinance.gov/consumer-tools/credit-reports-and-scores/',
+    publisher: 'Consumer Financial Protection Bureau',
+  },
+  {
+    title: 'Free credit reports',
+    url: 'https://www.annualcreditreport.com/',
+    publisher: 'AnnualCreditReport.com (authorized by federal law)',
+  },
+];
+---
+
+<ToolLayout
+  slug="credit-utilization-calculator"
+  sections={sections}
+  faq={faq}
+  sources={sources}
+  related={['credit-card-payoff-calculator', 'debt-payoff-calculator', 'balance-transfer-calculator', 'debt-to-income-ratio-calculator']}
+>
+  <p slot="intro">
+    Enter the balance and credit limit for each card to see your overall and per-card credit utilization, how scoring
+    models are likely to view it, and exactly how much to pay down to reach 30%, 10% or any target you choose.
+  </p>
+
+  <Calc id="cu" slot="calculator" inputsTitle="Your credit cards">
+    <Fragment slot="inputs">
+      <div data-rows data-key="c_name" data-min="1" data-max="12" data-label="Card">
+        <div class="rows" data-rows-list>
+          {
+            cards.map((c, i) => (
+              <RowCard title={`Card ${i + 1}`}>
+                <TextField name="c_name" label="Name" value={c.name} />
+                <NumberField name="c_bal" label="Balance" value={c.balance} prefix="$" format="money" min={0} row />
+                <NumberField name="c_lim" label="Credit limit" value={c.limit} prefix="$" format="money" min={0} row />
+              </RowCard>
+            ))
+          }
+        </div>
+        <template data-rows-template>
+          <RowCard title="Card">
+            <TextField name="c_name" label="Name" value="" placeholder="Card name" />
+            <NumberField name="c_bal" label="Balance" value="" prefix="$" format="money" min={0} row />
+            <NumberField name="c_lim" label="Credit limit" value="" prefix="$" format="money" min={0} row />
+          </RowCard>
+        </template>
+        <button type="button" class="btn btn-sm rows-add" data-rows-add><Icon name="plus" size={16} /> Add a card</button>
+      </div>
+      <SelectField
+        name="target"
+        label="Target utilization"
+        value="10"
+        options={[
+          { value: '30', label: '30% — avoid most score damage' },
+          { value: '10', label: '10% — where top scores tend to be' },
+          { value: '5', label: '5%' },
+          { value: '1', label: '1% — minimal reported balance' },
+        ]}
+      />
+    </Fragment>
+
+    <Fragment slot="results">
+      <div class="result-hero" aria-live="polite">
+        <p class="label">Overall credit utilization</p>
+        <p class="value" data-out="hero">—</p>
+        <p class="sub" data-out="heroSub"></p>
+      </div>
+      <Meter
+        bands={[[0, '#1c9a6b'], [10, '#6cb33f'], [30, '#d99a1e'], [50, '#e0712c'], [75, '#d0452f']]}
+        labels={[[0, '0%'], [10, '10%'], [30, '30%'], [50, '50%'], [75, '75%'], [100, '100%']]}
+      />
+      <div class="stats cols-3">
+        <div class="stat"><p class="label">Total balances</p><p class="value" data-out="bal">—</p></div>
+        <div class="stat"><p class="label">Total credit limits</p><p class="value" data-out="lim">—</p></div>
+        <div class="stat"><p class="label" data-out="payLabel">Pay down to reach target</p><p class="value" data-out="pay">—</p></div>
+      </div>
+      <div data-out="verdict"></div>
+      <h3 class="results-heading">Per-card utilization</h3>
+      <div data-out="cards"></div>
+    </Fragment>
+  </Calc>
+
+  <h2 id="how-to-use">How to use this calculator</h2>
+  <ol>
+    <li><strong>List every open credit card and line of credit.</strong> Include cards you rarely use — their limits count in your favor.</li>
+    <li><strong>Enter each balance and limit.</strong> For the most accurate picture, use the balance from your latest statement, because that’s usually the figure reported to Equifax, Experian and TransUnion.</li>
+    <li><strong>Choose a target.</strong> The calculator shows how much to pay down overall and on each card to reach it.</li>
+    <li><strong>Test scenarios.</strong> Try a credit limit increase, paying off one card, or closing a card (set its limit to 0) to see how your ratio changes.</li>
+  </ol>
+
+  <h2 id="what-is-utilization">What is credit utilization?</h2>
+  <p>
+    Credit utilization is the percentage of your available revolving credit that you’re currently using. It’s one of the
+    most important factors in your credit score: the “amounts owed” category makes up about <strong>30% of a FICO
+    Score</strong>, and utilization is a central part of it. VantageScore weighs it heavily too.
+  </p>
+  <div class="formula">Overall utilization = total card balances ÷ total credit limits × 100
+Per-card utilization = card balance ÷ card limit × 100</div>
+  <p>
+    Because utilization is based on reported balances, it can change quickly — which makes it one of the fastest ways to
+    improve a credit score before applying for a mortgage, car loan or new card.
+  </p>
+
+  <AdSlot slot="inContent" />
+
+  <h2 id="good-ratio">What is a good credit utilization ratio?</h2>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Utilization</th><th>How it’s generally viewed</th></tr></thead>
+      <tbody>
+        <tr><td>Under 10%</td><td>Excellent — typical of people with the highest scores</td></tr>
+        <tr><td>10%–29%</td><td>Good — little or no score penalty</td></tr>
+        <tr><td>30%–49%</td><td>Fair — scores start to fall noticeably</td></tr>
+        <tr><td>50%–74%</td><td>Poor — a significant drag on your score</td></tr>
+        <tr><td>75% and above</td><td>Very poor — signals financial stress to lenders</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    These bands are practical guidelines; scoring formulas don’t publish exact cut-offs, and the effect depends on the rest
+    of your credit file. Individual cards near their limit (90%+) can hurt even when the overall ratio looks fine.
+  </p>
+
+  <h2 id="example">Worked example</h2>
+  <p>
+    Sam has three cards: a rewards card with <strong>$2,400</strong> on a $6,000 limit (40%), a cash-back card with
+    <strong>$600</strong> on a $4,000 limit (15%), and an unused store card with a $5,000 limit.
+  </p>
+  <ul>
+    <li>Overall utilization: $3,000 ÷ $15,000 = <strong>20%</strong> — good.</li>
+    <li>But the rewards card alone is at 40%, which may hold the score back.</li>
+    <li>To reach 10% overall, Sam needs to pay down <strong>$1,500</strong>. Putting that on the rewards card brings it to 15% and the overall ratio to 10%.</li>
+    <li>If Sam closed the store card, the overall ratio would jump from 20% to <strong>30%</strong> overnight.</li>
+  </ul>
+
+  <h2 id="lower-utilization">8 ways to lower your utilization fast</h2>
+  <ol>
+    <li><strong>Pay before the statement closes.</strong> The reported balance is what counts — pay it down a few days before the closing date.</li>
+    <li><strong>Make two payments a month.</strong> A mid-cycle payment keeps the running balance low.</li>
+    <li><strong>Target your fullest card first</strong> to bring its individual ratio down.</li>
+    <li><strong>Ask for a credit limit increase.</strong> A higher limit lowers the ratio instantly — just don’t spend into it. Some issuers use a soft inquiry.</li>
+    <li><strong>Keep old, no-fee cards open</strong> and use them for a small recurring bill.</li>
+    <li><strong>Spread large purchases</strong> across cards rather than maxing out one.</li>
+    <li><strong>Consider a consolidation loan.</strong> Moving card balances to an installment loan can lower revolving utilization — compare the cost with our <a href="/debt-consolidation-calculator/">debt consolidation calculator</a>.</li>
+    <li><strong>Follow a payoff plan.</strong> Our <a href="/debt-payoff-calculator/">debt payoff calculator</a> builds a month-by-month schedule.</li>
+  </ol>
+
+  <h2 id="myths">Common utilization myths</h2>
+  <ul>
+    <li><strong>“Carrying a balance builds credit.”</strong> False. You never need to pay interest to build credit; a reported statement balance that you then pay in full works just as well.</li>
+    <li><strong>“0% is always best.”</strong> Not quite. Some scoring models reward seeing at least one card with a small reported balance, so all-zero reporting can score slightly lower than a very low ratio.</li>
+    <li><strong>“High utilization hurts forever.”</strong> In most scoring models it doesn’t — once lower balances are reported, the score recovers.</li>
+  </ul>
+</ToolLayout>
+
+<script>
+  import { bindCalculator, outputs, verdict } from '../lib/ui/form';
+  import { initRows, rowReaders } from '../lib/ui/rows';
+  import { esc, money, percent } from '../lib/ui/format';
+  import { creditUtilization } from '../lib/calc/debt';
+
+  const form = document.getElementById('cu') as HTMLFormElement;
+  initRows(form);
+  const out = outputs('cu');
+
+  const bandText: Record<string, string> = {
+    excellent: 'Excellent — under 10%',
+    good: 'Good — under 30%',
+    fair: 'Fair — 30% to 49%',
+    poor: 'Poor — 50% to 74%',
+    'very-poor': 'Very poor — 75% or more',
+  };
+
+  bindCalculator('cu', {
+    compute(f) {
+      const cards = rowReaders(form, 'c_name').map((r, i) => ({
+        name: r.str('c_name').trim() || `Card ${i + 1}`,
+        balance: r.num('c_bal'),
+        limit: r.num('c_lim'),
+      }));
+      const target = Number(f.str('target')) || 10;
+      const r = creditUtilization(cards, target);
+
+      out.text('bal', money(r.totalBalance));
+      out.text('lim', money(r.totalLimit));
+      out.text('payLabel', `Pay down to reach ${target}%`);
+      if (!(r.totalLimit > 0)) {
+        out.text('hero', '—');
+        out.text('heroSub', 'Enter at least one credit limit.');
+        out.text('pay', '—');
+        out.html('verdict', '');
+        out.html('cards', '');
+        return;
+      }
+      out.text('hero', percent(r.overall));
+      out.text('heroSub', bandText[r.band ?? 'good']);
+      out.text('pay', money(r.paydownToTarget));
+      const marker = out.el('marker');
+      if (marker) marker.style.left = `${Math.min(100, r.overall)}%`;
+
+      const worst = [...r.perCard].filter((c) => c.limit > 0).sort((a, b) => b.percent - a.percent)[0];
+      let msg: string;
+      let kind: 'good' | 'warn' | 'bad';
+      if (r.overall <= target && (!worst || worst.percent < 30)) {
+        kind = 'good';
+        msg = `You're at or below your ${target}% target overall and no card is above 30%. Keep reported balances low before each statement closes.`;
+      } else if (r.overall <= target) {
+        kind = 'warn';
+        msg = `Your overall ratio meets the target, but <strong>${esc(worst.name)}</strong> is at ${percent(worst.percent)}. Paying it down by <strong>${money(worst.paydownToTarget)}</strong> brings it to ${target}%.`;
+      } else {
+        kind = r.overall >= 50 ? 'bad' : 'warn';
+        msg = `Pay down <strong>${money(r.paydownToTarget)}</strong> in total to reach ${target}%. Start with <strong>${esc(worst.name)}</strong> (${percent(worst.percent)}) — high single-card utilization can weigh on your score too.`;
+      }
+      if (r.maxedCards > 0) msg += ` ${r.maxedCards} card${r.maxedCards > 1 ? 's are' : ' is'} at 90% or more of the limit.`;
+      out.html('verdict', verdict(kind, msg));
+
+      const rows = r.perCard
+        .map(
+          (c) =>
+            `<tr><td>${esc(c.name)}</td><td>${money(c.balance)}</td><td>${money(c.limit)}</td><td style="font-weight:650;color:var(${c.percent >= 30 ? '--danger' : '--text'})">${c.limit > 0 ? percent(c.percent) : '—'}</td><td>${money(c.paydownToTarget)}</td></tr>`,
+        )
+        .join('');
+      out.html(
+        'cards',
+        `<div class="table-wrap" style="max-height:none"><table class="data"><thead><tr><th>Card</th><th>Balance</th><th>Limit</th><th>Used</th><th>Pay to ${target}%</th></tr></thead><tbody>${rows}</tbody></table></div>`,
+      );
+    },
+  });
+</script>

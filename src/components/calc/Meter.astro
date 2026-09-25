@@ -1,0 +1,32 @@
+---
+/**
+ * Coloured band meter with a moving marker ([data-out="marker"], left: 0–100%).
+ * `bands` = [start %, colour] pairs in ascending order; `labels` sit at exact positions.
+ */
+interface Props {
+  bands: [number, string][];
+  labels: [number, string][];
+}
+const { bands, labels } = Astro.props;
+const gradient = bands
+  .map(([at, color], i) => {
+    const end = i < bands.length - 1 ? bands[i + 1][0] : 100;
+    return `${color} ${at}%, ${color} ${end}%`;
+  })
+  .join(', ');
+---
+
+<div class="meter" aria-hidden="true">
+  <div class="meter-track" style={`background:linear-gradient(90deg, ${gradient})`}>
+    <div class="meter-marker" data-out="marker" style="left:0%"></div>
+  </div>
+  <div class="meter-scale abs">
+    {
+      labels.map(([at, text]) => (
+        <span style={`left:${at}%`} class:list={{ first: at === 0, last: at === 100 }}>
+          {text}
+        </span>
+      ))
+    }
+  </div>
+</div>

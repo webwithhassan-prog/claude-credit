@@ -1,0 +1,262 @@
+---
+import ToolLayout from '../layouts/ToolLayout.astro';
+import Calc from '../components/calc/Calc.astro';
+import NumberField from '../components/calc/NumberField.astro';
+import SelectField from '../components/calc/SelectField.astro';
+import SegField from '../components/calc/SegField.astro';
+import AdSlot from '../components/AdSlot.astro';
+
+const sections = [
+  { id: 'how-to-use', title: 'How to use this calculator' },
+  { id: 'how-helocs-work', title: 'How HELOC payments work' },
+  { id: 'payment-shock', title: 'The repayment “payment shock”' },
+  { id: 'example', title: 'Worked example' },
+  { id: 'rates', title: 'Variable rates: stress-test your payment' },
+  { id: 'costs-tax', title: 'Fees, closing costs and taxes' },
+  { id: 'formula', title: 'Formulas used' },
+];
+
+const faq = [
+  {
+    q: 'How is a HELOC payment calculated during the draw period?',
+    a: 'Most HELOCs require interest-only payments during the draw period: your outstanding balance × the annual rate ÷ 12. A $50,000 balance at 8.5% costs about $354 a month. Some lenders require a small amount of principal too; select “Principal & interest” to model paying it down from day one.',
+  },
+  {
+    q: 'What happens when the HELOC draw period ends?',
+    a: 'You can no longer borrow, and the remaining balance is converted to a fully amortizing loan — usually over 10 to 20 years. Because you now repay principal as well as interest, the monthly payment typically jumps, often by 20% to 60% or more depending on the rate and repayment term.',
+  },
+  {
+    q: 'Is HELOC interest tax-deductible?',
+    a: 'Only if the money is used to buy, build or substantially improve the home that secures the loan, and only if you itemize deductions. The total mortgage debt eligible for the interest deduction is capped at $750,000 ($375,000 if married filing separately). Interest on a HELOC used for debt consolidation, cars or tuition isn’t deductible. Ask a tax professional about your situation.',
+  },
+  {
+    q: 'Can a HELOC rate go up?',
+    a: 'Yes. Most HELOCs have a variable rate equal to an index — usually the Prime Rate — plus a margin. When the Federal Reserve raises short-term rates, your payment rises too. Check the contract for rate caps and whether you can lock part of the balance at a fixed rate.',
+  },
+  {
+    q: 'How much can I borrow with a HELOC?',
+    a: 'Lenders typically allow a combined loan-to-value (CLTV) of 80% to 90%: your mortgage balance plus the HELOC limit can’t exceed that share of your home’s value. Use our <a href="/home-equity-calculator/">home equity calculator</a> to estimate your limit.',
+  },
+  {
+    q: 'HELOC or cash-out refinance — which is cheaper?',
+    a: 'If your current mortgage has a low rate, keeping it and adding a HELOC is often cheaper, because a cash-out refinance replaces your whole mortgage at today’s rate. Compare both with the <a href="/cash-out-refinance-vs-heloc-calculator/">cash-out refinance vs HELOC calculator</a>.',
+  },
+];
+
+const sources = [
+  {
+    title: 'What you should know about home equity lines of credit (HELOC brochure)',
+    url: 'https://www.consumerfinance.gov/consumer-tools/mortgages/',
+    publisher: 'Consumer Financial Protection Bureau',
+  },
+  {
+    title: 'Regulation Z §1026.40 — requirements for home equity plans',
+    url: 'https://www.consumerfinance.gov/rules-policy/regulations/1026/40/',
+    publisher: 'Consumer Financial Protection Bureau',
+  },
+  {
+    title: 'Publication 936, Home Mortgage Interest Deduction',
+    url: 'https://www.irs.gov/publications/p936',
+    publisher: 'Internal Revenue Service',
+  },
+  {
+    title: 'Selected Interest Rates (H.15) — bank prime loan rate',
+    url: 'https://www.federalreserve.gov/releases/h15/',
+    publisher: 'Board of Governors of the Federal Reserve System',
+  },
+];
+---
+
+<ToolLayout
+  slug="heloc-payment-calculator"
+  sections={sections}
+  faq={faq}
+  sources={sources}
+  related={['home-equity-calculator', 'cash-out-refinance-vs-heloc-calculator', 'debt-consolidation-calculator', 'debt-to-income-ratio-calculator']}
+>
+  <p slot="intro">
+    Estimate your home equity line of credit (HELOC) payment during the interest-only draw period, the higher payment once
+    repayment begins, and the total interest over the life of the line. Stress-test a rate increase before you borrow.
+  </p>
+
+  <Calc id="heloc" slot="calculator" inputsTitle="Your HELOC">
+    <Fragment slot="inputs">
+      <div class="field-row">
+        <NumberField name="balance" label="Amount borrowed" value={50000} prefix="$" format="money" min={0} hint="The balance you expect to carry." />
+        <NumberField name="rate" label="Interest rate" value={8.5} suffix="%" min={0} max={40} hint="Prime rate + your margin." />
+      </div>
+      <div class="field-row">
+        <SelectField name="draw" label="Draw period" value="10" options={[3, 5, 10, 15].map((y) => ({ value: y, label: `${y} years` }))} />
+        <SelectField name="repay" label="Repayment period" value="20" options={[5, 10, 15, 20, 25].map((y) => ({ value: y, label: `${y} years` }))} />
+      </div>
+      <SegField
+        name="drawType"
+        label="Draw-period payments"
+        value="interest-only"
+        options={[
+          { value: 'interest-only', label: 'Interest only' },
+          { value: 'amortizing', label: 'Principal & interest' },
+        ]}
+      />
+      <SelectField
+        name="shock"
+        label="Stress-test a rate increase"
+        value="0"
+        options={[
+          { value: 0, label: 'No change' },
+          { value: 1, label: '+1 percentage point' },
+          { value: 2, label: '+2 percentage points' },
+          { value: 3, label: '+3 percentage points' },
+        ]}
+      />
+    </Fragment>
+
+    <Fragment slot="results">
+      <div class="result-hero" aria-live="polite">
+        <p class="label" data-out="heroLabel">Draw-period payment</p>
+        <p class="value" data-out="hero">—</p>
+        <p class="sub" data-out="heroSub"></p>
+      </div>
+      <div class="stats cols-3">
+        <div class="stat"><p class="label">Repayment-period payment</p><p class="value" data-out="repay">—</p></div>
+        <div class="stat"><p class="label">Payment increase at repayment</p><p class="value" data-out="shock">—</p></div>
+        <div class="stat"><p class="label">Total interest</p><p class="value" data-out="interest">—</p></div>
+      </div>
+      <div data-out="verdict"></div>
+      <h3 class="results-heading">Balance over the life of the HELOC</h3>
+      <div class="chart" data-out="chart"></div>
+    </Fragment>
+  </Calc>
+
+  <h2 id="how-to-use">How to use this calculator</h2>
+  <ol>
+    <li><strong>Enter the amount you plan to borrow</strong> — not your full credit limit, unless you expect to use all of it.</li>
+    <li><strong>Enter the interest rate.</strong> HELOC rates are usually quoted as the Prime Rate plus a margin, for example “Prime + 1%”.</li>
+    <li><strong>Choose the draw and repayment periods</strong> from your loan offer. Ten years of draw and twenty years of repayment is the most common structure.</li>
+    <li><strong>Pick the payment type.</strong> Interest-only is standard; choose principal & interest if you plan to pay the balance down from the start.</li>
+    <li><strong>Stress-test.</strong> Add 1–3 percentage points to see what happens if rates rise.</li>
+  </ol>
+
+  <h2 id="how-helocs-work">How HELOC payments work</h2>
+  <p>
+    A HELOC is a revolving line of credit secured by your home. It has two phases:
+  </p>
+  <ul>
+    <li><strong>Draw period</strong> (typically 5–10 years): you can borrow, repay and borrow again up to your limit. Most lenders only require interest on what you’ve borrowed.</li>
+    <li><strong>Repayment period</strong> (typically 10–20 years): borrowing stops and the balance is repaid in equal monthly installments of principal and interest.</li>
+  </ul>
+  <p>
+    Because you only pay interest on the amount you actually draw, a HELOC can be cheaper than a lump-sum home equity loan
+    for projects with uncertain or staged costs, such as renovations.
+  </p>
+
+  <AdSlot slot="inContent" />
+
+  <h2 id="payment-shock">The repayment “payment shock”</h2>
+  <p>
+    The biggest surprise with HELOCs is the jump in payment when the draw period ends. During the draw period, an
+    interest-only payment doesn’t reduce the balance at all, so the full amount must then be repaid over a shorter window.
+    Many borrowers plan to refinance or sell before that happens — but if rates are higher or your home is worth less at
+    that time, those options may not be available. Budget for the repayment payment from the start.
+  </p>
+
+  <h2 id="example">Worked example</h2>
+  <p>
+    Pat borrows <strong>$50,000</strong> on a HELOC at <strong>8.5%</strong> with a 10-year draw period and a 20-year
+    repayment period.
+  </p>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Scenario</th><th>Draw payment</th><th>Repayment payment</th><th>Total interest</th></tr></thead>
+      <tbody>
+        <tr><td>Interest-only draw, 8.5%</td><td>$354.17</td><td>$433.91 (+22.5%)</td><td>$96,639</td></tr>
+        <tr><td>Interest-only draw, rate rises to 10.5%</td><td>$437.50</td><td>$499.19</td><td>—</td></tr>
+        <tr><td>Principal & interest from day one, 8.5%</td><td>$384.46</td><td>$384.46</td><td>$88,404</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    Paying about $30 a month more from the beginning keeps the payment level for 30 years, avoids the jump at year 10 and saves
+    about <strong>$8,200</strong> in interest. Paying the balance off even faster saves far more.
+  </p>
+
+  <h2 id="rates">Variable rates: stress-test your payment</h2>
+  <p>
+    Most HELOC rates are variable, tied to the <strong>Prime Rate</strong>, which moves with the Federal Reserve’s
+    federal funds target. A 2-point increase on a $50,000 interest-only balance adds about <strong>$83 a month</strong>.
+    Before borrowing, ask your lender about:
+  </p>
+  <ul>
+    <li><strong>Lifetime and periodic rate caps</strong> — the maximum the rate can reach or rise at once.</li>
+    <li><strong>Fixed-rate lock options</strong> that convert part of your balance to a fixed-rate installment loan.</li>
+    <li><strong>Introductory “teaser” rates</strong> and what the rate becomes afterward.</li>
+  </ul>
+
+  <h2 id="costs-tax">Fees, closing costs and taxes</h2>
+  <ul>
+    <li><strong>Closing costs</strong> can include an appraisal, title search and recording fees. Many lenders waive them, but may charge them back if you close the line within the first few years.</li>
+    <li><strong>Annual or inactivity fees</strong> are charged by some lenders — check the fee schedule.</li>
+    <li><strong>Tax deductibility:</strong> HELOC interest is deductible only when the funds buy, build or substantially improve the home securing the line, you itemize, and total mortgage debt stays within the $750,000 limit.</li>
+    <li><strong>Line freezes:</strong> federal rules allow lenders to freeze or reduce your line if your home’s value drops significantly or your finances change materially.</li>
+  </ul>
+
+  <h2 id="formula">Formulas used</h2>
+  <div class="formula">Interest-only draw payment = balance × rate ÷ 12
+Repayment payment = B · r / (1 − (1 + r)^−n)      r = rate ÷ 12, n = repayment months, B = balance at end of draw
+Payment increase = (repayment payment − draw payment) ÷ draw payment</div>
+  <p>
+    The calculator assumes the full amount is drawn at the start and the rate stays constant (plus any stress-test increase).
+    Real HELOCs accrue interest daily on the actual balance, and draws, repayments and rate changes will alter your payments.
+  </p>
+</ToolLayout>
+
+<script>
+  import { bindCalculator, outputs, verdict } from '../lib/ui/form';
+  import { money, percent } from '../lib/ui/format';
+  import { lineChart } from '../lib/ui/chart';
+  import { helocPayments } from '../lib/calc/home';
+
+  const out = outputs('heloc');
+
+  bindCalculator('heloc', {
+    compute(f) {
+      const balance = f.num('balance');
+      const shock = Number(f.str('shock')) || 0;
+      const rate = f.num('rate') + shock;
+      const drawYears = Number(f.str('draw')) || 10;
+      const repayYears = Number(f.str('repay')) || 20;
+      const type = f.str('drawType') === 'amortizing' ? 'amortizing' : 'interest-only';
+      const r = helocPayments({ balance, rate, drawYears, repayYears, drawPayment: type });
+
+      out.text('heroLabel', type === 'interest-only' ? 'Interest-only draw-period payment' : 'Monthly payment (draw period)');
+      out.text('hero', money(r.drawPayment, true));
+      out.text('heroSub', `For ${drawYears} years at ${percent(rate, 2)}${shock ? ` (includes +${shock} point stress test)` : ''}`);
+      out.text('repay', money(r.repayPayment, true));
+      out.text('shock', type === 'interest-only' ? `+${money(r.paymentShock, true)}` : money(r.paymentShock, true));
+      out.text('interest', money(r.totalInterest));
+
+      if (balance <= 0) {
+        out.html('verdict', '');
+        out.html('chart', '');
+        return;
+      }
+      if (type === 'interest-only' && r.paymentShockPercent > 0) {
+        out.html(
+          'verdict',
+          verdict(
+            r.paymentShockPercent >= 40 ? 'bad' : 'warn',
+            `When repayment starts in year ${drawYears + 1}, your payment rises by <strong>${percent(r.paymentShockPercent, 0)}</strong> to <strong>${money(r.repayPayment, true)}</strong>. Paying principal from the start would keep it level at about <strong>${money(helocPayments({ balance, rate, drawYears, repayYears, drawPayment: 'amortizing' }).drawPayment, true)}</strong>.`,
+          ),
+        );
+      } else {
+        out.html('verdict', verdict('good', `Paying principal from day one keeps your payment level and cuts total interest to <strong>${money(r.totalInterest)}</strong>.`));
+      }
+
+      lineChart(out.el('chart'), {
+        ariaLabel: `Balance stays at ${money(r.balances[0])} during the draw period, then falls to zero`,
+        xLabel: (i) => (i === 0 ? 'Now' : `Yr ${Math.round(i / 12)}`),
+        series: [{ name: 'Balance owed', values: r.balances, color: 'var(--chart-1)', area: true }],
+      });
+    },
+  });
+</script>

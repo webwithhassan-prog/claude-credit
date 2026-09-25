@@ -1,0 +1,67 @@
+---
+import ProseLayout from '../layouts/ProseLayout.astro';
+import { site } from '../site.config';
+---
+
+<ProseLayout
+  title="Editorial policy"
+  description={`How ${site.name} researches, builds, tests and updates its calculators and articles.`}
+  path="/editorial-policy/"
+  updated="2026-09-25"
+  lede="Our standards for accuracy, sourcing, independence and corrections."
+>
+  <h2>Our standards</h2>
+  <p>
+    {site.name} publishes calculators and explanations about money decisions that can have real consequences. We hold our work to
+    four standards: it must be <strong>accurate</strong>, <strong>sourced</strong>, <strong>transparent</strong> and
+    <strong>independent</strong>.
+  </p>
+
+  <h2>Sources we rely on</h2>
+  <p>We build from primary sources wherever they exist:</p>
+  <ul>
+    <li><strong>Taxes:</strong> the Internal Revenue Code, IRS revenue procedures, publications and form instructions, and enacted legislation on Congress.gov.</li>
+    <li><strong>Health and benefits:</strong> the Centers for Medicare &amp; Medicaid Services, HealthCare.gov, the Department of Health and Human Services (poverty guidelines) and the Social Security Administration.</li>
+    <li><strong>Lending and credit:</strong> the Consumer Financial Protection Bureau (including Regulation Z), the Federal Reserve, Fannie Mae, Freddie Mac and HUD/FHA.</li>
+    <li><strong>Small business:</strong> the U.S. Small Business Administration and IRS guidance on depreciation.</li>
+  </ul>
+  <p>
+    Where rules come from industry practice rather than law — such as typical HELOC loan-to-value limits or factoring fees — we
+    describe them as typical ranges and say so.
+  </p>
+
+  <h2>How a calculator is built</h2>
+  <ol>
+    <li><strong>Research</strong> the rules, thresholds and formulas from primary sources.</li>
+    <li><strong>Implement</strong> the math in a separate, testable module.</li>
+    <li><strong>Test</strong> the module against known values: textbook amortization results, published tables (for example, checking that Medicare premiums match the statutory percentages) and hand-worked examples.</li>
+    <li><strong>Explain</strong> the result on the page: how to use it, the formula, the assumptions and a worked example.</li>
+    <li><strong>Review</strong> the page before publication and record the review date on the page.</li>
+  </ol>
+
+  <h2>Keeping figures current</h2>
+  <p>
+    Many figures change every year — tax brackets and standard deductions, Medicare premiums and IRMAA brackets, poverty guidelines
+    and ACA contribution percentages, Social Security amounts. We track these release schedules and update affected calculators
+    when agencies publish new numbers, usually in the fall for the following year. Each page shows its “Updated” date.
+  </p>
+
+  <h2>Use of software and AI tools</h2>
+  <p>
+    We use software tools — including automated testing and AI-assisted drafting — to help build and maintain the site. Every
+    formula, figure and claim is checked against the sources listed on the page before it’s published, and responsibility for the
+    content rests with our editorial team.
+  </p>
+
+  <h2>Independence from advertisers</h2>
+  <p>
+    The site is funded by advertising. Advertisers can’t see or influence our content before publication, and we don’t accept
+    payment to feature, rank or recommend any lender, product or service.
+  </p>
+
+  <h2>Corrections</h2>
+  <p>
+    If you believe something is wrong, email <a href={`mailto:${site.email}`}>{site.email}</a> with the page and the issue. We
+    review every report, correct confirmed errors promptly, and update the page’s review date.
+  </p>
+</ProseLayout>

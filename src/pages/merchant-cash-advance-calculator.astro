@@ -1,0 +1,305 @@
+---
+import ToolLayout from '../layouts/ToolLayout.astro';
+import Calc from '../components/calc/Calc.astro';
+import NumberField from '../components/calc/NumberField.astro';
+import SegField from '../components/calc/SegField.astro';
+import AdSlot from '../components/AdSlot.astro';
+
+const sections = [
+  { id: 'how-to-use', title: 'How to use this calculator' },
+  { id: 'how-mca-works', title: 'How a merchant cash advance works' },
+  { id: 'factor-vs-apr', title: 'Factor rate vs APR: why the gap is so big' },
+  { id: 'example', title: 'Worked example' },
+  { id: 'questions', title: 'Questions to ask before you sign' },
+  { id: 'alternatives', title: 'Alternatives to a merchant cash advance' },
+  { id: 'formula', title: 'How we calculate APR' },
+];
+
+const faq = [
+  {
+    q: 'How do I convert a factor rate to an APR?',
+    a: 'Multiply the advance by the factor rate to get the total payback, subtract any upfront fees from the advance to get the cash you actually receive, then find the annual interest rate that makes your daily or weekly payments equal that cash — the same method lenders use for APR under the Truth in Lending Act. This calculator does it instantly.',
+  },
+  {
+    q: 'Is a factor rate of 1.2 the same as 20% interest?',
+    a: 'No. A 1.2 factor rate means you repay 20% more than you receive, but you repay it in months, not a year, and you start paying it back almost immediately. A 1.2 factor rate repaid over six months with daily payments is roughly a <strong>75% APR</strong>.',
+  },
+  {
+    q: 'What is a typical merchant cash advance factor rate?',
+    a: 'Factor rates commonly range from about 1.1 to 1.5, depending on your sales history, credit, industry and how quickly you’ll repay. Shorter terms at the same factor rate mean a much higher APR.',
+  },
+  {
+    q: 'Can I pay off a merchant cash advance early to save money?',
+    a: 'Usually not in the way you’d expect. Because the payback amount is fixed when you sign, paying early often costs the same total. Some providers offer an early-payoff discount — ask for it in writing before you sign.',
+  },
+  {
+    q: 'Is a merchant cash advance a loan?',
+    a: 'Legally, most MCAs are structured as a purchase of your future receivables rather than a loan, which is why they aren’t subject to federal Truth in Lending APR disclosures or many state usury limits. Several states — including California and New York — now require providers to disclose an estimated APR on many commercial financing offers.',
+  },
+  {
+    q: 'What is a holdback percentage?',
+    a: 'With a split-funding MCA, the provider collects a fixed percentage of your daily card or bank deposits — typically 10% to 20% — until the payback amount is repaid. Busy periods repay faster; slow months repay slower. Use the “Split of sales” option to estimate your term.',
+  },
+];
+
+const sources = [
+  {
+    title: 'Small business lending rule and research (Section 1071)',
+    url: 'https://www.consumerfinance.gov/data-research/small-business-lending/',
+    publisher: 'Consumer Financial Protection Bureau',
+  },
+  {
+    title: 'Business guidance for small businesses',
+    url: 'https://www.ftc.gov/business-guidance/small-businesses',
+    publisher: 'Federal Trade Commission',
+  },
+  {
+    title: 'Loans — funding programs for small businesses',
+    url: 'https://www.sba.gov/funding-programs/loans',
+    publisher: 'U.S. Small Business Administration',
+  },
+  {
+    title: 'Regulation Z §1026.22 — determination of annual percentage rate (methodology)',
+    url: 'https://www.consumerfinance.gov/rules-policy/regulations/1026/22/',
+    publisher: 'Consumer Financial Protection Bureau',
+  },
+];
+---
+
+<ToolLayout
+  slug="merchant-cash-advance-calculator"
+  sections={sections}
+  faq={faq}
+  sources={sources}
+  related={['invoice-factoring-calculator', 'equipment-loan-calculator', 'debt-consolidation-calculator', 'dscr-loan-calculator']}
+>
+  <p slot="intro">
+    Convert a merchant cash advance (MCA) <strong>factor rate</strong> into a true <strong>APR</strong>, see your daily or
+    weekly payment and the total cost after fees — so you can compare an MCA offer with a business loan, line of credit or
+    invoice factoring on equal terms.
+  </p>
+
+  <Calc id="mca" slot="calculator" inputsTitle="Your MCA offer">
+    <Fragment slot="inputs">
+      <div class="field-row">
+        <NumberField name="advance" label="Advance amount" value={50000} prefix="$" format="money" min={0} />
+        <NumberField name="factor" label="Factor rate" value={1.35} min={1} max={3} hint="Usually 1.10–1.50." />
+      </div>
+      <NumberField name="fees" label="Upfront fees" value={1500} prefix="$" format="money" min={0} hint="Origination, underwriting or admin fees taken from the advance." />
+      <SegField
+        name="freq"
+        label="Payments"
+        value="daily"
+        options={[
+          { value: 'daily', label: 'Daily (business days)' },
+          { value: 'weekly', label: 'Weekly' },
+        ]}
+      />
+      <SegField
+        name="mode"
+        label="Repayment"
+        value="term"
+        options={[
+          { value: 'term', label: 'Fixed term' },
+          { value: 'holdback', label: 'Split of sales' },
+        ]}
+      />
+      <div data-when="mode=term">
+        <NumberField name="months" label="Estimated term" value={8} suffix="months" min={1} max={36} />
+      </div>
+      <div data-when="mode=holdback">
+        <div class="field-row">
+          <NumberField name="sales" label="Monthly card/bank sales" value={80000} prefix="$" format="money" min={0} />
+          <NumberField name="holdback" label="Holdback" value={12} suffix="%" min={1} max={50} />
+        </div>
+      </div>
+    </Fragment>
+
+    <Fragment slot="results">
+      <div class="result-hero" aria-live="polite">
+        <p class="label">Estimated APR</p>
+        <p class="value" data-out="hero">—</p>
+        <p class="sub" data-out="heroSub"></p>
+      </div>
+      <div class="stats cols-3">
+        <div class="stat"><p class="label" data-out="payLabel">Daily payment</p><p class="value" data-out="payment">—</p></div>
+        <div class="stat"><p class="label">Total payback</p><p class="value" data-out="payback">—</p></div>
+        <div class="stat"><p class="label">Cost of financing</p><p class="value" data-out="cost">—</p></div>
+      </div>
+      <div data-out="verdict"></div>
+      <h3 class="results-heading">Where your payback goes</h3>
+      <div data-out="split"></div>
+      <div data-out="table"></div>
+    </Fragment>
+  </Calc>
+
+  <h2 id="how-to-use">How to use this calculator</h2>
+  <ol>
+    <li><strong>Enter the advance amount and factor rate</strong> from your offer. The payback is the advance × factor rate.</li>
+    <li><strong>Enter upfront fees</strong> deducted from the funding — these increase your true cost.</li>
+    <li><strong>Choose the payment schedule</strong>: daily (about 21 business days a month) or weekly.</li>
+    <li><strong>Choose how the term is set.</strong> For fixed payments, enter the term from the offer. For a split of your sales, enter your average monthly card or bank deposits and the holdback percentage.</li>
+  </ol>
+
+  <h2 id="how-mca-works">How a merchant cash advance works</h2>
+  <p>
+    A merchant cash advance gives your business a lump sum in exchange for a share of future sales. Instead of an interest rate,
+    the provider quotes a <strong>factor rate</strong> — say 1.35 — which sets a fixed payback: a $50,000 advance at 1.35 means
+    repaying $67,500. Repayment happens automatically, either as a fixed daily or weekly debit from your bank account, or as a
+    percentage “holdback” of your daily card sales.
+  </p>
+  <p>
+    MCAs are fast — often funded within a day or two — and accessible to businesses with limited credit history. But because the
+    cost is fixed and repayment is quick, they are among the most expensive forms of business financing.
+  </p>
+
+  <AdSlot slot="inContent" />
+
+  <h2 id="factor-vs-apr">Factor rate vs APR: why the gap is so big</h2>
+  <p>
+    A factor rate looks like a simple interest rate, but two things make the real cost far higher:
+  </p>
+  <ul>
+    <li><strong>Short terms.</strong> The whole cost is charged over months, not a year. Paying 35% extra over eight months is much more expensive than 35% a year.</li>
+    <li><strong>Immediate repayment.</strong> Daily debits start right away, so on average you only have about half the money for half the term — yet you pay the cost on the full amount.</li>
+  </ul>
+  <div class="table-scroll">
+    <table>
+      <caption class="visually-hidden">Approximate APR for a $50,000 advance at a 1.35 factor rate with $1,500 fees, daily payments</caption>
+      <thead><tr><th>Factor rate 1.35, $1,500 fees</th><th>Approx. APR</th></tr></thead>
+      <tbody>
+        <tr><td>Repaid over 4 months</td><td>≈ 209%</td></tr>
+        <tr><td>Repaid over 8 months</td><td>≈ 105%</td></tr>
+        <tr><td>Repaid over 12 months</td><td>≈ 70%</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    Notice that faster repayment makes the APR <em>higher</em>, not lower. With a split-of-sales MCA, a strong sales month shortens
+    the term — and raises your effective APR.
+  </p>
+
+  <h2 id="example">Worked example</h2>
+  <p>
+    A restaurant accepts a <strong>$50,000</strong> advance at a <strong>1.35</strong> factor rate with <strong>$1,500</strong>
+    in fees, repaid by daily debits over about eight months (168 business days).
+  </p>
+  <ul>
+    <li>Total payback: $50,000 × 1.35 = <strong>$67,500</strong>.</li>
+    <li>Cash actually received: $50,000 − $1,500 = <strong>$48,500</strong>.</li>
+    <li>Cost of financing: <strong>$19,000</strong> — about 39 cents per dollar received.</li>
+    <li>Daily payment: $67,500 ÷ 168 = <strong>$401.79</strong> (about $8,440 a month).</li>
+    <li>Estimated APR: roughly <strong>105%</strong>.</li>
+  </ul>
+
+  <h2 id="questions">Questions to ask before you sign</h2>
+  <ol>
+    <li>What is the <strong>total payback</strong>, and what is the <strong>estimated APR</strong>?</li>
+    <li>Which <strong>fees</strong> are deducted from the funding, and are there ongoing fees (ACH, “risk”, admin)?</li>
+    <li>Is there a <strong>discount for early payoff</strong>? Get it in writing.</li>
+    <li>With fixed debits, can payments be <strong>adjusted if sales fall</strong> (a “reconciliation” clause)?</li>
+    <li>Does the contract include a <strong>personal guarantee</strong>, a UCC lien on all business assets, or a <strong>confession of judgment</strong>?</li>
+    <li>Does it restrict other financing (<strong>anti-stacking</strong> clauses)?</li>
+  </ol>
+  <div class="callout warn">
+    <span class="callout-title">Avoid the renewal trap</span>
+    Taking a second advance to pay off the first (“stacking” or early renewals) often means paying fees on money you already owe.
+    If daily debits are straining your cash flow, talk to an SBA resource partner such as SCORE or a Small Business Development
+    Center before signing another advance.
+  </div>
+
+  <h2 id="alternatives">Alternatives to a merchant cash advance</h2>
+  <ul>
+    <li><strong>SBA loans</strong> (7(a) and microloans) — much lower rates, longer terms, slower approval.</li>
+    <li><strong>Business line of credit</strong> — pay interest only on what you use.</li>
+    <li><strong>Invoice factoring</strong> — if you have unpaid B2B invoices; compare costs with the <a href="/invoice-factoring-calculator/">invoice factoring calculator</a>.</li>
+    <li><strong>Equipment financing</strong> — if the money is for equipment, which then serves as collateral; see the <a href="/equipment-loan-calculator/">equipment loan calculator</a>.</li>
+    <li><strong>Business credit card</strong> — a 0% intro APR can bridge a short gap.</li>
+  </ul>
+
+  <h2 id="formula">How we calculate APR</h2>
+  <div class="formula">Payback = advance × factor rate
+Net funds received = advance − upfront fees
+APR = r × payments per year, where r solves:  net funds = Σ payment ÷ (1 + r)^k  for k = 1…n</div>
+  <p>
+    We annualize daily payments using 252 business days per year and weekly payments using 52 weeks. For split-of-sales MCAs,
+    the term is estimated from your average sales and holdback; real terms vary with your sales. Results are estimates to help
+    you compare offers — your provider’s disclosures and contract govern.
+  </p>
+</ToolLayout>
+
+<script>
+  import { bindCalculator, outputs, verdict } from '../lib/ui/form';
+  import { duration, money, percent } from '../lib/ui/format';
+  import { splitBar } from '../lib/ui/chart';
+  import { merchantCashAdvance } from '../lib/calc/business';
+
+  const out = outputs('mca');
+
+  bindCalculator('mca', {
+    compute(f) {
+      const frequency = f.str('freq') === 'weekly' ? 'weekly' : 'daily';
+      const mode = f.str('mode') === 'holdback' ? 'holdback' : 'term';
+      const r = merchantCashAdvance({
+        advance: f.num('advance'),
+        factorRate: f.num('factor', 1),
+        fees: f.num('fees'),
+        frequency,
+        mode,
+        termMonths: f.num('months', 1),
+        monthlySales: f.num('sales'),
+        holdbackPercent: f.num('holdback'),
+      });
+
+      out.text('hero', Number.isFinite(r.apr) ? percent(r.apr, 1) : '—');
+      out.text(
+        'heroSub',
+        Number.isFinite(r.termMonths)
+          ? `${r.payments} ${frequency} payments over about ${duration(r.termMonths)}`
+          : 'Enter sales and holdback to estimate the term.',
+      );
+      out.text('payLabel', frequency === 'daily' ? 'Daily payment' : 'Weekly payment');
+      out.text('payment', money(r.payment, true));
+      out.text('payback', money(r.payback));
+      out.text('cost', money(r.cost));
+
+      if (!Number.isFinite(r.apr)) {
+        out.html('verdict', '');
+        out.html('split', '');
+        out.html('table', '');
+        return;
+      }
+      const kind = r.apr >= 60 ? 'bad' : r.apr >= 30 ? 'warn' : 'info';
+      out.html(
+        'verdict',
+        verdict(
+          kind,
+          `You’d pay <strong>${money(r.cost)}</strong> to use <strong>${money(r.netFunds)}</strong> — <strong>${(r.costPerDollar * 100).toFixed(0)}¢</strong> per dollar received. That’s about <strong>${money(r.monthlyEquivalent)}</strong> a month in debits. ${
+            r.apr >= 60 ? 'Compare this with an SBA loan, line of credit or factoring before signing.' : ''
+          }`,
+        ),
+      );
+      out.html(
+        'split',
+        splitBar(
+          [
+            { label: 'Cash you receive', value: Math.max(0, r.netFunds), color: 'var(--chart-1)' },
+            { label: 'Cost (fees + factor)', value: r.cost, color: 'var(--chart-2)' },
+          ],
+          (n) => money(n),
+        ),
+      );
+      out.html(
+        'table',
+        `<div class="table-wrap" style="max-height:none;margin-top:14px"><table class="data"><tbody>
+          <tr><td>Advance</td><td>${money(f.num('advance'))}</td></tr>
+          <tr><td>Upfront fees</td><td>${money(f.num('fees'))}</td></tr>
+          <tr><td>Net funds received</td><td>${money(r.netFunds)}</td></tr>
+          <tr><td>Total payback</td><td>${money(r.payback)}</td></tr>
+          <tr><td>Number of payments</td><td>${Number.isFinite(r.payments) ? r.payments : '—'}</td></tr>
+          <tr><td>Estimated APR</td><td>${percent(r.apr, 1)}</td></tr>
+        </tbody></table></div>`,
+      );
+    },
+  });
+</script>

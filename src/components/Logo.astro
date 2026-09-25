@@ -1,0 +1,15 @@
+---
+/** Brand mark: a rounded tile with a rising bar chart / check. Colours follow the theme. */
+interface Props {
+  size?: number;
+}
+const { size = 30 } = Astro.props;
+---
+
+<svg width={size} height={size} viewBox="0 0 32 32" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+  <rect width="32" height="32" rx="8" fill="var(--primary)"></rect>
+  <path d="M8 22.5v-4M13 22.5v-8M18 22.5v-6" stroke="var(--primary-ink)" stroke-width="2.6" stroke-linecap="round"
+  ></path>
+  <path d="M17 11.5 20.5 15 25 8.5" fill="none" stroke="var(--primary-ink)" stroke-width="2.6" stroke-linecap="round"
+    stroke-linejoin="round"></path>
+</svg>

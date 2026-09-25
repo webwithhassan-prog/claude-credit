@@ -1,0 +1,299 @@
+---
+import ToolLayout from '../layouts/ToolLayout.astro';
+import Calc from '../components/calc/Calc.astro';
+import NumberField from '../components/calc/NumberField.astro';
+import TextField from '../components/calc/TextField.astro';
+import RowCard from '../components/calc/RowCard.astro';
+import SelectField from '../components/calc/SelectField.astro';
+import CheckField from '../components/calc/CheckField.astro';
+import AdSlot from '../components/AdSlot.astro';
+import Icon from '../components/Icon.astro';
+
+const debts = [
+  { name: 'Card A', balance: 7500, apr: 24.99, payment: 225 },
+  { name: 'Card B', balance: 4800, apr: 21.49, payment: 150 },
+  { name: 'Card C', balance: 2700, apr: 27.99, payment: 95 },
+];
+
+const sections = [
+  { id: 'how-to-use', title: 'How to use this calculator' },
+  { id: 'how-it-works', title: 'How debt consolidation works' },
+  { id: 'fees', title: 'Origination fees and true APR' },
+  { id: 'example', title: 'Worked example' },
+  { id: 'options', title: 'Consolidation options compared' },
+  { id: 'pitfalls', title: 'Pitfalls to avoid' },
+];
+
+const faq = [
+  {
+    q: 'Does debt consolidation save money?',
+    a: 'It saves money when the new loan’s <em>true</em> APR — including any origination fee — is lower than the average rate on the debts you pay off, and you don’t stretch the repayment out much longer than you would have taken anyway. The calculator compares both total cost and payoff time so you can see the trade-off.',
+  },
+  {
+    q: 'What is an origination fee?',
+    a: 'A one-time charge, usually 1% to 10% of the loan amount on personal loans, that is typically deducted from the money you receive. If you need $15,000 to pay off your cards and the fee is 5%, you must borrow about $15,789 to net $15,000. Tick “fee is deducted from the loan” to model this.',
+  },
+  {
+    q: 'Will a consolidation loan hurt my credit score?',
+    a: 'Applying causes a hard inquiry and the new loan lowers your average account age, so your score may dip briefly. Paying off credit cards usually lowers your revolving utilization, which often raises your score within a couple of months — as long as you don’t run the cards back up.',
+  },
+  {
+    q: 'Is a lower monthly payment always better?',
+    a: 'No. A longer term can shrink the payment while increasing the total interest you pay. Compare the “Total cost” figures, not just the monthly payment. If cash flow is tight, a lower payment may still be the right choice — but know what it costs.',
+  },
+  {
+    q: 'Can I use a HELOC or home equity loan to consolidate debt?',
+    a: 'Yes, and rates are usually lower than personal loans because your home secures the debt. That also means you could lose your home if you can’t repay, and you’re converting unsecured card debt into secured debt. Estimate the payment with our <a href="/heloc-payment-calculator/">HELOC payment calculator</a> and how much you can borrow with the <a href="/home-equity-calculator/">home equity calculator</a>.',
+  },
+  {
+    q: 'What credit score do I need for a debt consolidation loan?',
+    a: 'Many lenders approve applicants with fair credit (around 580–670), but the best rates generally go to scores of 700+. Prequalifying with several lenders uses a soft inquiry and shows your likely rate without affecting your score.',
+  },
+];
+
+const sources = [
+  {
+    title: 'What do I need to know about consolidating my credit card debt?',
+    url: 'https://www.consumerfinance.gov/ask-cfpb/what-do-i-need-to-know-about-consolidating-my-credit-card-debt-en-1861/',
+    publisher: 'Consumer Financial Protection Bureau',
+  },
+  {
+    title: 'How to get out of debt',
+    url: 'https://consumer.ftc.gov/articles/how-get-out-debt',
+    publisher: 'Federal Trade Commission',
+  },
+  {
+    title: 'Regulation Z §1026.22 — determination of annual percentage rate',
+    url: 'https://www.consumerfinance.gov/rules-policy/regulations/1026/22/',
+    publisher: 'Consumer Financial Protection Bureau',
+  },
+];
+---
+
+<ToolLayout
+  slug="debt-consolidation-calculator"
+  sections={sections}
+  faq={faq}
+  sources={sources}
+  related={['debt-payoff-calculator', 'balance-transfer-calculator', 'heloc-payment-calculator', 'credit-card-payoff-calculator']}
+>
+  <p slot="intro">
+    Compare what your current debts will cost with a single debt consolidation loan. Unlike simple calculators, this one
+    includes the <strong>origination fee</strong> and shows the loan’s <strong>true APR</strong>, so you can see your real
+    monthly and lifetime savings — or whether consolidating would cost you more.
+  </p>
+
+  <Calc id="dc" slot="calculator" inputsTitle="Your debts & loan offer">
+    <Fragment slot="inputs">
+      <div data-rows data-key="d_name" data-min="1" data-max="10" data-label="Debt">
+        <div class="rows" data-rows-list>
+          {
+            debts.map((d, i) => (
+              <RowCard title={`Debt ${i + 1}`}>
+                <TextField name="d_name" label="Name" value={d.name} />
+                <NumberField name="d_bal" label="Balance" value={d.balance} prefix="$" format="money" min={0} row />
+                <NumberField name="d_apr" label="APR" value={d.apr} suffix="%" min={0} max={100} row />
+                <NumberField name="d_pay" label="Monthly payment" value={d.payment} prefix="$" format="money" min={0} row />
+              </RowCard>
+            ))
+          }
+        </div>
+        <template data-rows-template>
+          <RowCard title="Debt">
+            <TextField name="d_name" label="Name" value="" placeholder="Debt name" />
+            <NumberField name="d_bal" label="Balance" value="" prefix="$" format="money" min={0} row />
+            <NumberField name="d_apr" label="APR" value="" suffix="%" min={0} max={100} row />
+            <NumberField name="d_pay" label="Monthly payment" value="" prefix="$" format="money" min={0} row />
+          </RowCard>
+        </template>
+        <button type="button" class="btn btn-sm rows-add" data-rows-add><Icon name="plus" size={16} /> Add a debt</button>
+      </div>
+      <div class="field-row">
+        <NumberField name="loanApr" label="Loan interest rate" value={12.5} suffix="%" min={0} max={100} />
+        <SelectField
+          name="term"
+          label="Loan term"
+          value="48"
+          options={[24, 36, 48, 60, 72, 84].map((m) => ({ value: m, label: `${m} months (${m / 12} yrs)` }))}
+        />
+      </div>
+      <NumberField name="fee" label="Origination fee" value={5} suffix="%" min={0} max={15} />
+      <CheckField name="feeFromProceeds" label="Fee is deducted from the loan (borrow extra to cover it)" checked />
+    </Fragment>
+
+    <Fragment slot="results">
+      <div class="result-hero" aria-live="polite">
+        <p class="label" data-out="heroLabel">Total savings with the loan</p>
+        <p class="value" data-out="hero">—</p>
+        <p class="sub" data-out="heroSub"></p>
+      </div>
+      <div class="stats cols-3">
+        <div class="stat"><p class="label">New monthly payment</p><p class="value" data-out="pay">—</p></div>
+        <div class="stat"><p class="label">Loan amount (incl. fee)</p><p class="value" data-out="amount">—</p></div>
+        <div class="stat"><p class="label">True APR with fee</p><p class="value" data-out="apr">—</p></div>
+      </div>
+      <div data-out="verdict"></div>
+      <h3 class="results-heading">Interest + fees: current debts vs loan</h3>
+      <div data-out="bars"></div>
+      <div data-out="table"></div>
+    </Fragment>
+  </Calc>
+
+  <h2 id="how-to-use">How to use this calculator</h2>
+  <ol>
+    <li><strong>Enter each debt you plan to consolidate</strong> with its balance, APR and the monthly amount you currently pay.</li>
+    <li><strong>Enter the loan offer</strong>: interest rate, term and origination fee. Prequalified offers from lenders give you the most realistic numbers.</li>
+    <li><strong>Choose how the fee is charged.</strong> Most personal loans deduct it from the proceeds, so you must borrow more to pay off the same debts.</li>
+    <li><strong>Compare.</strong> The results show your new payment, the true APR including the fee, and the difference in total cost and payoff time.</li>
+  </ol>
+
+  <h2 id="how-it-works">How debt consolidation works</h2>
+  <p>
+    Debt consolidation replaces several debts with one new loan — usually a fixed-rate personal loan — that you use to pay the
+    old balances off. You end up with one payment, one due date, a fixed rate and a guaranteed payoff date. It helps most
+    when the new rate is meaningfully lower than the rates on your current debts, which is common for credit cards charging
+    20%–30% APR.
+  </p>
+  <p>
+    Consolidation doesn’t reduce the amount you owe; it changes the price and the schedule. The savings come from a lower
+    rate, and they can be wiped out by fees or by stretching the loan over many more years.
+  </p>
+
+  <AdSlot slot="inContent" />
+
+  <h2 id="fees">Origination fees and true APR</h2>
+  <p>
+    Many personal loans charge an origination fee of about 1% to 10%, taken out of the loan before you receive the money.
+    That makes the loan more expensive than its interest rate suggests. The <strong>APR</strong> disclosed under the Truth
+    in Lending Act includes this fee; this calculator computes it the same way — as the rate at which your payments equal
+    the cash you actually receive.
+  </p>
+  <div class="formula">Loan amount (fee deducted) = amount needed ÷ (1 − fee %)
+Monthly payment = L · r / (1 − (1 + r)^−n)          r = rate ÷ 12, n = months
+True APR = the rate that makes the present value of all payments = cash received</div>
+
+  <h2 id="example">Worked example</h2>
+  <p>
+    Alex has three credit cards totalling <strong>$15,000</strong> at an average of about <strong>24.4% APR</strong>, paying
+    <strong>$470 a month</strong>. At those payments, the cards take <strong>4 years 10 months</strong> to clear and cost
+    <strong>$9,607</strong> in interest.
+  </p>
+  <p>
+    A lender offers a 48-month loan at <strong>12.5%</strong> with a <strong>5% origination fee</strong> deducted from the
+    proceeds. To net $15,000, Alex borrows <strong>$15,789</strong> (a $789 fee). The payment is <strong>$419.68</strong> a
+    month — $50 less than today — and the total interest is $4,355. Including the fee, the loan costs <strong>$5,145</strong>,
+    saving about <strong>$4,462</strong>, and Alex is debt-free 10 months sooner. The fee raises the true APR from 12.5% to
+    about <strong>15.3%</strong>.
+  </p>
+
+  <h2 id="options">Consolidation options compared</h2>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Option</th><th>Typical cost</th><th>Best for</th><th>Watch out for</th></tr></thead>
+      <tbody>
+        <tr><td>Personal loan</td><td>Fixed APR; fee 0%–10%</td><td>Fixed payoff date, no collateral</td><td>Origination fees; higher rates with fair credit</td></tr>
+        <tr><td>0% balance transfer card</td><td>3%–5% fee</td><td>Balances you can clear in 12–21 months</td><td>Regular APR after the promo — see the <a href="/balance-transfer-calculator/">balance transfer calculator</a></td></tr>
+        <tr><td>HELOC or home equity loan</td><td>Lower rates; closing costs possible</td><td>Homeowners with equity and stable income</td><td>Your home secures the debt</td></tr>
+        <tr><td>Debt management plan</td><td>Small monthly fee</td><td>Reducing card APRs through a nonprofit counselor</td><td>Cards are usually closed</td></tr>
+        <tr><td>401(k) loan</td><td>Interest paid to yourself</td><td>Last resort</td><td>Lost growth; due quickly if you leave your job</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="pitfalls">Pitfalls to avoid</h2>
+  <ul>
+    <li><strong>Running the cards back up.</strong> The biggest risk: consolidating, then spending on the freshly cleared cards. Consider lowering limits or removing saved card details.</li>
+    <li><strong>Focusing only on the payment.</strong> An 84-month loan can cut your payment and still cost more in total.</li>
+    <li><strong>Ignoring prepayment terms.</strong> Most personal loans have no prepayment penalty — confirm it so you can pay early.</li>
+    <li><strong>Debt settlement confusion.</strong> Debt <em>settlement</em> companies negotiate to pay less than you owe, often damaging your credit and charging large fees. That is not the same as consolidation.</li>
+  </ul>
+</ToolLayout>
+
+<script>
+  import { bindCalculator, outputs, verdict } from '../lib/ui/form';
+  import { initRows, rowReaders } from '../lib/ui/rows';
+  import { duration, money, percent } from '../lib/ui/format';
+  import { compareBars } from '../lib/ui/chart';
+  import { debtConsolidation } from '../lib/calc/debt';
+
+  const form = document.getElementById('dc') as HTMLFormElement;
+  initRows(form);
+  const out = outputs('dc');
+
+  bindCalculator('dc', {
+    compute(f) {
+      const debts = rowReaders(form, 'd_name')
+        .map((r, i) => ({
+          name: r.str('d_name') || `Debt ${i + 1}`,
+          balance: r.num('d_bal'),
+          apr: r.num('d_apr'),
+          payment: r.num('d_pay'),
+        }))
+        .filter((d) => d.balance > 0);
+      if (!debts.length) {
+        out.text('hero', '—');
+        out.text('heroSub', 'Add at least one debt.');
+        ['verdict', 'bars', 'table'].forEach((k) => out.html(k, ''));
+        return;
+      }
+      const term = Number(f.str('term')) || 48;
+      const r = debtConsolidation({
+        debts,
+        loanApr: f.num('loanApr'),
+        termMonths: term,
+        feePercent: f.num('fee'),
+        feeFromProceeds: f.bool('feeFromProceeds'),
+      });
+
+      const saved = r.savings;
+      out.text('heroLabel', saved >= 0 ? 'Total savings with the loan' : 'Extra cost of the loan');
+      out.text('hero', Number.isFinite(saved) ? money(Math.abs(saved)) : 'Large');
+      out.text(
+        'heroSub',
+        `Debt-free in ${duration(term)} with the loan vs ${Number.isFinite(r.currentMonths) ? duration(r.currentMonths) : 'never'} today`,
+      );
+      out.text('pay', money(r.payment, true));
+      out.text('amount', money(r.loanAmount));
+      out.text('apr', percent(r.trueApr, 2));
+
+      const change = r.monthlyChange;
+      let kind: 'good' | 'warn' | 'bad' = 'good';
+      let msg: string;
+      if (!Number.isFinite(r.currentInterest)) {
+        kind = 'warn';
+        msg = 'At least one of your current payments doesn’t cover its interest, so that debt would never be paid off. A consolidation loan with a fixed term guarantees a payoff date.';
+      } else if (saved > 0) {
+        msg = `The loan saves <strong>${money(saved)}</strong> in total and ${change <= 0 ? `lowers your payment by <strong>${money(-change, true)}</strong>` : `raises your payment by <strong>${money(change, true)}</strong>`} a month. Your current debts average <strong>${percent(r.weightedApr, 2)}</strong> vs a true APR of <strong>${percent(r.trueApr, 2)}</strong> on the loan.`;
+        if (term > r.currentMonths) {
+          kind = 'warn';
+          msg += ` Note: the loan term is longer than your current payoff time.`;
+        }
+      } else {
+        kind = 'bad';
+        msg = `This loan would cost <strong>${money(-saved)}</strong> more than keeping your current debts${change < 0 ? ', even though the monthly payment is lower' : ''}. Look for a lower rate, a smaller fee or a shorter term.`;
+      }
+      out.html('verdict', verdict(kind, msg));
+
+      out.html(
+        'bars',
+        compareBars(
+          [
+            { label: 'Current debts (interest)', value: r.currentInterest, color: 'var(--chart-2)' },
+            { label: 'Consolidation loan (interest + fee)', value: r.loanCost, color: 'var(--chart-1)' },
+          ],
+          (n) => money(n),
+        ),
+      );
+      out.html(
+        'table',
+        `<div class="table-wrap" style="max-height:none"><table class="data"><thead><tr><th></th><th>Current</th><th>Loan</th></tr></thead><tbody>
+          <tr><td>Balance / amount borrowed</td><td>${money(r.totalBalance)}</td><td>${money(r.loanAmount)}</td></tr>
+          <tr><td>Interest rate</td><td>${percent(r.weightedApr, 2)} avg</td><td>${percent(f.num('loanApr'), 2)} (${percent(r.trueApr, 2)} APR)</td></tr>
+          <tr><td>Monthly payment</td><td>${money(r.currentPayment, true)}</td><td>${money(r.payment, true)}</td></tr>
+          <tr><td>Fees</td><td>${money(0)}</td><td>${money(r.fee)}</td></tr>
+          <tr><td>Total interest</td><td>${money(r.currentInterest)}</td><td>${money(r.loanInterest)}</td></tr>
+        </tbody></table></div>`,
+      );
+    },
+  });
+</script>

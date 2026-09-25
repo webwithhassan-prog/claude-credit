@@ -1,0 +1,83 @@
+---
+import ProseLayout from '../layouts/ProseLayout.astro';
+import { site } from '../site.config';
+const law = site.jurisdiction
+  ? `These terms are governed by the laws of ${site.jurisdiction}, without regard to conflict-of-law rules.`
+  : 'These terms are governed by the laws of the place where the site operator is established, without regard to conflict-of-law rules.';
+---
+
+<ProseLayout
+  title="Terms of use"
+  description={`The terms that apply when you use ${site.name}’s calculators and content.`}
+  path="/terms/"
+  updated="2026-09-25"
+  lede={`By using ${site.name}, you agree to these terms. Please read them — they’re short.`}
+>
+  <h2>1. What we provide</h2>
+  <p>
+    {site.name} offers free online calculators and educational articles about personal and small-business finance, taxes and
+    benefits. The site is provided for general information and education only.
+  </p>
+
+  <h2>2. Not professional advice</h2>
+  <p>
+    Nothing on this site is financial, investment, tax, legal, insurance or medical advice, and using the site does not create a
+    professional or fiduciary relationship. Calculator results are estimates based on the information you enter and on the
+    assumptions described on each page. Always confirm important decisions with a qualified professional and with official sources.
+    See our <a href="/disclaimer/">disclaimer</a>.
+  </p>
+
+  <h2>3. Accuracy</h2>
+  <p>
+    We work hard to keep formulas and figures correct and up to date, but laws, rates and program rules change, and errors can
+    happen. The site is provided “as is” and “as available”, without warranties of any kind, express or implied, including
+    accuracy, completeness, fitness for a particular purpose and non-infringement.
+  </p>
+
+  <h2>4. Acceptable use</h2>
+  <p>You agree not to:</p>
+  <ul>
+    <li>use the site for any unlawful purpose;</li>
+    <li>copy, scrape or republish substantial parts of the site’s content or code without permission;</li>
+    <li>interfere with the site’s operation, security or advertising, including by generating invalid ad clicks or impressions;</li>
+    <li>misrepresent your affiliation with {site.name} or imply our endorsement.</li>
+  </ul>
+
+  <h2>5. Intellectual property</h2>
+  <p>
+    The site’s text, design, graphics and code are owned by {site.owner} or its licensors and protected by copyright and other
+    laws. You may use the calculators for your own personal or internal business purposes and share links to any page. Brief
+    quotations with attribution and a link are welcome.
+  </p>
+
+  <h2>6. Third-party links and advertising</h2>
+  <p>
+    The site contains links to third-party websites and displays advertisements served by third parties. We don’t control and
+    aren’t responsible for their content, products or practices, and an ad appearing on the site is not an endorsement.
+  </p>
+
+  <h2>7. Limitation of liability</h2>
+  <p>
+    To the fullest extent permitted by law, {site.owner} will not be liable for any indirect, incidental, special, consequential or
+    punitive damages, or any loss of profits, savings or data, arising from your use of — or inability to use — the site or any
+    calculator result. Where liability can’t be excluded, it is limited to the maximum extent the law allows.
+  </p>
+
+  <h2>8. Indemnity</h2>
+  <p>
+    You agree to indemnify and hold {site.owner} harmless from claims arising out of your misuse of the site or your violation of
+    these terms.
+  </p>
+
+  <h2>9. Changes</h2>
+  <p>
+    We may update the site and these terms at any time. The “last updated” date shows the latest version. Continuing to use the
+    site after changes means you accept the updated terms.
+  </p>
+
+  <h2>10. Governing law</h2>
+  <p>{law} If any provision is found unenforceable, the rest remain in effect.</p>
+
+  <h2>11. Contact</h2>
+  <p>Questions about these terms? Email <a href={`mailto:${site.email}`}>{site.email}</a>.</p>
+</ProseLayout>

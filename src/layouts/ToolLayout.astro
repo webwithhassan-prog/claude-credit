@@ -1,0 +1,167 @@
+---
+/**
+ * Page template for every calculator: breadcrumbs, H1 + intro, the calculator,
+ * then long-form explanatory content with a sidebar of related tools.
+ * The explanatory content is what makes a tool page "publisher content" in
+ * AdSense's eyes — never ship a tool page without it.
+ */
+import BaseLayout from './BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import Faq, { type FaqItem } from '../components/Faq.astro';
+import AdSlot from '../components/AdSlot.astro';
+import Icon from '../components/Icon.astro';
+import { categoryOf, relatedTools, toolBySlug } from '../data/tools';
+import { site } from '../site.config';
+
+export interface Source {
+  title: string;
+  url: string;
+  publisher: string;
+}
+
+interface Props {
+  slug: string;
+  sections: { id: string; title: string }[];
+  faq: FaqItem[];
+  sources: Source[];
+  related?: string[];
+}
+
+const { slug, sections, faq, sources, related = [] } = Astro.props;
+const tool = toolBySlug(slug);
+const category = categoryOf(tool);
+const path = `/${tool.slug}/`;
+const url = new URL(path, site.url).href;
+const updated = new Date(`${tool.updated}T12:00:00Z`);
+const updatedLabel = updated.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+const relatedList = relatedTools(slug, related, 6);
+
+const stripHtml = (s: string) => s.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: tool.title,
+    url,
+    description: tool.metaDescription,
+    applicationCategory: 'FinanceApplication',
+    operatingSystem: 'Any (runs in your web browser)',
+    isAccessibleForFree: true,
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+    dateModified: tool.updated,
+    inLanguage: 'en-US',
+    publisher: { '@id': `${site.url}/#organization` },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: `${site.url}/` },
+      { '@type': 'ListItem', position: 2, name: category.name, item: `${site.url}/${category.id}/` },
+      { '@type': 'ListItem', position: 3, name: tool.title, item: url },
+    ],
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faq.map((f) => ({
+      '@type': 'Question',
+      name: f.q,
+      acceptedAnswer: { '@type': 'Answer', text: stripHtml(f.a) },
+    })),
+  },
+];
+---
+
+<BaseLayout title={tool.metaTitle} description={tool.metaDescription} path={path} jsonLd={jsonLd} ogType="article">
+  <div class="container">
+    <Breadcrumbs
+      items={[
+        { name: 'Home', href: '/' },
+        { name: category.name, href: `/${category.id}/` },
+        { name: tool.title, href: path },
+      ]}
+    />
+    <header class="page-hero">
+      <h1>{tool.title}</h1>
+      <div class="lede"><slot name="intro" /></div>
+      <div class="meta-line">
+        <span><Icon name="calendar" size={15} />Updated <time datetime={tool.updated}>{updatedLabel}</time></span>
+        <span><Icon name="user" size={15} />By the <a href="/about/">{site.name} editorial team</a></span>
+        <span><Icon name="check-circle" size={15} /><a href="/editorial-policy/">How we build & check our calculators</a></span>
+      </div>
+    </header>
+
+    <slot name="calculator" />
+
+    <div class="tool-layout">
+      <article class="prose">
+        <nav class="toc" aria-label="On this page">
+          <strong>On this page</strong>
+          <ol>
+            {sections.map((s) => <li><a href={`#${s.id}`}>{s.title}</a></li>)}
+            <li><a href="#faq">Frequently asked questions</a></li>
+            <li><a href="#sources">Sources</a></li>
+          </ol>
+        </nav>
+
+        <slot />
+
+        <Faq items={faq} />
+
+        <AdSlot slot="endOfContent" />
+
+        <h2 id="sources">Sources</h2>
+        <ul class="sources">
+          {
+            sources.map((s) => (
+              <li>
+                <a href={s.url} rel="noopener" target="_blank">
+                  {s.title}
+                </a>{' '}
+                — {s.publisher}
+              </li>
+            ))
+          }
+        </ul>
+
+        <div class="author-box">
+          <div class="avatar"><Icon name="shield" /></div>
+          <div>
+            <strong>About this calculator.</strong> Written and maintained by the {site.name} editorial team and last
+            reviewed on {updatedLabel}. Rules and figures are checked against the official sources listed above.
+            Results are estimates for education — not financial, tax or legal advice. Found an error?
+            <a href="/contact/">Tell us</a> and we'll fix it. Read our <a href="/editorial-policy/">editorial policy</a>.
+          </div>
+        </div>
+      </article>
+
+      <aside class="sidebar">
+        <div class="sidebar-sticky">
+          <section class="side-card">
+            <h2>Related calculators</h2>
+            <ul class="side-links">
+              {
+                relatedList.map((t) => (
+                  <li>
+                    <a href={`/${t.slug}/`}>
+                      <span class="ico">
+                        <Icon name={t.icon} />
+                      </span>
+                      {t.title}
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+            <p class="small" style="margin:12px 0 0">
+              <a href={`/${category.id}/`}>All {category.name.toLowerCase()} tools →</a>
+            </p>
+          </section>
+          <AdSlot slot="sidebar" variant="sidebar" />
+        </div>
+      </aside>
+    </div>
+  </div>
+</BaseLayout>

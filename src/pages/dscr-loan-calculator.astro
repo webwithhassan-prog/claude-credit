@@ -1,0 +1,263 @@
+---
+import ToolLayout from '../layouts/ToolLayout.astro';
+import Calc from '../components/calc/Calc.astro';
+import NumberField from '../components/calc/NumberField.astro';
+import SelectField from '../components/calc/SelectField.astro';
+import CheckField from '../components/calc/CheckField.astro';
+import AdSlot from '../components/AdSlot.astro';
+
+const sections = [
+  { id: 'how-to-use', title: 'How to use this calculator' },
+  { id: 'what-is-dscr', title: 'What is DSCR?' },
+  { id: 'requirements', title: 'Typical DSCR loan requirements' },
+  { id: 'example', title: 'Worked example' },
+  { id: 'improve', title: 'How to improve your DSCR' },
+  { id: 'pros-cons', title: 'DSCR loan pros and cons' },
+];
+
+const faq = [
+  {
+    q: 'How do lenders calculate DSCR for a rental property?',
+    a: 'Most residential DSCR lenders divide the property’s gross monthly rent by its monthly PITIA — principal, interest, property taxes, insurance and any HOA dues. A ratio of 1.0 means the rent exactly covers the payment; 1.25 means rent is 25% higher than the payment.',
+  },
+  {
+    q: 'What is a good DSCR?',
+    a: '1.25 or higher is considered strong and typically earns the best rates and highest loan-to-value. Many lenders accept 1.0 to 1.24, sometimes with a slightly higher rate. Some “no-ratio” or sub-1.0 programs exist for strong borrowers, usually with a larger down payment.',
+  },
+  {
+    q: 'What rent do lenders use?',
+    a: 'Usually the lower of the signed lease and the appraiser’s market-rent estimate (for 1–4 unit homes, the rent schedule attached to the appraisal). For short-term rentals, some lenders accept 12 months of booking history or an AirDNA-style projection with a haircut.',
+  },
+  {
+    q: 'Is a DSCR loan the same as a commercial loan?',
+    a: 'No. DSCR loans for 1–4 unit rentals are residential non-QM mortgages. Commercial lenders use a different DSCR — net operating income (after vacancy and operating expenses) ÷ annual debt service. The calculator shows both.',
+  },
+  {
+    q: 'Do DSCR loans require tax returns or pay stubs?',
+    a: 'Generally no — that’s their main appeal. Qualification is based on the property’s income, your credit score, down payment and cash reserves. That makes them popular with self-employed investors and people with many properties.',
+  },
+];
+
+const sources = [
+  {
+    title: 'Mortgages — consumer tools',
+    url: 'https://www.consumerfinance.gov/consumer-tools/mortgages/',
+    publisher: 'Consumer Financial Protection Bureau',
+  },
+  {
+    title: 'Form 1007: Single-Family Comparable Rent Schedule',
+    url: 'https://singlefamily.fanniemae.com/',
+    publisher: 'Fannie Mae',
+  },
+  {
+    title: 'Publication 527, Residential Rental Property',
+    url: 'https://www.irs.gov/publications/p527',
+    publisher: 'Internal Revenue Service',
+  },
+];
+---
+
+<ToolLayout
+  slug="dscr-loan-calculator"
+  sections={sections}
+  faq={faq}
+  sources={sources}
+  related={['home-equity-calculator', 'cash-out-refinance-vs-heloc-calculator', 'heloc-payment-calculator', 'equipment-loan-calculator']}
+>
+  <p slot="intro">
+    Calculate the debt service coverage ratio (DSCR) that lenders use to approve rental property loans, see the maximum loan
+    that hits a 1.0 or 1.25 DSCR, and find the minimum rent the property needs to qualify.
+  </p>
+
+  <Calc id="dscr" slot="calculator" inputsTitle="Property & loan">
+    <Fragment slot="inputs">
+      <NumberField name="rent" label="Monthly rent" value={2800} prefix="$" format="money" min={0} hint="Lease or market rent, whichever is lower." />
+      <div class="field-row">
+        <NumberField name="taxes" label="Property taxes (yearly)" value={4200} prefix="$" format="money" min={0} />
+        <NumberField name="insurance" label="Insurance (yearly)" value={1800} prefix="$" format="money" min={0} />
+      </div>
+      <div class="field-row">
+        <NumberField name="hoa" label="HOA dues (monthly)" value={0} prefix="$" format="money" min={0} />
+        <NumberField name="loan" label="Loan amount" value={280000} prefix="$" format="money" min={0} />
+      </div>
+      <div class="field-row">
+        <NumberField name="rate" label="Interest rate" value={7.25} suffix="%" min={0} max={20} />
+        <SelectField name="term" label="Term" value="30" options={[15, 20, 25, 30, 40].map((y) => ({ value: y, label: `${y} years` }))} />
+      </div>
+      <CheckField name="io" label="Interest-only payments" />
+      <div class="field-row">
+        <SelectField
+          name="target"
+          label="Lender’s minimum DSCR"
+          value="1.25"
+          options={[
+            { value: '1', label: '1.00' },
+            { value: '1.1', label: '1.10' },
+            { value: '1.2', label: '1.20' },
+            { value: '1.25', label: '1.25' },
+          ]}
+        />
+        <NumberField name="vacancy" label="Vacancy (investor view)" value={5} suffix="%" min={0} max={50} />
+      </div>
+      <NumberField name="opex" label="Other yearly expenses" value={3000} prefix="$" format="money" min={0} hint="Maintenance, management, utilities you pay — for the NOI-based ratio." />
+    </Fragment>
+
+    <Fragment slot="results">
+      <div class="result-hero" aria-live="polite">
+        <p class="label">Lender DSCR (rent ÷ PITIA)</p>
+        <p class="value" data-out="hero">—</p>
+        <p class="sub" data-out="heroSub"></p>
+      </div>
+      <div class="stats cols-3">
+        <div class="stat"><p class="label">Monthly PITIA</p><p class="value" data-out="pitia">—</p></div>
+        <div class="stat"><p class="label" data-out="maxLabel">Max loan at target</p><p class="value" data-out="max">—</p></div>
+        <div class="stat"><p class="label" data-out="minLabel">Rent needed for target</p><p class="value" data-out="minRent">—</p></div>
+      </div>
+      <div data-out="verdict"></div>
+      <div data-out="table"></div>
+    </Fragment>
+  </Calc>
+
+  <h2 id="how-to-use">How to use this calculator</h2>
+  <ol>
+    <li><strong>Enter the monthly rent.</strong> Lenders typically use the lower of the lease and the appraiser’s market rent.</li>
+    <li><strong>Enter yearly property taxes and insurance</strong>, and monthly HOA dues if any.</li>
+    <li><strong>Enter the loan amount, rate and term.</strong> Tick interest-only if the offer has an interest-only period — many DSCR lenders calculate the ratio on the interest-only payment in that case.</li>
+    <li><strong>Choose the lender’s minimum DSCR</strong> to see your maximum loan and the rent needed to qualify.</li>
+    <li><strong>Optionally add vacancy and operating expenses</strong> for the investor-style NOI ratio.</li>
+  </ol>
+
+  <h2 id="what-is-dscr">What is DSCR?</h2>
+  <p>
+    The debt service coverage ratio measures how comfortably a property’s income covers its loan payment. For residential DSCR
+    loans, it’s simple:
+  </p>
+  <div class="formula">DSCR = gross monthly rent ÷ PITIA
+PITIA = principal + interest + property taxes/12 + insurance/12 + HOA dues</div>
+  <p>
+    A DSCR of 1.0 is break-even; below 1.0 the rent doesn’t cover the payment. Commercial and multifamily lenders instead use
+    <strong>net operating income (NOI) ÷ annual debt service</strong>, which subtracts vacancy and operating expenses first and
+    therefore produces a lower number for the same property.
+  </p>
+
+  <AdSlot slot="inContent" />
+
+  <h2 id="requirements">Typical DSCR loan requirements</h2>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Factor</th><th>Typical range</th></tr></thead>
+      <tbody>
+        <tr><td>Minimum DSCR</td><td>1.0–1.25 (some programs below 1.0)</td></tr>
+        <tr><td>Down payment</td><td>20%–25% (lower LTV for sub-1.0 DSCR)</td></tr>
+        <tr><td>Credit score</td><td>About 620–680 minimum; best pricing at 720+</td></tr>
+        <tr><td>Cash reserves</td><td>Commonly 3–12 months of PITIA</td></tr>
+        <tr><td>Rates</td><td>Usually higher than conventional investor loans</td></tr>
+        <tr><td>Prepayment penalty</td><td>Common, e.g. 5-4-3-2-1 step-down or 3 years</td></tr>
+        <tr><td>Borrower</td><td>Individual or LLC; no personal income verification</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Terms vary widely between lenders — treat these as benchmarks and compare offers.</p>
+
+  <h2 id="example">Worked example</h2>
+  <p>
+    A single-family rental earns <strong>$2,800</strong> a month. Taxes are $4,200 a year, insurance $1,800, no HOA. The
+    investor wants a <strong>$280,000</strong> 30-year loan at <strong>7.25%</strong>.
+  </p>
+  <ul>
+    <li>Principal and interest: <strong>$1,910.09</strong>; taxes and insurance add $500 → PITIA <strong>$2,410.09</strong>.</li>
+    <li>DSCR = $2,800 ÷ $2,410.09 = <strong>1.16</strong> — qualifies at a 1.0 minimum but not at 1.25.</li>
+    <li>To reach 1.25, the loan could be at most about <strong>$255,000</strong> (a larger down payment), or rent would need to be about <strong>$3,013</strong>.</li>
+    <li>On an NOI basis (5% vacancy, $3,000 of other expenses), the ratio is about <strong>1.00</strong> — the property roughly breaks even after all costs.</li>
+  </ul>
+
+  <h2 id="improve">How to improve your DSCR</h2>
+  <ol>
+    <li><strong>Put more down.</strong> A smaller loan lowers principal and interest directly.</li>
+    <li><strong>Buy down the rate</strong> with discount points, or compare more lenders.</li>
+    <li><strong>Choose an interest-only period</strong> if the lender calculates DSCR on the interest-only payment.</li>
+    <li><strong>Support a higher rent</strong> with comparable rentals, renovations or furnishing (for mid-term rentals).</li>
+    <li><strong>Shop insurance and appeal the tax assessment</strong> — both flow straight into PITIA.</li>
+    <li><strong>Choose a longer amortization</strong> (such as a 40-year option) if offered.</li>
+  </ol>
+
+  <h2 id="pros-cons">DSCR loan pros and cons</h2>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Pros</th><th>Cons</th></tr></thead>
+      <tbody>
+        <tr><td>No tax returns, W-2s or personal DTI</td><td>Higher rates and fees than conventional loans</td></tr>
+        <tr><td>Can close in an LLC</td><td>Larger down payments</td></tr>
+        <tr><td>No cap on the number of financed properties at many lenders</td><td>Prepayment penalties are common</td></tr>
+        <tr><td>Fast closings for experienced investors</td><td>Only for investment properties, not your home</td></tr>
+      </tbody>
+    </table>
+  </div>
+</ToolLayout>
+
+<script>
+  import { bindCalculator, outputs, verdict } from '../lib/ui/form';
+  import { money } from '../lib/ui/format';
+  import { dscr } from '../lib/calc/home';
+
+  const out = outputs('dscr');
+
+  bindCalculator('dscr', {
+    compute(f) {
+      const target = Number(f.str('target')) || 1.25;
+      const r = dscr({
+        monthlyRent: f.num('rent'),
+        taxes: f.num('taxes'),
+        insurance: f.num('insurance'),
+        hoa: f.num('hoa'),
+        loanAmount: f.num('loan'),
+        rate: f.num('rate'),
+        termYears: Number(f.str('term')) || 30,
+        interestOnly: f.bool('io'),
+        vacancyPercent: f.num('vacancy'),
+        otherExpenses: f.num('opex'),
+        targetDscr: target,
+      });
+      const fmt = (n: number) => (Number.isFinite(n) ? n.toFixed(2) : '—');
+      out.text('hero', fmt(r.ratio));
+      const band: Record<string, string> = {
+        strong: 'Strong — meets most lenders’ best-pricing tier',
+        qualifies: 'Qualifies with many lenders (1.00–1.24)',
+        'sub-one': 'Below 1.0 — only “no-ratio” programs',
+        weak: 'Weak — rent covers well under the payment',
+      };
+      out.text('heroSub', r.band ? band[r.band] : 'Enter rent and loan details.');
+      out.text('pitia', money(r.pitia, true));
+      out.text('maxLabel', `Max loan at ${target.toFixed(2)}`);
+      out.text('max', money(r.maxLoan));
+      out.text('minLabel', `Rent needed for ${target.toFixed(2)}`);
+      out.text('minRent', money(r.minRent));
+
+      if (!Number.isFinite(r.ratio)) {
+        out.html('verdict', '');
+        out.html('table', '');
+        return;
+      }
+      const ok = r.ratio >= target;
+      out.html(
+        'verdict',
+        verdict(
+          ok ? 'good' : r.ratio >= 1 ? 'warn' : 'bad',
+          ok
+            ? `This property meets a <strong>${target.toFixed(2)}</strong> DSCR with room to spare: rent exceeds PITIA by <strong>${money(r.cashFlow)}</strong> a month.`
+            : `To reach <strong>${target.toFixed(2)}</strong>, borrow no more than <strong>${money(r.maxLoan)}</strong> or support a rent of <strong>${money(r.minRent)}</strong>.`,
+        ),
+      );
+      out.html(
+        'table',
+        `<div class="table-wrap" style="max-height:none"><table class="data"><tbody>
+          <tr><td>Principal & interest</td><td>${money(r.pi, true)}</td></tr>
+          <tr><td>Taxes, insurance & HOA</td><td>${money(r.pitia - r.pi, true)}</td></tr>
+          <tr><td>Rent − PITIA (monthly)</td><td>${money(r.cashFlow, true)}</td></tr>
+          <tr><td>Net operating income (yearly)</td><td>${money(r.noi)}</td></tr>
+          <tr><td>NOI-based DSCR (commercial style)</td><td>${fmt(r.noiDscr)}</td></tr>
+        </tbody></table></div>`,
+      );
+    },
+  });
+</script>

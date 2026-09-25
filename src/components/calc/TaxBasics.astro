@@ -1,0 +1,58 @@
+---
+/** Shared inputs for the federal tax deduction calculators. */
+import NumberField from './NumberField.astro';
+import SelectField from './SelectField.astro';
+import { FILING_STATUS_LABELS } from '../../lib/calc/tax';
+
+interface Props {
+  agi?: number;
+  status?: string;
+  age65?: number;
+  hideAge?: boolean;
+}
+const { agi = 75000, status = 'single', age65 = 0, hideAge = false } = Astro.props;
+---
+
+<div class="field-row">
+  <SelectField
+    name="year"
+    label="Tax year"
+    value="2026"
+    options={[
+      { value: 2026, label: '2026 (file in 2027)' },
+      { value: 2025, label: '2025 (filed in 2026)' },
+    ]}
+  />
+  <SelectField
+    name="status"
+    label="Filing status"
+    value={status}
+    options={Object.entries(FILING_STATUS_LABELS).map(([value, label]) => ({ value, label }))}
+  />
+</div>
+<NumberField
+  name="agi"
+  label="Adjusted gross income (MAGI)"
+  value={agi}
+  prefix="$"
+  format="money"
+  min={0}
+  hint="Your total income after adjustments — Form 1040, line 11. For most people this equals MAGI."
+/>
+<div class="field-row">
+  <NumberField name="itemized" label="Itemized deductions" value={0} prefix="$" format="money" min={0} hint="Leave 0 to use the standard deduction." />
+  {
+    !hideAge && (
+      <SelectField
+        name="age65"
+        label="Filers age 65 or older"
+        value={String(age65)}
+        options={[
+          { value: 0, label: 'None' },
+          { value: 1, label: 'One' },
+          { value: 2, label: 'Two (joint filers)' },
+        ]}
+      />
+    )
+  }
+</div>

@@ -1,0 +1,56 @@
+---
+import ProseLayout from '../layouts/ProseLayout.astro';
+import { site } from '../site.config';
+---
+
+<ProseLayout
+  title="Disclaimer"
+  description={`Important information about the limits of ${site.name}’s calculators and content.`}
+  path="/disclaimer/"
+  updated="2026-09-25"
+  lede="Our calculators are designed to help you understand your options. They are not a substitute for professional advice."
+>
+  <h2>Educational information only</h2>
+  <p>
+    The calculators, articles and examples on {site.name} are for general educational purposes. They do not take into account
+    your full financial situation, objectives or needs, and they are not financial, investment, credit, tax, legal, insurance,
+    Medicare or Social Security advice.
+  </p>
+
+  <h2>Results are estimates</h2>
+  <p>Every result depends on the numbers you enter and on simplifying assumptions, which each page explains. For example:</p>
+  <ul>
+    <li>Loan and credit card calculators apply interest monthly; lenders usually charge interest daily and may change rates or fees.</li>
+    <li>Tax calculators use federal brackets and standard deductions for the selected year and exclude credits, other income, payroll taxes and state taxes.</li>
+    <li>ACA, Medicare IRMAA and Social Security figures come from published government tables that are updated each year; agencies make the final determination.</li>
+  </ul>
+  <p>
+    Your actual loan offer, tax bill, premium or benefit may differ. Before acting, confirm the numbers with your lender, a tax
+    professional, a licensed insurance agent or Marketplace navigator, an attorney, or the relevant government agency.
+  </p>
+
+  <h2>No professional relationship</h2>
+  <p>
+    Using the site or contacting us does not create an adviser–client, attorney–client or any other professional relationship.
+  </p>
+
+  <h2>Accuracy and updates</h2>
+  <p>
+    We check our formulas against primary sources and update figures when agencies publish new numbers — see our
+    <a href="/editorial-policy/">editorial policy</a>. Even so, rules change and mistakes happen. If you spot an error, please
+    <a href="/contact/">tell us</a>.
+  </p>
+
+  <h2>Advertising disclosure</h2>
+  <p>
+    {site.name} is supported by advertising, including ads served by Google AdSense. Advertisers do not review, approve or
+    influence our calculators or content, and we are not paid based on which products you choose. The appearance of an
+    advertisement is not an endorsement of the advertiser or its products.
+  </p>
+
+  <h2>External links</h2>
+  <p>
+    We link to official and third-party websites for reference. We aren’t responsible for the content or accuracy of external
+    sites.
+  </p>
+</ProseLayout>

@@ -1,0 +1,38 @@
+---
+import ProseLayout from '../layouts/ProseLayout.astro';
+import Icon from '../components/Icon.astro';
+import { site } from '../site.config';
+---
+
+<ProseLayout
+  title="Contact us"
+  description={`Get in touch with ${site.name} — report an error, suggest a calculator or ask a question.`}
+  path="/contact/"
+  lede="We read every message. The fastest way to reach us is by email."
+>
+  <div class="feature" style="display:flex;gap:16px;align-items:flex-start;margin-bottom:28px">
+    <span class="ico"><Icon name="mail" /></span>
+    <div>
+      <h2 style="margin:0 0 4px;font-size:1.1rem">Email</h2>
+      <p style="margin:0">
+        <a href={`mailto:${site.email}`} style="font-size:1.1rem;font-weight:650">{site.email}</a>
+      </p>
+      <p class="muted small" style="margin:6px 0 0">We aim to reply within two business days.</p>
+    </div>
+  </div>
+
+  <h2>What to include</h2>
+  <ul>
+    <li><strong>Reporting an error?</strong> Include the page address, the numbers you entered and what you expected to see. Please don’t send personal financial documents.</li>
+    <li><strong>Suggesting a calculator?</strong> Tell us what decision you’re trying to make and which rules apply.</li>
+    <li><strong>Media or citations?</strong> You’re welcome to cite and link to our calculators; let us know if you need details about our methodology.</li>
+    <li><strong>Privacy requests?</strong> See our <a href="/privacy-policy/">privacy policy</a> for your rights and how we handle requests.</li>
+  </ul>
+
+  <h2>Please note</h2>
+  <p>
+    We can’t provide personalized financial, tax, legal or insurance advice, and we can’t help with individual accounts at lenders,
+    the IRS, Medicare, the Marketplace or Social Security. For those, please contact the organization directly or a qualified
+    professional.
+  </p>
+</ProseLayout>

@@ -1,0 +1,239 @@
+---
+import ToolLayout from '../layouts/ToolLayout.astro';
+import Calc from '../components/calc/Calc.astro';
+import NumberField from '../components/calc/NumberField.astro';
+import SelectField from '../components/calc/SelectField.astro';
+import AdSlot from '../components/AdSlot.astro';
+
+const sections = [
+  { id: 'how-to-use', title: 'How to use this calculator' },
+  { id: 'equity-vs-borrowable', title: 'Home equity vs. what you can borrow' },
+  { id: 'cltv-limits', title: 'CLTV limits by loan type' },
+  { id: 'example', title: 'Worked example' },
+  { id: 'qualify', title: 'What else lenders check' },
+  { id: 'ways-to-borrow', title: 'Ways to tap your equity' },
+];
+
+const faq = [
+  {
+    q: 'How much equity can I borrow from my house?',
+    a: 'Most lenders let your total mortgage debt — first mortgage plus the new HELOC or home equity loan — reach 80% to 85% of your home’s appraised value, and some go to 90%. The amount you can borrow is that cap minus what you already owe. On a $450,000 home with $280,000 owed, an 85% limit allows about $102,500.',
+  },
+  {
+    q: 'What is CLTV?',
+    a: 'Combined loan-to-value (CLTV) is the total of all loans secured by your home divided by its value. It’s the key number for second mortgages such as HELOCs and home equity loans. Loan-to-value (LTV) usually refers to the first mortgage alone.',
+  },
+  {
+    q: 'How do lenders determine my home’s value?',
+    a: 'Through a full appraisal, a drive-by appraisal or an automated valuation model (AVM), depending on the loan size and lender. Online estimates can be off by several percent, so enter a conservative value for a realistic limit.',
+  },
+  {
+    q: 'Do I need 20% equity to get a HELOC?',
+    a: 'Not always, but you need enough equity to stay under the lender’s CLTV cap after the new line. With an 85% cap, you need more than 15% equity to borrow anything at all, and the more equity you have, the larger the line.',
+  },
+  {
+    q: 'Does borrowing against my home affect my DTI?',
+    a: 'Yes. Lenders add the new HELOC or home equity loan payment to your monthly debts, and many cap back-end debt-to-income at about 43%–50%. Check yours with the <a href="/debt-to-income-ratio-calculator/">DTI calculator</a>.',
+  },
+];
+
+const sources = [
+  {
+    title: 'Mortgages — consumer tools (home equity loans and lines of credit)',
+    url: 'https://www.consumerfinance.gov/consumer-tools/mortgages/',
+    publisher: 'Consumer Financial Protection Bureau',
+  },
+  {
+    title: 'Selling Guide B2-1.1-01: Occupancy, LTV and CLTV ratios',
+    url: 'https://selling-guide.fanniemae.com/',
+    publisher: 'Fannie Mae',
+  },
+  {
+    title: 'Regulation Z §1026.40 — requirements for home equity plans',
+    url: 'https://www.consumerfinance.gov/rules-policy/regulations/1026/40/',
+    publisher: 'Consumer Financial Protection Bureau',
+  },
+];
+---
+
+<ToolLayout
+  slug="home-equity-calculator"
+  sections={sections}
+  faq={faq}
+  sources={sources}
+  related={['heloc-payment-calculator', 'cash-out-refinance-vs-heloc-calculator', 'debt-to-income-ratio-calculator', 'debt-consolidation-calculator']}
+>
+  <p slot="intro">
+    See how much equity you have in your home and how much a lender may let you borrow with a HELOC or home equity loan at
+    80%, 85% or 90% combined loan-to-value — plus an estimate of the monthly payment.
+  </p>
+
+  <Calc id="he" slot="calculator" inputsTitle="Your home">
+    <Fragment slot="inputs">
+      <NumberField name="value" label="Estimated home value" value={450000} prefix="$" format="money" min={0} />
+      <div class="field-row">
+        <NumberField name="mortgage" label="Mortgage balance" value={280000} prefix="$" format="money" min={0} />
+        <NumberField name="other" label="Other home loans" value={0} prefix="$" format="money" min={0} hint="Existing HELOC or second mortgage." />
+      </div>
+      <div class="field-row">
+        <SelectField
+          name="cltv"
+          label="Lender’s CLTV limit"
+          value="85"
+          options={[
+            { value: 75, label: '75%' },
+            { value: 80, label: '80% — conservative' },
+            { value: 85, label: '85% — most common' },
+            { value: 90, label: '90% — some lenders' },
+          ]}
+        />
+        <NumberField name="rate" label="HELOC rate" value={8.25} suffix="%" min={0} max={40} />
+      </div>
+    </Fragment>
+
+    <Fragment slot="results">
+      <div class="result-hero" aria-live="polite">
+        <p class="label">You may be able to borrow up to</p>
+        <p class="value" data-out="hero">—</p>
+        <p class="sub" data-out="heroSub"></p>
+      </div>
+      <div class="stats cols-3">
+        <div class="stat"><p class="label">Total home equity</p><p class="value" data-out="equity">—</p></div>
+        <div class="stat"><p class="label">Current loan-to-value</p><p class="value" data-out="ltv">—</p></div>
+        <div class="stat"><p class="label">Interest-only payment on the max</p><p class="value" data-out="payment">—</p></div>
+      </div>
+      <div data-out="verdict"></div>
+      <h3 class="results-heading">Your home’s value, split</h3>
+      <div data-out="split"></div>
+      <h3 class="results-heading">Borrowing limit at different CLTV caps</h3>
+      <div data-out="table"></div>
+    </Fragment>
+  </Calc>
+
+  <h2 id="how-to-use">How to use this calculator</h2>
+  <ol>
+    <li><strong>Enter your home’s estimated value.</strong> A recent appraisal is best; an online estimate or recent sale prices of similar homes nearby also work. Be conservative.</li>
+    <li><strong>Enter what you owe</strong> on your first mortgage and any existing second mortgage or HELOC.</li>
+    <li><strong>Pick the lender’s CLTV limit</strong>. 80%–85% is typical; check the lender’s requirements.</li>
+    <li><strong>Enter a HELOC rate</strong> to estimate the interest-only payment if you borrowed the full amount.</li>
+  </ol>
+
+  <h2 id="equity-vs-borrowable">Home equity vs. what you can borrow</h2>
+  <p>
+    Your <strong>home equity</strong> is the part of your home you own outright: its current value minus every loan secured by
+    it. But lenders won’t let you borrow all of it. They require you to keep a cushion of equity — typically 15% to 20% of the
+    home’s value — to protect against falling prices and selling costs.
+  </p>
+  <div class="formula">Home equity = home value − all mortgage balances
+Borrowing limit = (home value × CLTV limit) − all mortgage balances</div>
+
+  <AdSlot slot="inContent" />
+
+  <h2 id="cltv-limits">CLTV limits by loan type</h2>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Loan type</th><th>Typical maximum</th></tr></thead>
+      <tbody>
+        <tr><td>HELOC (primary residence)</td><td>80%–85% CLTV; some lenders 90%</td></tr>
+        <tr><td>Home equity loan (fixed-rate)</td><td>80%–85% CLTV; some lenders 90%</td></tr>
+        <tr><td>Conventional cash-out refinance</td><td>80% LTV (primary residence)</td></tr>
+        <tr><td>FHA cash-out refinance</td><td>80% LTV</td></tr>
+        <tr><td>VA cash-out refinance</td><td>Up to 90%–100% LTV, depending on the lender</td></tr>
+        <tr><td>Investment property HELOC</td><td>Often 70%–75% CLTV, and fewer lenders offer them</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="example">Worked example</h2>
+  <p>
+    Taylor’s home is worth <strong>$450,000</strong> and the mortgage balance is <strong>$280,000</strong>.
+  </p>
+  <ul>
+    <li>Total equity: $450,000 − $280,000 = <strong>$170,000</strong> (about 38% of the home’s value).</li>
+    <li>At an 85% CLTV limit: $450,000 × 85% = $382,500 of total debt allowed, so Taylor could borrow up to <strong>$102,500</strong>.</li>
+    <li>At 80%: $360,000 − $280,000 = <strong>$80,000</strong>. At 90%: <strong>$125,000</strong>.</li>
+    <li>Drawing the full $102,500 on a HELOC at 8.25% would mean an interest-only payment of about <strong>$705 a month</strong>.</li>
+  </ul>
+
+  <h2 id="qualify">What else lenders check</h2>
+  <ul>
+    <li><strong>Credit score:</strong> many HELOC lenders want 680+, with the best rates at 740+.</li>
+    <li><strong>Debt-to-income ratio:</strong> including the new payment, usually under 43%–50%. Use the <a href="/debt-to-income-ratio-calculator/">DTI calculator</a>.</li>
+    <li><strong>Income and employment:</strong> documented, stable income to support the payment.</li>
+    <li><strong>Property type and occupancy:</strong> primary residences get the highest limits and best rates.</li>
+  </ul>
+
+  <h2 id="ways-to-borrow">Ways to tap your equity</h2>
+  <ul>
+    <li><strong>HELOC:</strong> a revolving line with a variable rate and interest-only draw period — flexible for ongoing projects. Estimate payments with the <a href="/heloc-payment-calculator/">HELOC payment calculator</a>.</li>
+    <li><strong>Home equity loan:</strong> a lump sum at a fixed rate with fixed payments — predictable for one-time costs.</li>
+    <li><strong>Cash-out refinance:</strong> replaces your mortgage with a larger one. Often costly if your current rate is low — compare with the <a href="/cash-out-refinance-vs-heloc-calculator/">cash-out refinance vs HELOC calculator</a>.</li>
+    <li><strong>Reverse mortgage (HECM):</strong> for homeowners 62+, converts equity into payments without monthly mortgage payments; the loan is repaid when you move or sell.</li>
+  </ul>
+  <div class="callout warn">
+    <span class="callout-title">Your home is the collateral</span>
+    Borrowing against your home turns unsecured spending into secured debt. If you can’t make the payments, you could lose
+    your home. Borrow only what you need and have a plan to repay it.
+  </div>
+</ToolLayout>
+
+<script>
+  import { bindCalculator, outputs, verdict } from '../lib/ui/form';
+  import { money, percent } from '../lib/ui/format';
+  import { splitBar } from '../lib/ui/chart';
+  import { homeEquity } from '../lib/calc/home';
+
+  const out = outputs('he');
+
+  bindCalculator('he', {
+    compute(f) {
+      const value = f.num('value');
+      const owed = f.num('mortgage') + f.num('other');
+      const cap = Number(f.str('cltv')) || 85;
+      const rate = f.num('rate');
+      const r = homeEquity(value, owed, cap);
+
+      if (!(value > 0)) {
+        out.text('hero', '—');
+        out.text('heroSub', 'Enter your home’s value.');
+        ['verdict', 'split', 'table'].forEach((k) => out.html(k, ''));
+        return;
+      }
+      out.text('hero', money(r.borrowable));
+      out.text('heroSub', `At a ${cap}% combined loan-to-value limit`);
+      out.text('equity', `${money(r.equity)} (${percent(r.equityPercent, 0)})`);
+      out.text('ltv', percent(r.currentLtv));
+      out.text('payment', money((r.borrowable * rate) / 100 / 12, true));
+
+      if (r.borrowable <= 0) {
+        out.html('verdict', verdict('bad', `You owe ${percent(r.currentLtv)} of your home’s value, which is above the ${cap}% limit, so there is no equity available to borrow at this cap. Paying down the mortgage or a higher appraisal would change that.`));
+      } else if (r.borrowable < 10000) {
+        out.html('verdict', verdict('warn', `You have some borrowing room, but many lenders set a minimum line of $10,000–$25,000.`));
+      } else {
+        out.html('verdict', verdict('good', `After borrowing the full <strong>${money(r.borrowable)}</strong>, you’d still keep <strong>${money(r.retainedEquity)}</strong> of equity in the home.`));
+      }
+
+      out.html(
+        'split',
+        splitBar(
+          [
+            { label: 'Owed now', value: Math.min(owed, value), color: 'var(--chart-2)' },
+            { label: 'Borrowable', value: r.borrowable, color: 'var(--chart-1)' },
+            { label: 'Equity you keep', value: Math.max(0, value - Math.max(owed, 0) - r.borrowable), color: 'var(--chart-3)' },
+          ],
+          (n) => money(n),
+        ),
+      );
+      const rows = [75, 80, 85, 90]
+        .map((c) => {
+          const x = homeEquity(value, owed, c);
+          return `<tr${c === cap ? ' style="font-weight:700"' : ''}><td>${c}% CLTV</td><td>${money(x.maxTotalDebt)}</td><td>${money(x.borrowable)}</td></tr>`;
+        })
+        .join('');
+      out.html(
+        'table',
+        `<div class="table-wrap" style="max-height:none"><table class="data"><thead><tr><th>Limit</th><th>Max total debt</th><th>You could borrow</th></tr></thead><tbody>${rows}</tbody></table></div>`,
+      );
+    },
+  });
+</script>

@@ -1,0 +1,20 @@
+---
+import Icon from './Icon.astro';
+import type { Tool } from '../data/tools';
+import { categoryById } from '../data/categories';
+
+interface Props {
+  tool: Tool;
+  showCategory?: boolean;
+}
+const { tool, showCategory = false } = Astro.props;
+const cat = categoryById(tool.category);
+const q = `${tool.title} ${tool.short} ${cat.name}`.toLowerCase();
+---
+
+<a class="tool-card" href={`/${tool.slug}/`} data-q={q}>
+  <span class="ico"><Icon name={tool.icon} /></span>
+  <h3>{tool.title}</h3>
+  <p>{tool.short}</p>
+  {showCategory && <span class="tag">{cat.name}</span>}
+</a>

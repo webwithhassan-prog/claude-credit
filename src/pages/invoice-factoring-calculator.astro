@@ -1,0 +1,256 @@
+---
+import ToolLayout from '../layouts/ToolLayout.astro';
+import Calc from '../components/calc/Calc.astro';
+import NumberField from '../components/calc/NumberField.astro';
+import SelectField from '../components/calc/SelectField.astro';
+import AdSlot from '../components/AdSlot.astro';
+
+const sections = [
+  { id: 'how-to-use', title: 'How to use this calculator' },
+  { id: 'how-factoring-works', title: 'How invoice factoring works' },
+  { id: 'fee-structures', title: 'Factoring fee structures' },
+  { id: 'example', title: 'Worked example' },
+  { id: 'recourse', title: 'Recourse vs non-recourse factoring' },
+  { id: 'compare', title: 'Factoring vs other financing' },
+];
+
+const faq = [
+  {
+    q: 'How much does invoice factoring cost?',
+    a: 'Factoring fees typically range from about 1% to 5% of the invoice for every 30 days it remains unpaid, plus possible extras such as application, ACH/wire or due-diligence fees. The total depends heavily on how long your customer takes to pay — which is why this calculator asks for the expected days to payment.',
+  },
+  {
+    q: 'What is an advance rate?',
+    a: 'The percentage of the invoice the factoring company pays you upfront — commonly 70% to 95%. The rest (the reserve) is held until your customer pays, then released to you minus the factoring fees. This released amount is called the rebate.',
+  },
+  {
+    q: 'How do I calculate the APR of invoice factoring?',
+    a: 'Divide the total fees by the cash you actually received upfront (the advance), then scale it to a year: fees ÷ advance × 365 ÷ days outstanding. It’s an approximation, but it lets you compare factoring with a loan or line of credit on the same basis.',
+  },
+  {
+    q: 'Does my customer know I’m factoring?',
+    a: 'In most “notification” factoring arrangements, yes — your customer is told to pay the factoring company directly. Some providers offer non-notification (confidential) factoring or invoice financing, where you collect and repay yourself, usually at a higher cost or with stricter requirements.',
+  },
+  {
+    q: 'Is invoice factoring a loan?',
+    a: 'Factoring is typically structured as a sale of your receivables rather than a loan, so it doesn’t appear as debt on your balance sheet the same way. Approval depends mainly on your customers’ creditworthiness rather than your own credit score.',
+  },
+];
+
+const sources = [
+  {
+    title: 'Loans — funding programs for small businesses',
+    url: 'https://www.sba.gov/funding-programs/loans',
+    publisher: 'U.S. Small Business Administration',
+  },
+  {
+    title: 'Manage your finances — business guide',
+    url: 'https://www.sba.gov/business-guide/manage-your-business/manage-your-finances',
+    publisher: 'U.S. Small Business Administration',
+  },
+  {
+    title: 'Small business lending rule and research (Section 1071)',
+    url: 'https://www.consumerfinance.gov/data-research/small-business-lending/',
+    publisher: 'Consumer Financial Protection Bureau',
+  },
+];
+---
+
+<ToolLayout
+  slug="invoice-factoring-calculator"
+  sections={sections}
+  faq={faq}
+  sources={sources}
+  related={['merchant-cash-advance-calculator', 'equipment-loan-calculator', 'dscr-loan-calculator', 'debt-consolidation-calculator']}
+>
+  <p slot="intro">
+    Estimate what factoring an unpaid invoice really costs: the cash advance you receive today, the factoring fees, the rebate
+    released when your customer pays, your net proceeds, and the effective annual rate on the money you actually used.
+  </p>
+
+  <Calc id="fac" slot="calculator" inputsTitle="Invoice & factoring terms">
+    <Fragment slot="inputs">
+      <div class="field-row">
+        <NumberField name="invoice" label="Invoice amount" value={25000} prefix="$" format="money" min={0} />
+        <NumberField name="advance" label="Advance rate" value={85} suffix="%" min={0} max={100} hint="Usually 70%–95%." />
+      </div>
+      <div class="field-row">
+        <NumberField name="fee" label="Factoring fee" value={3} suffix="%" min={0} max={20} />
+        <SelectField
+          name="period"
+          label="Fee charged per"
+          value="30"
+          options={[
+            { value: 30, label: '30 days' },
+            { value: 15, label: '15 days' },
+            { value: 10, label: '10 days' },
+            { value: 7, label: 'Week' },
+            { value: 1, label: 'Day (pro rata)' },
+          ]}
+        />
+      </div>
+      <div class="field-row">
+        <NumberField name="days" label="Days until customer pays" value={45} suffix="days" min={1} max={365} />
+        <NumberField name="other" label="Other fees" value={50} prefix="$" format="money" min={0} hint="ACH, wire, application." />
+      </div>
+    </Fragment>
+
+    <Fragment slot="results">
+      <div class="result-hero" aria-live="polite">
+        <p class="label">Total factoring cost</p>
+        <p class="value" data-out="hero">—</p>
+        <p class="sub" data-out="heroSub"></p>
+      </div>
+      <div class="stats cols-3">
+        <div class="stat"><p class="label">Cash advance today</p><p class="value" data-out="advance">—</p></div>
+        <div class="stat"><p class="label">Rebate when paid</p><p class="value" data-out="rebate">—</p></div>
+        <div class="stat"><p class="label">Effective APR on advance</p><p class="value" data-out="apr">—</p></div>
+      </div>
+      <div data-out="verdict"></div>
+      <h3 class="results-heading">How the invoice is split</h3>
+      <div data-out="split"></div>
+      <div data-out="table"></div>
+    </Fragment>
+  </Calc>
+
+  <h2 id="how-to-use">How to use this calculator</h2>
+  <ol>
+    <li><strong>Enter the invoice amount</strong> and the advance rate from the factoring quote.</li>
+    <li><strong>Enter the factoring fee and how it’s charged</strong> — for example “3% per 30 days”. Most factors charge for each period, or part of a period, that the invoice is outstanding.</li>
+    <li><strong>Estimate how many days your customer takes to pay.</strong> Use their actual payment history if you have it; Net 30 terms often stretch to 40–60 days.</li>
+    <li><strong>Add any flat fees</strong> such as ACH or wire charges, application or due-diligence fees.</li>
+  </ol>
+
+  <h2 id="how-factoring-works">How invoice factoring works</h2>
+  <p>
+    Invoice factoring turns unpaid business-to-business invoices into immediate cash. You sell an invoice to a factoring
+    company, which advances most of its value — often within a day or two. When your customer pays the invoice, the factor
+    releases the remaining balance to you, minus its fees.
+  </p>
+  <ol>
+    <li>You deliver goods or services and invoice your customer.</li>
+    <li>The factor advances, say, 85% of the invoice.</li>
+    <li>Your customer pays the factor on the invoice’s terms.</li>
+    <li>The factor sends you the reserve (15%) minus its fees — the rebate.</li>
+  </ol>
+
+  <AdSlot slot="inContent" />
+
+  <h2 id="fee-structures">Factoring fee structures</h2>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Structure</th><th>How it works</th></tr></thead>
+      <tbody>
+        <tr><td>Flat fee</td><td>A single percentage regardless of payment time — simple but can be expensive on fast-paying invoices.</td></tr>
+        <tr><td>Per period (tiered)</td><td>A fee for every 30, 15 or 10 days outstanding. Any part of a period is usually charged as a full period.</td></tr>
+        <tr><td>Prime-plus / daily</td><td>Interest-like charge on the advanced amount, accruing daily — common with larger facilities.</td></tr>
+        <tr><td>Extra fees</td><td>Application, due diligence, ACH/wire, monthly minimums, early termination — ask for the full fee schedule.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="example">Worked example</h2>
+  <p>
+    A staffing firm factors a <strong>$25,000</strong> invoice with an <strong>85% advance</strong> and a fee of <strong>3% per
+    30 days</strong>. The client pays in <strong>45 days</strong>, and there’s a $50 ACH fee.
+  </p>
+  <ul>
+    <li>Advance today: 85% × $25,000 = <strong>$21,250</strong>.</li>
+    <li>45 days spans two 30-day periods, so the factoring fee is 2 × 3% × $25,000 = <strong>$1,500</strong>; total fees <strong>$1,550</strong>.</li>
+    <li>Rebate when the client pays: $3,750 reserve − $1,550 = <strong>$2,200</strong>.</li>
+    <li>Net received: <strong>$23,450</strong> (6.2% of the invoice went to fees).</li>
+    <li>Effective APR on the $21,250 advance: $1,550 ÷ $21,250 × 365 ÷ 45 ≈ <strong>59%</strong>.</li>
+  </ul>
+  <p>
+    If the client had paid on day 30, only one fee period would apply and the total cost would fall to $800. Payment speed
+    matters as much as the headline rate.
+  </p>
+
+  <h2 id="recourse">Recourse vs non-recourse factoring</h2>
+  <ul>
+    <li><strong>Recourse factoring</strong> — the most common and cheapest. If your customer doesn’t pay, you must buy back the invoice or replace it.</li>
+    <li><strong>Non-recourse factoring</strong> — the factor absorbs the loss if your customer can’t pay due to insolvency (usually not for disputes). Fees are higher and approval is stricter.</li>
+  </ul>
+
+  <h2 id="compare">Factoring vs other financing</h2>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Option</th><th>Speed</th><th>Typical cost</th><th>Approval based on</th></tr></thead>
+      <tbody>
+        <tr><td>Invoice factoring</td><td>1–3 days</td><td>1%–5% per 30 days</td><td>Your customers’ credit</td></tr>
+        <tr><td>Business line of credit</td><td>Days to weeks</td><td>Lower APR, interest on what you use</td><td>Your business credit and revenue</td></tr>
+        <tr><td>Merchant cash advance</td><td>1–2 days</td><td>Often very high APR — see the <a href="/merchant-cash-advance-calculator/">MCA calculator</a></td><td>Card or bank deposits</td></tr>
+        <tr><td>SBA loan</td><td>Weeks to months</td><td>Lowest</td><td>Credit, cash flow, collateral</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="formula">Advance = invoice × advance rate
+Factoring fee = invoice × fee % × number of fee periods (rounded up)
+Rebate = (invoice − advance) − total fees
+Effective APR ≈ total fees ÷ advance × 365 ÷ days outstanding</div>
+</ToolLayout>
+
+<script>
+  import { bindCalculator, outputs, verdict } from '../lib/ui/form';
+  import { money, percent } from '../lib/ui/format';
+  import { splitBar } from '../lib/ui/chart';
+  import { invoiceFactoring } from '../lib/calc/business';
+
+  const out = outputs('fac');
+
+  bindCalculator('fac', {
+    compute(f) {
+      const invoice = f.num('invoice');
+      const days = Math.max(1, Math.round(f.num('days', 1)));
+      const r = invoiceFactoring({
+        invoice,
+        advanceRate: f.num('advance'),
+        feePercent: f.num('fee'),
+        feePeriodDays: Number(f.str('period')) || 30,
+        daysToPay: days,
+        otherFees: f.num('other'),
+      });
+      out.text('hero', money(r.totalFees));
+      out.text('heroSub', invoice > 0 ? `${percent(r.feePercentOfInvoice)} of the invoice · ${r.periods} fee period${r.periods === 1 ? '' : 's'}` : '');
+      out.text('advance', money(r.advance));
+      out.text('rebate', money(r.rebate));
+      out.text('apr', percent(r.apr, 1));
+
+      if (!(invoice > 0)) {
+        ['verdict', 'split', 'table'].forEach((k) => out.html(k, ''));
+        return;
+      }
+      if (r.rebate < 0) {
+        out.html('verdict', verdict('bad', `Fees exceed the reserve by ${money(-r.rebate)} — you’d owe the factor money when the invoice is paid.`));
+      } else {
+        out.html(
+          'verdict',
+          verdict(
+            r.apr > 36 ? 'warn' : 'info',
+            `You get <strong>${money(r.advance)}</strong> now and <strong>${money(r.rebate)}</strong> when your customer pays — <strong>${money(r.netReceived)}</strong> in total. Each extra fee period would add <strong>${money((invoice * f.num('fee')) / 100)}</strong>.`,
+          ),
+        );
+      }
+      out.html(
+        'split',
+        splitBar(
+          [
+            { label: 'Advance', value: r.advance, color: 'var(--chart-1)' },
+            { label: 'Rebate', value: Math.max(0, r.rebate), color: 'var(--chart-3)' },
+            { label: 'Fees', value: r.totalFees, color: 'var(--chart-2)' },
+          ],
+          (n) => money(n),
+        ),
+      );
+      out.html(
+        'table',
+        `<div class="table-wrap" style="max-height:none;margin-top:14px"><table class="data"><tbody>
+          <tr><td>Reserve held back</td><td>${money(r.reserve)}</td></tr>
+          <tr><td>Factoring fee (${r.periods} period${r.periods === 1 ? '' : 's'})</td><td>${money(r.factoringFee)}</td></tr>
+          <tr><td>Other fees</td><td>${money(f.num('other'))}</td></tr>
+          <tr><td>Net received</td><td>${money(r.netReceived)}</td></tr>
+        </tbody></table></div>`,
+      );
+    },
+  });
+</script>

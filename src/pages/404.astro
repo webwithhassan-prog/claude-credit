@@ -1,0 +1,21 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ToolCard from '../components/ToolCard.astro';
+import { tools } from '../data/tools';
+
+const popular = tools.filter((t) => t.featured).slice(0, 6);
+---
+
+<BaseLayout title="Page not found" description="The page you were looking for doesn’t exist." path="/404/" noindex noAds>
+  <div class="container">
+    <section class="hero" style="padding-bottom:24px">
+      <span class="pill">Error 404</span>
+      <h1 style="margin-top:14px">We couldn’t find that page</h1>
+      <p class="lede">It may have moved, or the link may be mistyped. Try one of our most popular calculators, or browse them all.</p>
+      <a class="btn btn-primary" href="/calculators/">Browse all calculators</a>
+    </section>
+    <div class="card-grid">
+      {popular.map((t) => <ToolCard tool={t} showCategory />)}
+    </div>
+  </div>
+</BaseLayout>

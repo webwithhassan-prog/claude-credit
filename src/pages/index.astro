@@ -1,0 +1,111 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ToolCard from '../components/ToolCard.astro';
+import ToolSearch from '../components/ToolSearch.astro';
+import Icon from '../components/Icon.astro';
+import { categories } from '../data/categories';
+import { tools, toolsInCategory } from '../data/tools';
+import { site } from '../site.config';
+
+const featured = tools.filter((t) => t.featured);
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    '@id': `${site.url}/#website`,
+    name: site.name,
+    url: `${site.url}/`,
+    description: site.tagline,
+    publisher: { '@id': `${site.url}/#organization` },
+    inLanguage: 'en-US',
+  },
+];
+---
+
+<BaseLayout
+  title={`${site.name} — Free Debt, Home Equity, Tax & Benefits Calculators`}
+  description={`Free, private calculators for credit card payoff, debt-to-income, HELOCs, merchant cash advance APR, 2025–2026 tax deductions, ACA subsidies and IRMAA. Clear formulas and official sources.`}
+  path="/"
+  jsonLd={jsonLd}
+>
+  <section class="hero">
+    <div class="container">
+      <span class="pill">Updated for 2026 rules</span>
+      <h1 style="margin-top:14px">Money calculators that show their work</h1>
+      <p class="lede">
+        Free tools for debt, home equity, business financing, taxes and benefits. Every calculator explains the formula,
+        cites official sources, and runs privately in your browser.
+      </p>
+      <ToolSearch />
+      <div class="hero-badges">
+        <span><Icon name="check-circle" />100% free, no sign-up</span>
+        <span><Icon name="lock" />Your numbers never leave your device</span>
+        <span><Icon name="book" />Formulas & sources on every page</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="container" data-search-scope>
+    <section class="category-block" data-hide-when-searching>
+      <div class="category-head">
+        <div>
+          <h2>Most popular</h2>
+          <p>The calculators people use most this year.</p>
+        </div>
+      </div>
+      <div class="card-grid">
+        {featured.map((t) => <ToolCard tool={t} showCategory />)}
+      </div>
+    </section>
+
+    {
+      categories.map((c) => (
+        <section class="category-block" data-search-group id={c.id}>
+          <div class="category-head">
+            <div>
+              <h2>{c.name}</h2>
+              <p>{c.description}</p>
+            </div>
+            <a href={`/${c.id}/`} class="btn btn-sm">
+              View all <Icon name="arrow-right" size={16} />
+            </a>
+          </div>
+          <div class="card-grid">
+            {toolsInCategory(c.id).map((t) => (
+              <ToolCard tool={t} />
+            ))}
+          </div>
+        </section>
+      ))
+    }
+
+    <section class="section" data-hide-when-searching>
+      <h2 style="text-align:center">Why people trust {site.name}</h2>
+      <p class="muted" style="text-align:center;max-width:640px;margin:0 auto 26px">
+        Financial decisions deserve more than a black-box number. Here's how we build every tool.
+      </p>
+      <div class="feature-grid">
+        <div class="feature">
+          <span class="ico"><Icon name="book" /></span>
+          <h3>Transparent formulas</h3>
+          <p>Each page shows the exact formula and a worked example, so you can check the math yourself.</p>
+        </div>
+        <div class="feature">
+          <span class="ico"><Icon name="landmark" /></span>
+          <h3>Official sources</h3>
+          <p>Tax, Medicare and ACA figures come from the IRS, CMS, HHS and SSA, with links on every page.</p>
+        </div>
+        <div class="feature">
+          <span class="ico"><Icon name="lock" /></span>
+          <h3>Private by design</h3>
+          <p>Calculations run in your browser. We never ask for your name, email or account details.</p>
+        </div>
+        <div class="feature">
+          <span class="ico"><Icon name="calendar" /></span>
+          <h3>Kept up to date</h3>
+          <p>Pages show when they were last reviewed, and figures are updated as new rules take effect.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</BaseLayout>

@@ -1,0 +1,40 @@
+---
+/** Instant client-side filter over every .tool-card[data-q] on the page. */
+import Icon from './Icon.astro';
+interface Props {
+  placeholder?: string;
+}
+const { placeholder = 'Search calculators' } = Astro.props;
+---
+
+<div class="search-box" role="search">
+  <label class="input-wrap">
+    <span class="affix"><Icon name="search" size={20} /></span>
+    <span class="visually-hidden">Search calculators</span>
+    <input type="search" placeholder={placeholder} data-tool-search autocomplete="off" />
+  </label>
+  <p class="muted small" data-search-empty hidden style="text-align:center;margin-top:12px">
+    No calculators match that search. Try a broader word like “loan” or “tax”.
+  </p>
+</div>
+
+<script>
+  const input = document.querySelector<HTMLInputElement>('[data-tool-search]');
+  const empty = document.querySelector<HTMLElement>('[data-search-empty]');
+  input?.addEventListener('input', () => {
+    const terms = input.value.toLowerCase().trim().split(/\s+/).filter(Boolean);
+    const searching = terms.length > 0;
+    let shown = 0;
+    document.querySelectorAll<HTMLElement>('[data-search-scope] .tool-card').forEach((card) => {
+      const q = card.dataset.q ?? '';
+      const hit = terms.every((t) => q.includes(t));
+      card.hidden = !hit;
+      if (hit) shown++;
+    });
+    document.querySelectorAll<HTMLElement>('[data-search-group]').forEach((g) => {
+      g.hidden = searching && !g.querySelector('.tool-card:not([hidden])');
+    });
+    document.querySelectorAll<HTMLElement>('[data-hide-when-searching]').forEach((el) => (el.hidden = searching));
+    if (empty) empty.hidden = !searching || shown > 0;
+  });
+</script>

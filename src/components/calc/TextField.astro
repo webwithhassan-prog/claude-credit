@@ -1,0 +1,18 @@
+---
+interface Props {
+  name: string;
+  label: string;
+  value?: string;
+  placeholder?: string;
+}
+const { name, label, value = '', placeholder } = Astro.props;
+---
+
+<div class="field">
+  <label>
+    <span class="label">{label}</span>
+    <span class="input-wrap">
+      <input type="text" name={name} value={value} placeholder={placeholder} autocomplete="off" maxlength="40" />
+    </span>
+  </label>
+</div>

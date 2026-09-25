@@ -1,0 +1,216 @@
+---
+import ToolLayout from '../layouts/ToolLayout.astro';
+import Calc from '../components/calc/Calc.astro';
+import NumberField from '../components/calc/NumberField.astro';
+import CheckField from '../components/calc/CheckField.astro';
+import TaxBasics from '../components/calc/TaxBasics.astro';
+import AdSlot from '../components/AdSlot.astro';
+
+const sections = [
+  { id: 'how-to-use', title: 'How to use this calculator' },
+  { id: 'qualified-tips', title: 'What counts as qualified tips' },
+  { id: 'limits', title: 'The $25,000 cap and phase-out' },
+  { id: 'example', title: 'Worked examples' },
+  { id: 'self-employed', title: 'Self-employed and gig workers' },
+  { id: 'method', title: 'How the calculator works' },
+];
+
+const faq = [
+  {
+    q: 'Are tips completely tax-free now?',
+    a: 'Not exactly. For tax years 2025–2028 you can <em>deduct</em> up to $25,000 of qualified tips from your taxable income. You still pay Social Security and Medicare tax on them, they still count in your AGI, and your state may still tax them.',
+  },
+  {
+    q: 'Which jobs qualify?',
+    a: 'The tips must be earned in an occupation that customarily and regularly received tips on or before December 31, 2024. The Treasury Department published a list of qualifying occupations — for example bartenders, wait staff, hairstylists, rideshare and delivery drivers, and hotel and casino workers.',
+  },
+  {
+    q: 'Do credit card tips count?',
+    a: 'Yes. Cash tips include tips paid in cash, by card or by check, and tips received through tip-sharing arrangements. Automatic service charges, such as a mandatory 18% gratuity for large parties, don’t count because the customer didn’t choose to pay them.',
+  },
+  {
+    q: 'Is the $25,000 limit per person or per return?',
+    a: 'It’s a limit per tax return. Married couples must file jointly to claim the deduction, and the combined deduction is capped at $25,000.',
+  },
+  {
+    q: 'Do I need to report my tips to my employer?',
+    a: 'Yes — reported tips (on your pay stubs and Form W-2) are the easiest to document. Unreported tips must be reported on Form 4137 with your return, and you’ll owe Social Security and Medicare tax on them.',
+  },
+];
+
+const sources = [
+  {
+    title: 'One, Big, Beautiful Bill provisions — no tax on tips',
+    url: 'https://www.irs.gov/newsroom/one-big-beautiful-bill-provisions',
+    publisher: 'Internal Revenue Service',
+  },
+  {
+    title: 'Tip recordkeeping and reporting',
+    url: 'https://www.irs.gov/businesses/small-businesses-self-employed/tip-recordkeeping-and-reporting',
+    publisher: 'Internal Revenue Service',
+  },
+  {
+    title: 'Public Law 119-21 (H.R. 1), One Big Beautiful Bill Act',
+    url: 'https://www.congress.gov/bill/119th-congress/house-bill/1',
+    publisher: 'Congress.gov',
+  },
+];
+---
+
+<ToolLayout
+  slug="no-tax-on-tips-calculator"
+  sections={sections}
+  faq={faq}
+  sources={sources}
+  related={['new-tax-deductions-calculator', 'no-tax-on-overtime-calculator', 'car-loan-interest-deduction-calculator', 'senior-deduction-calculator']}
+>
+  <p slot="intro">
+    Estimate the new federal deduction for qualified tips — up to $25,000 a year for 2025 through 2028. Enter your tips and
+    income to see the deduction after the phase-out and the federal income tax it saves.
+  </p>
+
+  <Calc id="tips" slot="calculator" inputsTitle="Your tips & tax details">
+    <Fragment slot="inputs">
+      <NumberField name="tips" label="Qualified tips received this year" value={18000} prefix="$" format="money" min={0} hint="Cash, card and shared tips you reported." />
+      <TaxBasics agi={48000} />
+      <CheckField name="eligible" label="My job is on the list of occupations that customarily receive tips" checked />
+    </Fragment>
+
+    <Fragment slot="results">
+      <div class="result-hero" aria-live="polite">
+        <p class="label">Estimated federal tax savings</p>
+        <p class="value" data-out="hero">—</p>
+        <p class="sub" data-out="heroSub"></p>
+      </div>
+      <div class="stats cols-3">
+        <div class="stat"><p class="label">Tips entered</p><p class="value" data-out="tipsOut">—</p></div>
+        <div class="stat"><p class="label">Deduction allowed</p><p class="value" data-out="deduction">—</p></div>
+        <div class="stat"><p class="label">Your marginal rate</p><p class="value" data-out="marginal">—</p></div>
+      </div>
+      <div data-out="verdict"></div>
+      <div data-out="table"></div>
+    </Fragment>
+  </Calc>
+
+  <h2 id="how-to-use">How to use this calculator</h2>
+  <ol>
+    <li><strong>Enter the qualified tips</strong> you received during the year — the total on your pay stubs, Form W-2 or tip records.</li>
+    <li><strong>Choose the tax year and filing status</strong>, and enter your adjusted gross income (tips included).</li>
+    <li><strong>Confirm your occupation qualifies.</strong></li>
+    <li><strong>Read the result</strong>: the deduction after the cap and phase-out, and the federal tax you save.</li>
+  </ol>
+
+  <h2 id="qualified-tips">What counts as qualified tips</h2>
+  <ul>
+    <li><strong>Voluntary</strong> payments the customer chose to make, in any amount they decided.</li>
+    <li>Paid in <strong>cash, by card or by check</strong>, including tips distributed through a tip pool.</li>
+    <li>Earned in an occupation that <strong>customarily and regularly received tips</strong> on or before December 31, 2024.</li>
+    <li><strong>Not</strong> mandatory service charges, negotiated fees or amounts the customer couldn’t decline.</li>
+    <li>Reported on a Form W-2, 1099 or Form 4137 so they’re documented.</li>
+  </ul>
+
+  <AdSlot slot="inContent" />
+
+  <h2 id="limits">The $25,000 cap and phase-out</h2>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Filing status</th><th>Maximum deduction</th><th>Phase-out begins (MAGI)</th></tr></thead>
+      <tbody>
+        <tr><td>Married filing jointly</td><td>$25,000 per return</td><td>$300,000</td></tr>
+        <tr><td>Single / head of household</td><td>$25,000</td><td>$150,000</td></tr>
+        <tr><td>Married filing separately</td><td colspan="2">Not eligible</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>The deduction falls by <strong>$100 for each $1,000</strong> of modified AGI above the threshold.</p>
+
+  <h2 id="example">Worked examples</h2>
+  <p>
+    <strong>Server, single, $48,000 AGI including $18,000 of tips (2026).</strong> Income is well under $150,000, so the full
+    $18,000 is deductible. Taxable income falls from $31,900 to $13,900 — all in the 12% bracket — saving about
+    <strong>$2,160</strong>.
+  </p>
+  <p>
+    <strong>Single filer with $165,500 of MAGI and $18,000 of tips.</strong> MAGI is $15,500 over the threshold, so the
+    deduction drops by 15 × $100 = $1,500, to <strong>$16,500</strong>.
+  </p>
+
+  <h2 id="self-employed">Self-employed and gig workers</h2>
+  <p>
+    Self-employed people in qualifying tipped occupations — such as rideshare drivers, delivery workers or independent
+    hairstylists — can also claim the deduction. For them, the deduction can’t exceed the net income from the business that
+    earned the tips, and some specified service businesses are excluded. Keep records of tips separately from fares or fees.
+  </p>
+  <div class="callout">
+    <span class="callout-title">Stack your deductions</span>
+    If you also earn overtime, bought a new U.S.-assembled car with a loan, or are 65+, estimate everything together with the
+    <a href="/new-tax-deductions-calculator/">Schedule 1-A calculator</a>.
+  </div>
+
+  <h2 id="method">How the calculator works</h2>
+  <div class="formula">Deduction = min(tips, $25,000) − $100 × floor(max(0, MAGI − threshold) ÷ $1,000)
+Savings = federal tax on (AGI − standard or itemized deduction) − federal tax after the tips deduction</div>
+  <p>
+    We use the 2025 or 2026 federal brackets and standard deduction. The result excludes credits, payroll taxes and state
+    income taxes. It’s an estimate for planning, not tax advice.
+  </p>
+</ToolLayout>
+
+<script>
+  import { bindCalculator, outputs, verdict } from '../lib/ui/form';
+  import { money } from '../lib/ui/format';
+  import { readTaxBasics } from '../lib/ui/tax';
+  import { taxSavings, tipsDeduction } from '../lib/calc/tax';
+
+  const out = outputs('tips');
+
+  bindCalculator('tips', {
+    compute(f) {
+      const b = readTaxBasics(f);
+      const tips = f.num('tips');
+      const eligible = f.bool('eligible');
+      const d = tipsDeduction(eligible ? tips : 0, b.agi, b.status);
+      const s = taxSavings({ ...b, otherDeductions: 0, deduction: d.allowed });
+
+      out.text('hero', money(s.savings));
+      out.text('heroSub', `On your ${b.year} federal return`);
+      out.text('tipsOut', money(tips));
+      out.text('deduction', money(d.allowed));
+      out.text('marginal', `${s.marginal}%`);
+
+      let kind: 'good' | 'warn' | 'bad' | 'info' = 'good';
+      let msg = `Your <strong>${money(d.allowed)}</strong> of qualified tips is fully deductible, saving about <strong>${money(s.savings)}</strong> in federal income tax.`;
+      if (!eligible) {
+        kind = 'bad';
+        msg = 'Only tips earned in an occupation that customarily received tips on or before December 31, 2024 qualify.';
+      } else if (d.ineligible) {
+        kind = 'bad';
+        msg = 'Married people must file jointly to claim the tips deduction.';
+      } else if (d.allowed === 0 && tips > 0) {
+        kind = 'bad';
+        msg = 'Your income is above the phase-out range, so the deduction is reduced to zero.';
+      } else if (d.reduction > 0) {
+        kind = 'warn';
+        msg = `Your deduction is reduced by <strong>${money(d.reduction)}</strong> because your MAGI is above ${b.status === 'mfj' ? '$300,000' : '$150,000'}.`;
+      } else if (tips > 25000) {
+        kind = 'warn';
+        msg = 'Your tips exceed the $25,000 annual cap, so the deduction is limited to $25,000.';
+      }
+      if (s.taxableBefore <= 0 && eligible && !d.ineligible) {
+        kind = 'info';
+        msg = 'Your standard or itemized deduction already reduces your taxable income to zero, so this deduction wouldn’t lower your federal income tax.';
+      }
+      out.html('verdict', verdict(kind, msg));
+      out.html(
+        'table',
+        `<div class="table-wrap" style="max-height:none"><table class="data"><tbody>
+          <tr><td>Standard / itemized deduction</td><td>${money(s.baseDeduction)}</td></tr>
+          <tr><td>Taxable income before</td><td>${money(s.taxableBefore)}</td></tr>
+          <tr><td>Taxable income after</td><td>${money(s.taxableAfter)}</td></tr>
+          <tr><td>Federal income tax before</td><td>${money(s.taxBefore)}</td></tr>
+          <tr><td>Federal income tax after</td><td>${money(s.taxAfter)}</td></tr>
+        </tbody></table></div>`,
+      );
+    },
+  });
+</script>

@@ -1,0 +1,286 @@
+---
+import ToolLayout from '../layouts/ToolLayout.astro';
+import Calc from '../components/calc/Calc.astro';
+import NumberField from '../components/calc/NumberField.astro';
+import SelectField from '../components/calc/SelectField.astro';
+import CheckField from '../components/calc/CheckField.astro';
+import AdSlot from '../components/AdSlot.astro';
+
+const sections = [
+  { id: 'how-to-use', title: 'How to use this calculator' },
+  { id: 'difference', title: 'Cash-out refinance vs HELOC: the key difference' },
+  { id: 'example', title: 'Worked example: the low-rate lock-in' },
+  { id: 'when-refi-wins', title: 'When a cash-out refinance wins' },
+  { id: 'comparison-table', title: 'Side-by-side comparison' },
+  { id: 'method', title: 'How the comparison works' },
+];
+
+const faq = [
+  {
+    q: 'Is a HELOC cheaper than a cash-out refinance?',
+    a: 'Often, but not always. A HELOC usually has a higher rate than a first mortgage, but it only applies to the cash you borrow, and you keep your existing mortgage and its rate. A cash-out refinance replaces your whole mortgage at today’s rate and adds closing costs of roughly 2%–5%. If your current rate is well below today’s rates, the HELOC route is usually far cheaper.',
+  },
+  {
+    q: 'When does a cash-out refinance make more sense?',
+    a: 'When your current mortgage rate is <em>higher</em> than today’s refinance rate, when you need a large amount you’ll repay over many years and want a fixed rate, or when you want one predictable payment. The calculator shows the break-even point where one option becomes cheaper than the other.',
+  },
+  {
+    q: 'Why does the refinance show a higher total cost even with a lower payment?',
+    a: 'Resetting to a new 30-year term spreads payments out, so each payment is smaller — but you pay interest for longer and on a larger balance, and the closing costs are usually financed. Always compare total cost over the time you expect to keep the loan, not just the monthly payment.',
+  },
+  {
+    q: 'What are typical closing costs?',
+    a: 'Cash-out refinances generally cost about 2% to 5% of the new loan amount (appraisal, title, origination, recording and prepaid items). HELOCs often have low or waived closing costs, though some lenders charge an appraisal, annual fee or an early-closure fee.',
+  },
+  {
+    q: 'Can I deduct the interest?',
+    a: 'Mortgage and HELOC interest is deductible only on debt used to buy, build or substantially improve the home, only if you itemize, and within the $750,000 acquisition-debt limit. Cash taken out for other purposes, such as paying off cards, doesn’t qualify.',
+  },
+];
+
+const sources = [
+  {
+    title: 'Mortgages — consumer tools and refinancing guides',
+    url: 'https://www.consumerfinance.gov/consumer-tools/mortgages/',
+    publisher: 'Consumer Financial Protection Bureau',
+  },
+  {
+    title: 'Regulation Z §1026.40 — requirements for home equity plans',
+    url: 'https://www.consumerfinance.gov/rules-policy/regulations/1026/40/',
+    publisher: 'Consumer Financial Protection Bureau',
+  },
+  {
+    title: 'Primary Mortgage Market Survey (weekly average mortgage rates)',
+    url: 'https://www.freddiemac.com/pmms',
+    publisher: 'Freddie Mac',
+  },
+  {
+    title: 'Publication 936, Home Mortgage Interest Deduction',
+    url: 'https://www.irs.gov/publications/p936',
+    publisher: 'Internal Revenue Service',
+  },
+];
+---
+
+<ToolLayout
+  slug="cash-out-refinance-vs-heloc-calculator"
+  sections={sections}
+  faq={faq}
+  sources={sources}
+  related={['heloc-payment-calculator', 'home-equity-calculator', 'debt-to-income-ratio-calculator', 'debt-consolidation-calculator']}
+>
+  <p slot="intro">
+    Need cash from your home? Compare replacing your mortgage with a larger <strong>cash-out refinance</strong> against keeping
+    your mortgage and adding a <strong>HELOC</strong>. See monthly payments, closing costs, total interest over the years you’ll
+    keep the loan, and the break-even point.
+  </p>
+
+  <Calc id="cvh" slot="calculator" inputsTitle="Your mortgage & options">
+    <Fragment slot="inputs">
+      <div class="field-row">
+        <NumberField name="balance" label="Mortgage balance" value={280000} prefix="$" format="money" min={0} />
+        <NumberField name="rate" label="Current rate" value={3.25} suffix="%" min={0} max={20} />
+      </div>
+      <div class="field-row">
+        <NumberField name="yearsLeft" label="Years left on mortgage" value={24} suffix="years" min={1} max={40} />
+        <NumberField name="cash" label="Cash you need" value={60000} prefix="$" format="money" min={0} />
+      </div>
+      <p class="calc-title" style="margin-top:8px">Cash-out refinance</p>
+      <div class="field-row">
+        <NumberField name="refiRate" label="New mortgage rate" value={6.5} suffix="%" min={0} max={20} />
+        <SelectField name="refiYears" label="New term" value="30" options={[15, 20, 25, 30].map((y) => ({ value: y, label: `${y} years` }))} />
+      </div>
+      <NumberField name="refiCosts" label="Closing costs" value={3} suffix="% of loan" min={0} max={10} />
+      <CheckField name="financeCosts" label="Roll closing costs into the new loan" checked />
+      <p class="calc-title" style="margin-top:8px">HELOC</p>
+      <div class="field-row">
+        <NumberField name="helocRate" label="HELOC rate" value={8.25} suffix="%" min={0} max={30} />
+        <NumberField name="helocCosts" label="HELOC closing costs" value={750} prefix="$" format="money" min={0} />
+      </div>
+      <div class="field-row">
+        <SelectField name="shock" label="HELOC rate stress test" value="0" options={[0, 1, 2, 3].map((p) => ({ value: p, label: p ? `+${p} points` : 'No change' }))} />
+        <SelectField name="horizon" label="Compare over" value="10" options={[3, 5, 7, 10, 15, 20, 30].map((y) => ({ value: y, label: `${y} years` }))} />
+      </div>
+    </Fragment>
+
+    <Fragment slot="results">
+      <div class="result-hero" aria-live="polite">
+        <p class="label" data-out="heroLabel">Cheaper option</p>
+        <p class="value" data-out="hero">—</p>
+        <p class="sub" data-out="heroSub"></p>
+      </div>
+      <div class="stats">
+        <div class="stat"><p class="label">Cash-out refi payment</p><p class="value" data-out="refiPay">—</p></div>
+        <div class="stat"><p class="label">Mortgage + HELOC payment</p><p class="value" data-out="helocPay">—</p></div>
+      </div>
+      <div data-out="verdict"></div>
+      <h3 class="results-heading">Interest + closing costs paid over time</h3>
+      <div class="chart" data-out="chart"></div>
+      <div data-out="table"></div>
+    </Fragment>
+  </Calc>
+
+  <h2 id="how-to-use">How to use this calculator</h2>
+  <ol>
+    <li><strong>Enter your current mortgage</strong>: balance, interest rate and the years remaining.</li>
+    <li><strong>Enter the cash you need</strong> — for a renovation, debt payoff, tuition or another goal.</li>
+    <li><strong>Enter the cash-out refinance offer</strong>: rate, term and closing costs (usually 2%–5% of the new loan).</li>
+    <li><strong>Enter the HELOC offer</strong>: rate and any closing costs. Use the stress test to see what happens if the variable HELOC rate rises.</li>
+    <li><strong>Choose a time horizon</strong> — how long you expect to keep the loans before selling or refinancing — and compare.</li>
+  </ol>
+
+  <h2 id="difference">Cash-out refinance vs HELOC: the key difference</h2>
+  <p>
+    A <strong>cash-out refinance</strong> pays off your current mortgage with a new, larger one and hands you the difference in
+    cash. Your <em>entire</em> mortgage balance moves to the new rate. A <strong>HELOC</strong> is a second loan on top of your
+    existing mortgage: only the cash you borrow carries the HELOC rate, and your first mortgage stays exactly as it is.
+  </p>
+  <p>
+    That makes your current mortgage rate the single most important input. If you locked in a rate of 2%–4% in 2020–2022,
+    refinancing $280,000 of cheap debt to reach $60,000 of new cash can cost far more than the higher rate on the $60,000 alone.
+  </p>
+
+  <AdSlot slot="inContent" />
+
+  <h2 id="example">Worked example: the low-rate lock-in</h2>
+  <p>
+    Riley owes <strong>$280,000</strong> at <strong>3.25%</strong> with 24 years left and needs <strong>$60,000</strong>.
+    Offers: a 30-year cash-out refinance at 6.5% with 3% closing costs rolled in, or a HELOC at 8.25% with $750 in costs.
+  </p>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Over 10 years</th><th>Cash-out refinance</th><th>Keep mortgage + HELOC</th></tr></thead>
+      <tbody>
+        <tr><td>New loan amount</td><td>$350,515</td><td>$280,000 + $60,000</td></tr>
+        <tr><td>Monthly payment</td><td>$2,215</td><td>$1,401 + $413 = $1,814</td></tr>
+        <tr><td>Interest + closing costs</td><td>$223,013</td><td>$127,377</td></tr>
+        <tr><td>Still owed after 10 years</td><td>$297,153</td><td>$248,955</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    Keeping the 3.25% mortgage and adding a HELOC saves about <strong>$95,600</strong> over ten years, costs $401 less per
+    month, and leaves Riley owing almost $50,000 less. The HELOC rate would have to rise a long way before the refinance won.
+  </p>
+
+  <h2 id="when-refi-wins">When a cash-out refinance wins</h2>
+  <ul>
+    <li><strong>Your current rate is higher than today’s rates.</strong> If you’re paying 6.9% and can refinance at 6.25%, lowering the rate on the whole balance can beat a HELOC — in our tests that scenario saves roughly $15,000 over ten years.</li>
+    <li><strong>You need a large sum for a long time</strong> and want a fixed rate rather than a variable HELOC rate.</li>
+    <li><strong>You want one payment</strong> and can live with resetting the loan term.</li>
+    <li><strong>You’d otherwise pay mortgage insurance</strong> that a refinance could remove (for example, FHA to conventional).</li>
+  </ul>
+
+  <h2 id="comparison-table">Side-by-side comparison</h2>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th></th><th>Cash-out refinance</th><th>HELOC</th></tr></thead>
+      <tbody>
+        <tr><td>Rate type</td><td>Usually fixed</td><td>Usually variable (Prime + margin)</td></tr>
+        <tr><td>Rate applies to</td><td>The whole new mortgage</td><td>Only the amount you draw</td></tr>
+        <tr><td>Closing costs</td><td>About 2%–5% of the loan</td><td>Often low or waived</td></tr>
+        <tr><td>Maximum borrowing</td><td>Usually 80% LTV</td><td>Usually 80%–90% CLTV</td></tr>
+        <tr><td>Payments</td><td>One fixed payment</td><td>Interest-only draw, then higher repayment</td></tr>
+        <tr><td>Best when</td><td>Current rate is above market</td><td>Current rate is below market</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="method">How the comparison works</h2>
+  <p>
+    Both routes are simulated month by month over your chosen horizon. The cash-out refinance creates one new loan equal to
+    your balance plus the cash needed (plus closing costs if you roll them in) and amortizes it over the new term. The HELOC
+    route keeps your current mortgage on its existing schedule and adds a HELOC for the cash: interest-only during a 10-year
+    draw period, then amortized over 20 years.
+  </p>
+  <div class="formula">Cost over horizon = interest paid during the horizon + closing costs
+Refinance loan (costs rolled in) = (balance + cash needed) ÷ (1 − closing cost %)</div>
+  <p>
+    Principal you repay isn’t a cost — it reduces what you owe, which is why the “still owed” row matters too. The HELOC rate
+    is held constant (plus any stress test); real HELOC rates move with the Prime Rate.
+  </p>
+</ToolLayout>
+
+<script>
+  import { bindCalculator, outputs, verdict } from '../lib/ui/form';
+  import { money } from '../lib/ui/format';
+  import { lineChart } from '../lib/ui/chart';
+  import { cashOutVsHeloc, type CashOutVsHelocInput } from '../lib/calc/home';
+
+  const out = outputs('cvh');
+
+  bindCalculator('cvh', {
+    compute(f) {
+      const base: CashOutVsHelocInput = {
+        mortgageBalance: f.num('balance'),
+        mortgageRate: f.num('rate'),
+        mortgageYearsLeft: Math.max(1, f.num('yearsLeft', 1)),
+        cashNeeded: f.num('cash'),
+        refiRate: f.num('refiRate'),
+        refiYears: Number(f.str('refiYears')) || 30,
+        refiCostsPercent: f.num('refiCosts'),
+        refiFinanceCosts: f.bool('financeCosts'),
+        helocRate: f.num('helocRate') + (Number(f.str('shock')) || 0),
+        helocDrawYears: 10,
+        helocRepayYears: 20,
+        helocCosts: f.num('helocCosts'),
+        horizonYears: Number(f.str('horizon')) || 10,
+      };
+      const r = cashOutVsHeloc(base);
+      const years = base.horizonYears;
+
+      const helocWins = r.helocAdvantage > 0;
+      out.text('heroLabel', `Cheaper over ${years} years`);
+      out.text('hero', helocWins ? 'Keep mortgage + HELOC' : 'Cash-out refinance');
+      out.text('heroSub', `Saves about ${money(Math.abs(r.helocAdvantage))} in interest and closing costs`);
+      out.text('refiPay', money(r.refi.payment));
+      out.text('helocPay', money(r.heloc.paymentNow));
+
+      // Cumulative cost curves for break-even.
+      const refiCurve: number[] = [];
+      const helocCurve: number[] = [];
+      for (let y = 0; y <= 30; y++) {
+        const x = cashOutVsHeloc({ ...base, horizonYears: y });
+        refiCurve.push(x.refi.totalCost);
+        helocCurve.push(x.heloc.totalCost);
+      }
+      let crossing: number | null = null;
+      for (let y = 1; y <= 30; y++) {
+        const prev = Math.sign(refiCurve[y - 1] - helocCurve[y - 1]);
+        const now = Math.sign(refiCurve[y] - helocCurve[y]);
+        if (prev !== 0 && now !== 0 && prev !== now) {
+          crossing = y;
+          break;
+        }
+      }
+
+      const blended = r.blendedRate.toFixed(2);
+      let msg = helocWins
+        ? `Keeping your ${base.mortgageRate}% mortgage and adding a HELOC gives a blended rate of about <strong>${blended}%</strong>, versus <strong>${base.refiRate}%</strong> on the whole balance with a refinance.`
+        : `Refinancing lowers the rate on your whole balance enough to beat a separate HELOC over ${years} years.`;
+      if (crossing) msg += ` The cheaper option switches around <strong>year ${crossing}</strong> — check the chart.`;
+      out.html('verdict', verdict(helocWins ? 'good' : 'info', msg));
+
+      lineChart(out.el('chart'), {
+        ariaLabel: 'Cumulative interest and closing costs for each option over 30 years',
+        xLabel: (i) => (i === 0 ? 'Now' : `Yr ${i}`),
+        series: [
+          { name: 'Cash-out refinance', values: refiCurve, color: 'var(--chart-2)' },
+          { name: 'Mortgage + HELOC', values: helocCurve, color: 'var(--chart-1)' },
+        ],
+      });
+
+      out.html(
+        'table',
+        `<div class="table-wrap" style="max-height:none"><table class="data"><thead><tr><th>Over ${years} years</th><th>Refinance</th><th>Mortgage + HELOC</th></tr></thead><tbody>
+          <tr><td>Loan amount</td><td>${money(r.refi.loanAmount)}</td><td>${money(base.mortgageBalance)} + ${money(base.cashNeeded)}</td></tr>
+          <tr><td>Monthly payment now</td><td>${money(r.refi.payment)}</td><td>${money(r.heloc.paymentNow)}</td></tr>
+          <tr><td>Closing costs</td><td>${money(r.refi.closingCosts)}</td><td>${money(r.heloc.costs)}</td></tr>
+          <tr><td>Interest paid</td><td>${money(r.refi.interest)}</td><td>${money(r.heloc.interest)}</td></tr>
+          <tr><td>Interest + costs</td><td>${money(r.refi.totalCost)}</td><td>${money(r.heloc.totalCost)}</td></tr>
+          <tr><td>Still owed at the end</td><td>${money(r.refi.balanceAtHorizon)}</td><td>${money(r.heloc.balanceAtHorizon)}</td></tr>
+        </tbody></table></div><p class="small muted" style="margin-top:8px">HELOC modeled with a 10-year interest-only draw and 20-year repayment (payment rises to ${money(r.heloc.helocPaymentRepay)}/mo for the HELOC after year 10).</p>`,
+      );
+    },
+  });
+</script>

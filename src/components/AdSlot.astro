@@ -1,0 +1,36 @@
+---
+/**
+ * A manual AdSense unit. Renders nothing until both the publisher ID and the
+ * slot ID are configured in site.config.ts, so the page never shows empty
+ * boxes before approval. Placement rule: never put a slot directly next to
+ * calculator inputs or buttons (AdSense accidental-click policy).
+ */
+import { site } from '../site.config';
+
+type SlotName = keyof typeof site.adsense.slots;
+interface Props {
+  slot: SlotName;
+  variant?: 'inline' | 'sidebar';
+}
+const { slot, variant = 'inline' } = Astro.props;
+const client = site.adsense.client;
+const slotId = site.adsense.slots[slot];
+const enabled = Boolean(client && slotId);
+---
+
+{
+  enabled && (
+    <aside class:list={['ad-slot', { 'sidebar-ad': variant === 'sidebar' }]} aria-label="Advertisement">
+      <span class="ad-label">Advertisement</span>
+      <ins
+        class="adsbygoogle"
+        style="display:block"
+        data-ad-client={client}
+        data-ad-slot={slotId}
+        data-ad-format={variant === 'sidebar' ? 'vertical' : 'auto'}
+        data-full-width-responsive="true"
+      />
+      <script is:inline>(window.adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </aside>
+  )
+}

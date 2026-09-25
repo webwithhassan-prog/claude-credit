@@ -1,0 +1,129 @@
+---
+import ProseLayout from '../layouts/ProseLayout.astro';
+import { site } from '../site.config';
+---
+
+<ProseLayout
+  title="Privacy policy"
+  description={`How ${site.name} handles information: calculators run in your browser, what cookies are used for advertising, and your choices.`}
+  path="/privacy-policy/"
+  updated="2026-09-25"
+  lede={`${site.name} is built to be private by design. This policy explains what information is and isn’t collected when you use the site, and the choices you have.`}
+>
+  <h2>The short version</h2>
+  <ul>
+    <li><strong>Your calculator inputs stay on your device.</strong> Every calculation runs in your web browser. The numbers you type are not sent to our servers or stored by us.</li>
+    <li><strong>No accounts.</strong> We don’t ask for your name, email, address or financial account details to use any tool.</li>
+    <li><strong>Advertising.</strong> We show ads served by Google AdSense, which uses cookies and similar technologies as described below.</li>
+    <li><strong>Your choices.</strong> You can control personalized advertising and cookies through the consent message, Google’s Ads Settings and your browser.</li>
+  </ul>
+
+  <h2>Who we are</h2>
+  <p>
+    This website ({site.url.replace('https://', '')}) is operated by {site.owner} (“{site.name}”, “we”, “us”). You can contact us
+    about privacy at <a href={`mailto:${site.email}`}>{site.email}</a>.
+  </p>
+
+  <h2>Information we collect</h2>
+  <h3>Information you enter into calculators</h3>
+  <p>
+    Calculations are performed by JavaScript running in your browser. We do not receive, log or store the values you enter.
+    If you use <em>Copy link to results</em>, your inputs are encoded in the part of the link after the “#” symbol. Browsers do
+    not send that part of a link to web servers; anyone you share the link with can see the values in it.
+  </p>
+  <h3>Information stored on your device</h3>
+  <p>
+    If you switch between light and dark mode, your choice is saved in your browser’s local storage so the site remembers it.
+    This preference never leaves your device, and you can clear it at any time in your browser settings.
+  </p>
+  <h3>Technical information</h3>
+  <p>
+    Like virtually all websites, our hosting and content-delivery providers automatically process technical information needed
+    to deliver pages securely — such as your IP address, browser type, the page requested and the time of the request. This
+    information is used for security, abuse prevention and reliability, and is retained only as long as our providers need it for
+    those purposes.
+  </p>
+  <h3>Information you send us</h3>
+  <p>
+    If you email us, we receive your email address and the contents of your message. We use it only to respond and to improve the
+    site, and we don’t add you to any mailing list.
+  </p>
+
+  <h2>Advertising and cookies</h2>
+  <p>
+    We use <strong>Google AdSense</strong> to display advertising, which keeps our calculators free. Google and its partners
+    use cookies and similar technologies to serve and measure ads:
+  </p>
+  <ul>
+    <li>Third-party vendors, including Google, use cookies to serve ads based on a user’s prior visits to this website or other websites.</li>
+    <li>Google’s use of advertising cookies enables it and its partners to serve ads to our users based on their visit to our site and/or other sites on the Internet.</li>
+    <li>
+      You may opt out of personalized advertising by visiting <a href="https://adssettings.google.com/" rel="noopener" target="_blank">Google Ads Settings</a>.
+      You can also opt out of some third-party vendors’ use of cookies for personalized advertising at
+      <a href="https://www.aboutads.info/choices/" rel="noopener" target="_blank">www.aboutads.info/choices</a> or, in Europe,
+      <a href="https://www.youronlinechoices.eu/" rel="noopener" target="_blank">www.youronlinechoices.eu</a>.
+    </li>
+    <li>
+      Learn more about how Google uses information from sites that use its services at
+      <a href="https://policies.google.com/technologies/partner-sites" rel="noopener" target="_blank">policies.google.com/technologies/partner-sites</a>.
+    </li>
+  </ul>
+  <p>
+    If you opt out of personalized ads, you will still see ads, but they will be based on general factors such as the page you
+    are viewing rather than your interests. For details on the specific cookies used, see our <a href="/cookie-policy/">cookie policy</a>.
+  </p>
+
+  <h2>Consent for visitors in the EEA, UK and Switzerland</h2>
+  <p>
+    Visitors from the European Economic Area, the United Kingdom and Switzerland are shown a consent message, provided through a
+    Google-certified consent management platform that supports the IAB Transparency and Consent Framework. Ads are personalized only
+    if you consent. You can change your choices at any time using the privacy settings link displayed by the consent message.
+  </p>
+
+  <h2>Your rights in U.S. states</h2>
+  <p>
+    Residents of certain U.S. states, including California, have rights under state privacy laws — for example, to know what
+    personal information is processed, to request deletion, and to opt out of the “sale” or “sharing” of personal information for
+    targeted advertising. Because we don’t collect calculator inputs or maintain user accounts, we hold very little personal
+    information about you. Where required, a “Do Not Sell or Share My Personal Information” option is provided through Google’s
+    privacy messaging, and you can also opt out of personalized ads using the links above. To make a request, email
+    <a href={`mailto:${site.email}`}>{site.email}</a>.
+  </p>
+
+  <h2>Rights under the GDPR and UK GDPR</h2>
+  <p>
+    If you are in the EEA or UK, you have the right to access, correct, delete or restrict processing of your personal data, to
+    object to processing, and to data portability, as well as the right to complain to your local data protection authority. The
+    legal basis for advertising cookies is your consent; the legal basis for technical information processed to deliver the site
+    securely is our legitimate interest in operating a secure, reliable website.
+  </p>
+
+  <h2>Children’s privacy</h2>
+  <p>
+    {site.name} is intended for adults and is not directed to children under 13 (or under 16 in some jurisdictions). We do not
+    knowingly collect personal information from children.
+  </p>
+
+  <h2>Links to other websites</h2>
+  <p>
+    Our pages link to government agencies and other external sites for reference. We aren’t responsible for their privacy
+    practices; please review their policies.
+  </p>
+
+  <h2>Security</h2>
+  <p>
+    The site is served only over encrypted HTTPS connections. Because we don’t collect your calculator inputs or create accounts,
+    there is very little personal data to protect in the first place.
+  </p>
+
+  <h2>Changes to this policy</h2>
+  <p>
+    We may update this policy when our practices or legal requirements change. The “last updated” date at the top shows the most
+    recent revision. Significant changes will be highlighted on this page.
+  </p>
+
+  <h2>Contact</h2>
+  <p>
+    Questions about this policy? Email <a href={`mailto:${site.email}`}>{site.email}</a> or use our <a href="/contact/">contact page</a>.
+  </p>
+</ProseLayout>

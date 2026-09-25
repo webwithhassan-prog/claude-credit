@@ -1,0 +1,331 @@
+---
+import ToolLayout from '../layouts/ToolLayout.astro';
+import Calc from '../components/calc/Calc.astro';
+import NumberField from '../components/calc/NumberField.astro';
+import SegField from '../components/calc/SegField.astro';
+import AdSlot from '../components/AdSlot.astro';
+
+const sections = [
+  { id: 'how-to-use', title: 'How to use this calculator' },
+  { id: 'how-interest-works', title: 'How credit card interest is calculated' },
+  { id: 'minimum-payment-trap', title: 'Why minimum payments take so long' },
+  { id: 'example', title: 'Worked example' },
+  { id: 'pay-off-faster', title: '7 ways to pay off a credit card faster' },
+  { id: 'formula', title: 'The formula behind the numbers' },
+];
+
+const faq = [
+  {
+    q: 'How long will it take to pay off my credit card?',
+    a: 'It depends on three numbers: your balance, your APR and your monthly payment. For example, a $6,500 balance at 22.99% APR takes about 37 months to clear at $250 a month, but more than 21 years if you only ever pay a typical minimum (1% of the balance plus interest). Enter your own numbers above to get your exact payoff date.',
+  },
+  {
+    q: 'How much should I pay each month to pay off my credit card in 12, 24 or 36 months?',
+    a: 'Switch the calculator to <strong>“Pay off by a date”</strong> and enter the number of months. It returns the fixed monthly payment that brings your balance to zero in that time. Your card statement also shows a “36-month” payment figure, which is required by the Credit CARD Act.',
+  },
+  {
+    q: 'Does this calculator include new purchases?',
+    a: 'No. It assumes you stop using the card while you pay it down, which is the fastest way out of debt. If you keep charging, your payoff date will move later by roughly the amount you add each month divided by your payment.',
+  },
+  {
+    q: 'Why is my real payoff slightly different from the calculator?',
+    a: 'Card issuers calculate interest daily on your average daily balance, and the number of days in each billing cycle varies. This calculator uses a monthly rate (APR ÷ 12), which is accurate to within a few dollars for most balances. Fees, promotional rates and penalty APRs will also change the result.',
+  },
+  {
+    q: 'Is it better to pay off one card or spread payments across all of them?',
+    a: 'Always pay at least the minimum on every card to avoid late fees and credit damage. Then put every extra dollar on one card at a time — either the highest-APR card (the avalanche method, which saves the most interest) or the smallest balance (the snowball method). Our <a href="/debt-payoff-calculator/">debt payoff calculator</a> compares both.',
+  },
+  {
+    q: 'Will paying off my credit card raise my credit score?',
+    a: 'Usually, yes. Paying down balances lowers your credit utilization — the share of your credit limits you are using — which is one of the biggest factors in FICO and VantageScore models. Use the <a href="/credit-utilization-calculator/">credit utilization calculator</a> to see where you stand.',
+  },
+];
+
+const sources = [
+  {
+    title: 'Credit cards — consumer tools and answers',
+    url: 'https://www.consumerfinance.gov/consumer-tools/credit-cards/',
+    publisher: 'Consumer Financial Protection Bureau',
+  },
+  {
+    title: 'Regulation Z §1026.7 — periodic statement disclosures (minimum payment warning)',
+    url: 'https://www.consumerfinance.gov/rules-policy/regulations/1026/7/',
+    publisher: 'Consumer Financial Protection Bureau',
+  },
+  {
+    title: 'G.19 Consumer Credit — interest rates on credit card plans',
+    url: 'https://www.federalreserve.gov/releases/g19/current/default.htm',
+    publisher: 'Board of Governors of the Federal Reserve System',
+  },
+];
+---
+
+<ToolLayout
+  slug="credit-card-payoff-calculator"
+  sections={sections}
+  faq={faq}
+  sources={sources}
+  related={['debt-payoff-calculator', 'balance-transfer-calculator', 'debt-consolidation-calculator', 'credit-utilization-calculator']}
+>
+  <p slot="intro">
+    Enter your balance, APR and monthly payment to see exactly when your credit card will be paid off, how much interest
+    you'll pay, and how much faster you'll be debt-free than paying only the minimum. Or pick a target date and we'll
+    tell you the payment you need.
+  </p>
+
+  <Calc id="cc" slot="calculator">
+    <Fragment slot="inputs">
+      <NumberField name="balance" label="Credit card balance" value={6500} prefix="$" format="money" min={0} />
+      <NumberField name="apr" label="Interest rate (APR)" value={22.99} suffix="%" min={0} max={100} hint="Find your purchase APR on your statement." />
+      <SegField
+        name="mode"
+        label="I want to"
+        value="payment"
+        options={[
+          { value: 'payment', label: 'Pay a fixed amount' },
+          { value: 'months', label: 'Pay off by a date' },
+        ]}
+      />
+      <div data-when="mode=payment">
+        <NumberField name="payment" label="Monthly payment" value={250} prefix="$" format="money" min={0} error="This payment doesn't cover the monthly interest — the balance would never go down." />
+      </div>
+      <div data-when="mode=months">
+        <NumberField name="months" label="Pay it off in" value={24} suffix="months" min={1} max={600} />
+      </div>
+    </Fragment>
+
+    <Fragment slot="results">
+      <div class="result-hero" aria-live="polite">
+        <p class="label" data-out="heroLabel">Debt-free in</p>
+        <p class="value" data-out="hero">—</p>
+        <p class="sub" data-out="heroSub"></p>
+      </div>
+      <div class="stats cols-3">
+        <div class="stat"><p class="label">Total interest</p><p class="value" data-out="interest">—</p></div>
+        <div class="stat"><p class="label">Total paid</p><p class="value" data-out="total">—</p></div>
+        <div class="stat"><p class="label">Interest saved vs. minimum</p><p class="value" data-out="saved">—</p></div>
+      </div>
+      <div data-out="verdict"></div>
+      <h3 class="results-heading">Balance over time</h3>
+      <div class="chart" data-out="chart"></div>
+      <div data-out="split"></div>
+      <details class="more">
+        <summary>Year-by-year payoff schedule</summary>
+        <div class="more-body" data-out="table"></div>
+      </details>
+    </Fragment>
+  </Calc>
+
+  <h2 id="how-to-use">How to use this calculator</h2>
+  <ol>
+    <li><strong>Enter your current balance.</strong> Use the balance on your latest statement, or today's balance from your card app.</li>
+    <li><strong>Enter your APR.</strong> It's printed on your statement next to “Annual Percentage Rate”. If you have several rates (purchases, cash advances, a promo rate), use the purchase APR — or run the calculator once per balance.</li>
+    <li><strong>Choose your goal.</strong> Pick <em>Pay a fixed amount</em> to see when a payment you can afford will clear the debt, or <em>Pay off by a date</em> to find the payment needed to be debt-free in a set number of months.</li>
+    <li><strong>Read the results.</strong> You'll see your payoff date, total interest, the interest you save compared with minimum payments, a balance chart and a year-by-year schedule. Use <em>Copy link</em> to save or share your plan.</li>
+  </ol>
+
+  <h2 id="how-interest-works">How credit card interest is calculated</h2>
+  <p>
+    Your APR is a yearly rate, but card issuers charge interest daily. Most divide the APR by 365 to get a <strong>daily
+    periodic rate</strong>, multiply it by your <strong>average daily balance</strong> for the billing cycle, and then
+    multiply by the number of days in the cycle. At 22.99% APR, the daily rate is about 0.063%, so a $6,500 balance
+    costs roughly <strong>$4.09 a day</strong> — about $124.50 a month.
+  </p>
+  <p>
+    Two rules make a big difference:
+  </p>
+  <ul>
+    <li><strong>The grace period.</strong> If you pay your full statement balance by the due date, you normally pay no interest on new purchases. Once you carry a balance, you lose the grace period and interest starts on new purchases from the day you make them.</li>
+    <li><strong>Interest compounds.</strong> Unpaid interest becomes part of the balance, so next month you pay interest on last month's interest. That's why small payments barely dent a high-APR balance.</li>
+  </ul>
+  <p>
+    This calculator applies interest monthly at APR ÷ 12, the standard way to model card payoff. The result is typically
+    within a few dollars of what your issuer's daily method produces.
+  </p>
+
+  <AdSlot slot="inContent" />
+
+  <h2 id="minimum-payment-trap">Why minimum payments take so long</h2>
+  <p>
+    Many large issuers set the minimum payment at <strong>1% of the balance plus that month's interest</strong> (with a
+    floor of around $25–$40). Because the minimum shrinks as your balance shrinks, most of every payment goes to interest,
+    and the debt drags on for decades. That's why the Credit CARD Act requires your statement to show how long payoff will
+    take at the minimum, and the payment needed to pay it off in three years.
+  </p>
+  <div class="table-scroll">
+    <table>
+      <caption class="visually-hidden">Payoff time and interest for a $6,500 balance at 22.99% APR</caption>
+      <thead>
+        <tr><th>Monthly payment</th><th>Time to pay off</th><th>Total interest</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Minimum only (starts at $189.53)</td><td>21 years 6 months</td><td>$11,363</td></tr>
+        <tr><td>$200 fixed</td><td>4 years 4 months</td><td>$3,771</td></tr>
+        <tr><td>$250 fixed</td><td>3 years 1 month</td><td>$2,582</td></tr>
+        <tr><td>$300 fixed</td><td>2 years 5 months</td><td>$1,979</td></tr>
+        <tr><td>$400 fixed</td><td>1 year 8 months</td><td>$1,363</td></tr>
+        <tr><td>$500 fixed</td><td>1 year 4 months</td><td>$1,047</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    Notice that a <strong>fixed $200 payment</strong> — only about $10 more than the first minimum — cuts the payoff
+    time from over 21 years to just over 4, and saves more than $7,500 in interest. The single most powerful move is to
+    <strong>keep paying the same dollar amount</strong> every month instead of letting your payment fall with the minimum.
+  </p>
+
+  <h2 id="example">Worked example</h2>
+  <p>
+    Maria owes <strong>$6,500</strong> on a card charging <strong>22.99% APR</strong>. Her first month's interest is
+    $6,500 × 22.99% ÷ 12 = <strong>$124.53</strong>. If she pays $250, $125.47 goes to principal and her balance
+    drops to $6,374.53. Next month's interest is a little smaller, so a little more of her $250 goes to principal — and
+    the process accelerates.
+  </p>
+  <p>
+    At $250 a month, Maria is debt-free in <strong>37 months</strong> and pays <strong>$2,582</strong> in interest. If she
+    wants to be done in <strong>24 months</strong>, she needs to pay <strong>$340.39</strong> a month; to finish in
+    <strong>12 months</strong>, <strong>$611.46</strong>. Moving the balance to a 0% balance-transfer card could save
+    even more — run the numbers with our <a href="/balance-transfer-calculator/">balance transfer calculator</a>.
+  </p>
+
+  <h2 id="pay-off-faster">7 ways to pay off a credit card faster</h2>
+  <ol>
+    <li><strong>Fix your payment.</strong> Pick a dollar amount and keep paying it even as the minimum falls.</li>
+    <li><strong>Stop adding new charges.</strong> Switch day-to-day spending to debit or cash until the card is clear.</li>
+    <li><strong>Target one card at a time.</strong> Pay minimums everywhere and throw all extra money at the highest APR (avalanche) or smallest balance (snowball). Compare both with the <a href="/debt-payoff-calculator/">debt payoff calculator</a>.</li>
+    <li><strong>Ask for a lower APR.</strong> If you've paid on time for a year, call your issuer and ask. Even a few points matter on a large balance.</li>
+    <li><strong>Use a 0% balance transfer.</strong> Transfer fees are usually 3%–5%, but 15–21 interest-free months can save far more. Aim to clear the balance before the promotion ends.</li>
+    <li><strong>Consider a consolidation loan.</strong> A fixed-rate personal loan at a lower APR gives you one payment and a guaranteed end date. Check the true cost, including origination fees, with the <a href="/debt-consolidation-calculator/">debt consolidation calculator</a>.</li>
+    <li><strong>Put windfalls to work.</strong> Tax refunds, bonuses and side-income payments applied directly to principal shorten the payoff dramatically.</li>
+  </ol>
+  <div class="callout warn">
+    <span class="callout-title">Struggling to make the minimum?</span>
+    Contact your card issuer about hardship programs, or a nonprofit credit counseling agency (look for NFCC membership).
+    Be wary of debt settlement companies that charge large upfront fees.
+  </div>
+
+  <h2 id="formula">The formula behind the numbers</h2>
+  <p>With a monthly rate <em>r</em> = APR ÷ 12, balance <em>B</em> and fixed payment <em>P</em>:</p>
+  <div class="formula">Months to pay off: n = −ln(1 − r·B / P) ÷ ln(1 + r)
+
+Payment to pay off in n months: P = B · r / (1 − (1 + r)^−n)</div>
+  <p>
+    If the payment <em>P</em> is less than or equal to the first month's interest (r·B), the balance never goes down and
+    the calculator will tell you. Total interest is the sum of each month's interest charge until the balance reaches zero;
+    the final payment is usually a little smaller than the others.
+  </p>
+</ToolLayout>
+
+<script>
+  import { bindCalculator, outputs, verdict } from '../lib/ui/form';
+  import { duration, money, monthFromNow } from '../lib/ui/format';
+  import { lineChart, splitBar } from '../lib/ui/chart';
+  import { payoffWithFixedPayment } from '../lib/calc/loan';
+  import { minimumPaymentPayoff, paymentForPayoffMonths } from '../lib/calc/debt';
+
+  const out = outputs('cc');
+
+  bindCalculator('cc', {
+    compute(f) {
+      const balance = f.num('balance');
+      const apr = f.num('apr');
+      const mode = f.str('mode');
+      let payment = f.num('payment');
+      if (mode === 'months') payment = paymentForPayoffMonths(balance, apr, Math.max(1, Math.round(f.num('months', 1))));
+
+      const plan = payoffWithFixedPayment(balance, apr, payment);
+      const min = minimumPaymentPayoff(balance, apr);
+      f.flag('payment', mode === 'payment' && plan.neverPaysOff && balance > 0);
+
+      if (balance <= 0) {
+        out.text('heroLabel', 'Debt-free in');
+        out.text('hero', '0 months');
+        out.text('heroSub', 'Enter a balance to see your payoff plan.');
+        ['interest', 'total', 'saved'].forEach((k) => out.text(k, '—'));
+        out.html('verdict', '');
+        out.html('chart', '');
+        out.html('split', '');
+        out.html('table', '');
+        return;
+      }
+
+      if (mode === 'months') {
+        out.text('heroLabel', 'Monthly payment needed');
+        out.text('hero', money(payment, true));
+        out.text('heroSub', `Debt-free by ${monthFromNow(plan.months)} (${duration(plan.months)})`);
+      } else {
+        out.text('heroLabel', 'Debt-free in');
+        out.text('hero', plan.neverPaysOff ? 'Never' : duration(plan.months));
+        out.text('heroSub', plan.neverPaysOff ? 'Your payment is less than the monthly interest.' : `Paid off by ${monthFromNow(plan.months)}`);
+      }
+
+      out.text('interest', money(plan.totalInterest));
+      out.text('total', money(plan.totalPaid));
+      const saved = min.totalInterest - plan.totalInterest;
+      out.text('saved', plan.neverPaysOff || !Number.isFinite(saved) ? '—' : money(Math.max(0, saved)));
+
+      const firstInterest = (balance * apr) / 100 / 12;
+      if (plan.neverPaysOff) {
+        out.html(
+          'verdict',
+          verdict('bad', `At ${money(payment, true)} a month you're only covering part of the <strong>${money(firstInterest, true)}</strong> monthly interest. Pay more than that to start shrinking the balance.`),
+        );
+      } else if (min.neverPaysOff || plan.months < min.months) {
+        out.html(
+          'verdict',
+          verdict(
+            'good',
+            `Paying <strong>${money(payment, true)}</strong> a month clears the card <strong>${duration(Math.max(0, min.months - plan.months))} sooner</strong> than minimum payments (which would take ${duration(min.months)}) and saves <strong>${money(Math.max(0, saved))}</strong> in interest.`,
+          ),
+        );
+      } else {
+        out.html('verdict', verdict('warn', `Your payment is at or below the typical minimum. Paying even a little more each month cuts both time and interest.`));
+      }
+
+      if (!plan.neverPaysOff) {
+        const len = Math.min(Math.max(plan.months, 2), 600);
+        const minLen = Math.min(min.schedule.length, 600);
+        const horizon = Math.max(len, Math.min(minLen, len * 3));
+        const yours = [balance, ...plan.schedule.map((r) => r.balance)];
+        const mins = [balance, ...min.schedule.map((r) => r.balance)].slice(0, horizon + 1);
+        while (yours.length < horizon + 1) yours.push(0);
+        lineChart(out.el('chart'), {
+          ariaLabel: `Balance falls from ${money(balance)} to zero in ${duration(plan.months)}`,
+          xLabel: (i) => (i === 0 ? 'Now' : i % 12 === 0 ? `${i / 12} yr` : `${i} mo`),
+          series: [
+            { name: 'Your plan', values: yours, color: 'var(--chart-1)', area: true },
+            { name: 'Minimum payments', values: mins, color: 'var(--chart-2)', dashed: true },
+          ],
+        });
+        out.html(
+          'split',
+          splitBar(
+            [
+              { label: 'Principal', value: balance, color: 'var(--chart-1)' },
+              { label: 'Interest', value: plan.totalInterest, color: 'var(--chart-2)' },
+            ],
+            (n) => money(n),
+          ),
+        );
+        // Yearly schedule
+        const rows: string[] = [];
+        for (let y = 0; y * 12 < plan.schedule.length; y++) {
+          const slice = plan.schedule.slice(y * 12, y * 12 + 12);
+          const paid = slice.reduce((s, r) => s + r.payment, 0);
+          const int = slice.reduce((s, r) => s + r.interest, 0);
+          rows.push(
+            `<tr><td>Year ${y + 1}</td><td>${money(paid)}</td><td>${money(paid - int)}</td><td>${money(int)}</td><td>${money(slice.at(-1)!.balance)}</td></tr>`,
+          );
+        }
+        out.html(
+          'table',
+          `<div class="table-wrap"><table class="data"><thead><tr><th>Year</th><th>Paid</th><th>Principal</th><th>Interest</th><th>Balance</th></tr></thead><tbody>${rows.join('')}</tbody></table></div>`,
+        );
+      } else {
+        out.html('chart', '');
+        out.html('split', '');
+        out.html('table', '');
+      }
+    },
+  });
+</script>

@@ -1,0 +1,21 @@
+---
+/** One repeating row (debt, card…). Fields go in the default slot. */
+import Icon from '../Icon.astro';
+interface Props {
+  title: string;
+  cols?: 2 | 3;
+}
+const { title, cols = 2 } = Astro.props;
+---
+
+<div class="row-card" data-row>
+  <div class="row-head">
+    <span data-row-title>{title}</span>
+    <button type="button" class="btn btn-sm btn-ghost" data-row-remove aria-label="Remove">
+      <Icon name="trash" size={16} /><span>Remove</span>
+    </button>
+  </div>
+  <div class:list={['row-grid', { 'cols-3': cols === 3 }]}>
+    <slot />
+  </div>
+</div>

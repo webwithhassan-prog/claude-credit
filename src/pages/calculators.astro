@@ -1,0 +1,46 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import ToolCard from '../components/ToolCard.astro';
+import ToolSearch from '../components/ToolSearch.astro';
+import { categories } from '../data/categories';
+import { tools, toolsInCategory } from '../data/tools';
+---
+
+<BaseLayout
+  title="All Calculators"
+  description={`Browse all ${tools.length} free calculators for debt and credit, home equity, business financing, 2025–2026 tax deductions and health benefits.`}
+  path="/calculators/"
+>
+  <div class="container">
+    <Breadcrumbs items={[{ name: 'Home', href: '/' }, { name: 'All calculators', href: '/calculators/' }]} />
+    <header class="page-hero">
+      <h1>All calculators</h1>
+      <p class="lede">
+        {tools.length} free tools, grouped by topic. Every calculator runs in your browser and explains the math behind
+        its results.
+      </p>
+    </header>
+    <ToolSearch />
+    <div data-search-scope>
+      {
+        categories.map((c) => (
+          <section class="category-block" data-search-group>
+            <div class="category-head">
+              <h2>
+                <a href={`/${c.id}/`} style="color:inherit;text-decoration:none">
+                  {c.name}
+                </a>
+              </h2>
+            </div>
+            <div class="card-grid">
+              {toolsInCategory(c.id).map((t) => (
+                <ToolCard tool={t} />
+              ))}
+            </div>
+          </section>
+        ))
+      }
+    </div>
+  </div>
+</BaseLayout>

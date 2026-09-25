@@ -1,0 +1,227 @@
+---
+import ToolLayout from '../layouts/ToolLayout.astro';
+import Calc from '../components/calc/Calc.astro';
+import NumberField from '../components/calc/NumberField.astro';
+import CheckField from '../components/calc/CheckField.astro';
+import TaxBasics from '../components/calc/TaxBasics.astro';
+import AdSlot from '../components/AdSlot.astro';
+
+const sections = [
+  { id: 'how-to-use', title: 'How to use this calculator' },
+  { id: 'overview', title: 'The four new Schedule 1-A deductions at a glance' },
+  { id: 'example', title: 'Worked example' },
+  { id: 'agi-magi', title: 'AGI, MAGI and why these deductions don’t lower them' },
+  { id: 'timeline', title: 'How long the deductions last' },
+  { id: 'method', title: 'How the calculator works' },
+];
+
+const faq = [
+  {
+    q: 'What is Schedule 1-A?',
+    a: 'Schedule 1-A (Form 1040), “Additional Deductions”, is the IRS form for the four deductions created by the One Big Beautiful Bill Act: qualified tips, qualified overtime compensation, qualified passenger vehicle loan interest, and the enhanced deduction for seniors. The total flows to your Form 1040 as a deduction from taxable income.',
+  },
+  {
+    q: 'Can I claim more than one of the new deductions?',
+    a: 'Yes. They’re separate deductions with separate caps and phase-outs, so a tipped worker who also earns overtime and bought a qualifying new car could claim three of them — and a fourth if they’re 65 or older.',
+  },
+  {
+    q: 'Do I have to itemize?',
+    a: 'No. All four are available whether you take the standard deduction or itemize.',
+  },
+  {
+    q: 'Why is my tax saving smaller than the deduction?',
+    a: 'A deduction reduces taxable income, not tax. Your saving is roughly the deduction multiplied by your marginal tax rate — 10%, 12%, 22% or 24% for most households. If your taxable income is already low, part of a deduction may have no effect at all.',
+  },
+  {
+    q: 'Do married couples have to file jointly?',
+    a: 'For the tips, overtime and senior deductions, yes — married people filing separately can’t claim them. The calculator flags this if you choose “married filing separately”.',
+  },
+];
+
+const sources = [
+  {
+    title: 'One, Big, Beautiful Bill provisions',
+    url: 'https://www.irs.gov/newsroom/one-big-beautiful-bill-provisions',
+    publisher: 'Internal Revenue Service',
+  },
+  {
+    title: 'Forms and instructions — Form 1040 and schedules',
+    url: 'https://www.irs.gov/forms-instructions',
+    publisher: 'Internal Revenue Service',
+  },
+  {
+    title: 'Public Law 119-21 (H.R. 1), One Big Beautiful Bill Act',
+    url: 'https://www.congress.gov/bill/119th-congress/house-bill/1',
+    publisher: 'Congress.gov',
+  },
+  {
+    title: 'Tax inflation adjustments for tax year 2026',
+    url: 'https://www.irs.gov/newsroom/irs-releases-tax-inflation-adjustments-for-tax-year-2026-including-amendments-from-the-one-big-beautiful-bill',
+    publisher: 'Internal Revenue Service',
+  },
+];
+---
+
+<ToolLayout
+  slug="new-tax-deductions-calculator"
+  sections={sections}
+  faq={faq}
+  sources={sources}
+  related={['no-tax-on-tips-calculator', 'no-tax-on-overtime-calculator', 'car-loan-interest-deduction-calculator', 'senior-deduction-calculator']}
+>
+  <p slot="intro">
+    Estimate all four new federal deductions on <strong>Schedule 1-A</strong> in one place — no tax on tips, no tax on overtime,
+    car loan interest and the $6,000 senior deduction. Each is capped and phased out separately, then combined to show your total
+    federal tax savings for 2025 or 2026.
+  </p>
+
+  <Calc id="s1a" slot="calculator" inputsTitle="Your income & deductions">
+    <Fragment slot="inputs">
+      <TaxBasics agi={140000} status="mfj" />
+      <div class="field-row">
+        <NumberField name="tips" label="Qualified tips" value={15000} prefix="$" format="money" min={0} />
+        <NumberField name="overtime" label="Qualified overtime premium" value={5000} prefix="$" format="money" min={0} hint="The “half” in time-and-a-half." />
+      </div>
+      <NumberField name="carInterest" label="New-car loan interest paid" value={2800} prefix="$" format="money" min={0} />
+      <CheckField name="tipsOk" label="Tips are from an occupation that customarily receives tips" checked />
+      <CheckField name="carOk" label="Car is new, U.S.-assembled, bought after 2024 with a secured loan" checked />
+    </Fragment>
+
+    <Fragment slot="results">
+      <div class="result-hero" aria-live="polite">
+        <p class="label">Estimated total federal tax savings</p>
+        <p class="value" data-out="hero">—</p>
+        <p class="sub" data-out="heroSub"></p>
+      </div>
+      <div class="stats cols-3">
+        <div class="stat"><p class="label">Total Schedule 1-A deduction</p><p class="value" data-out="total">—</p></div>
+        <div class="stat"><p class="label">Taxable income after</p><p class="value" data-out="taxable">—</p></div>
+        <div class="stat"><p class="label">Your marginal rate</p><p class="value" data-out="marginal">—</p></div>
+      </div>
+      <div data-out="verdict"></div>
+      <h3 class="results-heading">Deduction by deduction</h3>
+      <div data-out="table"></div>
+    </Fragment>
+  </Calc>
+
+  <h2 id="how-to-use">How to use this calculator</h2>
+  <ol>
+    <li><strong>Enter your tax year, filing status and adjusted gross income.</strong> Choose how many filers are 65 or older — that drives the senior deduction.</li>
+    <li><strong>Enter each amount that applies to you</strong>: qualified tips, the qualified overtime premium and interest on a qualifying new-car loan. Leave any that don’t apply at 0.</li>
+    <li><strong>Confirm eligibility</strong> for tips and the car loan.</li>
+    <li><strong>Review the breakdown.</strong> The table shows each deduction after its cap and phase-out, and how much of your total saving it produces.</li>
+  </ol>
+  <p>
+    Need help with one piece? Our single-purpose calculators go deeper: <a href="/no-tax-on-tips-calculator/">tips</a>,
+    <a href="/no-tax-on-overtime-calculator/">overtime</a>, <a href="/car-loan-interest-deduction-calculator/">car loan interest</a>
+    and <a href="/senior-deduction-calculator/">senior deduction</a>.
+  </p>
+
+  <h2 id="overview">The four new Schedule 1-A deductions at a glance</h2>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Deduction</th><th>Maximum</th><th>Phase-out starts (single / joint)</th><th>Phase-out rate</th></tr></thead>
+      <tbody>
+        <tr><td>Qualified tips</td><td>$25,000 per return</td><td>$150,000 / $300,000</td><td>$100 per $1,000</td></tr>
+        <tr><td>Qualified overtime</td><td>$12,500 / $25,000</td><td>$150,000 / $300,000</td><td>$100 per $1,000</td></tr>
+        <tr><td>Car loan interest</td><td>$10,000 per return</td><td>$100,000 / $200,000</td><td>$200 per $1,000 (or part)</td></tr>
+        <tr><td>Senior (age 65+)</td><td>$6,000 per person</td><td>$75,000 / $150,000</td><td>6% of excess MAGI</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>All four apply to tax years <strong>2025 through 2028</strong> and are available to itemizers and non-itemizers alike.</p>
+
+  <AdSlot slot="inContent" />
+
+  <h2 id="example">Worked example</h2>
+  <p>
+    Sam and Jordan file jointly with an AGI of <strong>$140,000</strong> in 2026. Sam is a restaurant server with
+    <strong>$15,000</strong> of tips; Jordan earned a <strong>$5,000</strong> overtime premium; and they paid
+    <strong>$2,800</strong> of interest on a new U.S.-assembled SUV. Neither is 65.
+  </p>
+  <ul>
+    <li>All three amounts are under their caps and their income is below every phase-out threshold, so the total Schedule 1-A deduction is <strong>$22,800</strong>.</li>
+    <li>Taxable income falls from $107,800 to $85,000. Part of that comes out of the 22% bracket and part out of the 12% bracket.</li>
+    <li>Estimated federal tax savings: about <strong>$3,436</strong>.</li>
+  </ul>
+
+  <h2 id="agi-magi">AGI, MAGI and why these deductions don’t lower them</h2>
+  <p>
+    These deductions are taken <em>after</em> adjusted gross income is calculated — they reduce taxable income, not AGI. That
+    matters because many other benefits depend on AGI or MAGI: ACA premium tax credits, Medicare IRMAA surcharges, the taxation of
+    Social Security benefits and many state programs. Claiming the new deductions won’t improve those, so check them separately with
+    our <a href="/aca-subsidy-calculator/">ACA subsidy</a> and <a href="/irmaa-calculator/">IRMAA</a> calculators.
+  </p>
+
+  <h2 id="timeline">How long the deductions last</h2>
+  <p>
+    Under current law, all four deductions expire after tax year 2028. Unless Congress extends them, 2028 returns (filed in 2029)
+    are the last on which they can be claimed. Figures such as the tax brackets and standard deduction are adjusted for inflation
+    each year; the caps and phase-out thresholds for these deductions are fixed dollar amounts in the law.
+  </p>
+
+  <h2 id="method">How the calculator works</h2>
+  <div class="formula">Each deduction = min(amount, cap) − phase-out reduction      (0 if ineligible)
+Total Schedule 1-A deduction = tips + overtime + car loan interest + senior
+Savings = federal tax on taxable income before − federal tax after</div>
+  <p>
+    The per-deduction savings in the table are calculated in order (tips, overtime, car loan, senior), so they add up to the
+    total. We apply the 2025 or 2026 brackets and standard deduction (including the extra amount for filers 65+). The estimate
+    excludes credits, payroll taxes and state taxes — it isn’t tax advice.
+  </p>
+</ToolLayout>
+
+<script>
+  import { bindCalculator, outputs, verdict } from '../lib/ui/form';
+  import { money } from '../lib/ui/format';
+  import { readTaxBasics } from '../lib/ui/tax';
+  import { carLoanInterestDeduction, overtimeDeduction, seniorDeduction, taxSavings, tipsDeduction } from '../lib/calc/tax';
+
+  const out = outputs('s1a');
+
+  bindCalculator('s1a', {
+    compute(f) {
+      const b = readTaxBasics(f);
+      const items = [
+        { name: 'Tips', d: tipsDeduction(f.bool('tipsOk') ? f.num('tips') : 0, b.agi, b.status) },
+        { name: 'Overtime', d: overtimeDeduction(f.num('overtime'), b.agi, b.status) },
+        { name: 'Car loan interest', d: carLoanInterestDeduction(f.bool('carOk') ? f.num('carInterest') : 0, b.agi, b.status) },
+        { name: 'Senior (65+)', d: seniorDeduction(b.people65, b.agi, b.status) },
+      ];
+      let running = 0;
+      const rows = items.map((it) => {
+        const before = taxSavings({ ...b, otherDeductions: running, deduction: 0 }).taxBefore;
+        running += it.d.allowed;
+        const after = taxSavings({ ...b, otherDeductions: running, deduction: 0 }).taxBefore;
+        return { ...it, saved: before - after };
+      });
+      const total = running;
+      const s = taxSavings({ ...b, otherDeductions: 0, deduction: total });
+
+      out.text('hero', money(s.savings));
+      out.text('heroSub', `On your ${b.year} federal return`);
+      out.text('total', money(total));
+      out.text('taxable', money(s.taxableAfter));
+      out.text('marginal', `${s.marginal}%`);
+
+      const notes: string[] = [];
+      if (b.status === 'mfs') notes.push('Married filing separately can’t claim the tips, overtime or senior deductions.');
+      const phased = items.filter((i) => i.d.reduction > 0 && !i.d.ineligible).map((i) => i.name.toLowerCase());
+      if (phased.length) notes.push(`Income phase-outs reduce your ${phased.join(', ')} deduction${phased.length > 1 ? 's' : ''}.`);
+      if (s.taxableBefore <= 0) notes.push('Your taxable income is already zero, so these deductions wouldn’t lower your federal income tax.');
+      out.html(
+        'verdict',
+        notes.length
+          ? verdict('warn', notes.join(' '))
+          : verdict('good', `Together the new deductions cut your taxable income by <strong>${money(total)}</strong> and your federal income tax by about <strong>${money(s.savings)}</strong>.`),
+      );
+
+      out.html(
+        'table',
+        `<div class="table-wrap" style="max-height:none"><table class="data"><thead><tr><th>Deduction</th><th>Allowed</th><th>Tax saved</th></tr></thead><tbody>
+          ${rows.map((r) => `<tr><td>${r.name}</td><td>${money(r.d.allowed)}</td><td>${money(r.saved)}</td></tr>`).join('')}
+        </tbody><tfoot><tr><td>Total</td><td>${money(total)}</td><td>${money(s.savings)}</td></tr></tfoot></table></div>`,
+      );
+    },
+  });
+</script>

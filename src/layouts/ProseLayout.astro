@@ -1,0 +1,33 @@
+---
+/** Simple long-form page: legal pages, about, editorial policy. */
+import BaseLayout from './BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  path: string;
+  /** ISO date shown as "Last updated". */
+  updated?: string;
+  lede?: string;
+  noAds?: boolean;
+}
+const { title, description, path, updated, lede, noAds = false } = Astro.props;
+const updatedLabel = updated
+  ? new Date(`${updated}T12:00:00Z`).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' })
+  : null;
+---
+
+<BaseLayout title={title} description={description} path={path} noAds={noAds}>
+  <div class="container">
+    <Breadcrumbs items={[{ name: 'Home', href: '/' }, { name: title, href: path }]} />
+    <header class="page-hero">
+      <h1>{title}</h1>
+      {lede && <p class="lede">{lede}</p>}
+      {updatedLabel && <p class="meta-line">Last updated <time datetime={updated}>{updatedLabel}</time></p>}
+    </header>
+    <article class="prose" style="margin-top:12px">
+      <slot />
+    </article>
+  </div>
+</BaseLayout>

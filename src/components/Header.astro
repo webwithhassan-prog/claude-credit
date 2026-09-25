@@ -1,0 +1,70 @@
+---
+import Icon from './Icon.astro';
+import Logo from './Logo.astro';
+import { categories } from '../data/categories';
+import { site } from '../site.config';
+
+const current = Astro.url.pathname;
+const navCats = categories.slice(0, 5);
+---
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="/" aria-label={`${site.name} home`}>
+      <Logo />
+      <span>{site.name}</span>
+    </a>
+
+    <nav class="main-nav" aria-label="Main">
+      {
+        navCats.map((c) => (
+          <a href={`/${c.id}/`} aria-current={current.startsWith(`/${c.id}/`) ? 'page' : undefined}>
+            {c.nav}
+          </a>
+        ))
+      }
+      <a href="/calculators/" aria-current={current === '/calculators/' ? 'page' : undefined}>All tools</a>
+    </nav>
+
+    <div class="header-actions">
+      <button class="icon-btn theme-toggle" type="button" aria-label="Toggle dark mode" data-theme-toggle>
+        <Icon name="moon" class="moon" />
+        <Icon name="sun" class="sun" />
+      </button>
+      <details class="mobile-menu">
+        <summary class="icon-btn" aria-label="Open menu">
+          <Icon name="menu" />
+        </summary>
+        <nav class="mobile-menu-panel" aria-label="Mobile">
+          {categories.map((c) => <a href={`/${c.id}/`}>{c.name}</a>)}
+          <a href="/calculators/">All calculators</a>
+          <a href="/about/">About</a>
+          <a href="/contact/">Contact</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+<script>
+  const btn = document.querySelector<HTMLButtonElement>('[data-theme-toggle]');
+  btn?.addEventListener('click', () => {
+    const root = document.documentElement;
+    const current =
+      root.getAttribute('data-theme') ??
+      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    const next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try {
+      localStorage.setItem('theme', next);
+    } catch {
+      /* storage unavailable — theme still applies for this page view */
+    }
+  });
+
+  // Close the mobile menu when clicking outside it.
+  document.addEventListener('click', (e) => {
+    const menu = document.querySelector<HTMLDetailsElement>('.mobile-menu');
+    if (menu?.open && !menu.contains(e.target as Node)) menu.open = false;
+  });
+</script>

@@ -1,0 +1,212 @@
+---
+import ToolLayout from '../layouts/ToolLayout.astro';
+import Calc from '../components/calc/Calc.astro';
+import TaxBasics from '../components/calc/TaxBasics.astro';
+import AdSlot from '../components/AdSlot.astro';
+
+const sections = [
+  { id: 'how-to-use', title: 'How to use this calculator' },
+  { id: 'rules', title: 'Who qualifies for the $6,000 senior deduction' },
+  { id: 'phase-out', title: 'How the 6% phase-out works' },
+  { id: 'example', title: 'Worked examples' },
+  { id: 'social-security', title: 'Does this mean no tax on Social Security?' },
+  { id: 'method', title: 'How the calculator works' },
+];
+
+const faq = [
+  {
+    q: 'What is the new senior deduction?',
+    a: 'For tax years 2025 through 2028, each taxpayer who is 65 or older by the end of the year can deduct an extra $6,000 — $12,000 for a married couple when both spouses qualify. It was created by the One Big Beautiful Bill Act and is available whether you itemize or take the standard deduction.',
+  },
+  {
+    q: 'Is this the same as the extra standard deduction for people over 65?',
+    a: 'No — it’s in addition to it. The long-standing additional standard deduction for age 65+ ($2,050 for single filers and $1,650 per married person in 2026) still applies if you take the standard deduction. The new $6,000 deduction stacks on top, and you can claim it even if you itemize.',
+  },
+  {
+    q: 'At what income does the senior deduction phase out?',
+    a: 'The $6,000 is reduced by 6% of your modified AGI above $75,000 ($150,000 for joint filers). It disappears completely at $175,000 of MAGI for a single filer and $250,000 for a married couple.',
+  },
+  {
+    q: 'Do both spouses need to be 65?',
+    a: 'Each spouse who is 65 or older gets their own $6,000 (subject to the phase-out). If only one spouse qualifies, the joint return gets one deduction. Married couples must file jointly to claim it.',
+  },
+  {
+    q: 'When am I considered 65?',
+    a: 'You’re treated as 65 for a tax year if you turn 65 by the last day of that year — for 2026, if you were born before January 2, 1962.',
+  },
+];
+
+const sources = [
+  {
+    title: 'One, Big, Beautiful Bill provisions — enhanced deduction for seniors',
+    url: 'https://www.irs.gov/newsroom/one-big-beautiful-bill-provisions',
+    publisher: 'Internal Revenue Service',
+  },
+  {
+    title: 'Publication 554, Tax Guide for Seniors',
+    url: 'https://www.irs.gov/publications/p554',
+    publisher: 'Internal Revenue Service',
+  },
+  {
+    title: 'Publication 915, Social Security and Equivalent Railroad Retirement Benefits',
+    url: 'https://www.irs.gov/publications/p915',
+    publisher: 'Internal Revenue Service',
+  },
+];
+---
+
+<ToolLayout
+  slug="senior-deduction-calculator"
+  sections={sections}
+  faq={faq}
+  sources={sources}
+  related={['new-tax-deductions-calculator', 'irmaa-calculator', 'car-loan-interest-deduction-calculator', 'aca-subsidy-calculator']}
+>
+  <p slot="intro">
+    Estimate the new $6,000 federal deduction for taxpayers age 65 and older (tax years 2025–2028), including the 6% income
+    phase-out, and see how much federal income tax it saves you on top of the regular senior standard deduction.
+  </p>
+
+  <Calc id="sen" slot="calculator" inputsTitle="Your household">
+    <Fragment slot="inputs">
+      <TaxBasics agi={120000} status="mfj" age65={2} />
+    </Fragment>
+
+    <Fragment slot="results">
+      <div class="result-hero" aria-live="polite">
+        <p class="label">Estimated federal tax savings</p>
+        <p class="value" data-out="hero">—</p>
+        <p class="sub" data-out="heroSub"></p>
+      </div>
+      <div class="stats cols-3">
+        <div class="stat"><p class="label">Senior deduction</p><p class="value" data-out="deduction">—</p></div>
+        <div class="stat"><p class="label">Phase-out reduction (each)</p><p class="value" data-out="reduction">—</p></div>
+        <div class="stat"><p class="label">Your marginal rate</p><p class="value" data-out="marginal">—</p></div>
+      </div>
+      <div data-out="verdict"></div>
+      <div data-out="table"></div>
+    </Fragment>
+  </Calc>
+
+  <h2 id="how-to-use">How to use this calculator</h2>
+  <ol>
+    <li><strong>Choose the tax year and filing status.</strong></li>
+    <li><strong>Enter your adjusted gross income</strong>, including the taxable part of any Social Security benefits.</li>
+    <li><strong>Enter itemized deductions</strong> if you itemize; leave 0 to use the standard deduction.</li>
+    <li><strong>Choose how many filers are 65 or older.</strong> Each qualifies for their own deduction.</li>
+  </ol>
+
+  <h2 id="rules">Who qualifies for the $6,000 senior deduction</h2>
+  <ul>
+    <li>You are <strong>65 or older</strong> by the end of the tax year.</li>
+    <li>You have a valid <strong>Social Security number</strong>.</li>
+    <li>If married, you <strong>file jointly</strong>.</li>
+    <li>The tax year is <strong>2025, 2026, 2027 or 2028</strong>.</li>
+  </ul>
+  <p>
+    The deduction is claimed on Schedule 1-A and reduces taxable income. You don’t need to itemize, and it doesn’t matter whether
+    you’re still working or retired.
+  </p>
+
+  <AdSlot slot="inContent" />
+
+  <h2 id="phase-out">How the 6% phase-out works</h2>
+  <p>
+    Each qualifying person’s $6,000 is reduced by <strong>6% of modified AGI above $75,000</strong> ($150,000 on a joint
+    return). Put another way, every $1,000 of income above the threshold removes $60 of deduction per qualifying person.
+  </p>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>MAGI (single, age 65+)</th><th>Deduction</th></tr></thead>
+      <tbody>
+        <tr><td>$75,000 or less</td><td>$6,000</td></tr>
+        <tr><td>$95,000</td><td>$4,800</td></tr>
+        <tr><td>$125,000</td><td>$3,000</td></tr>
+        <tr><td>$150,000</td><td>$1,500</td></tr>
+        <tr><td>$175,000 or more</td><td>$0</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="example">Worked examples</h2>
+  <p>
+    <strong>Married couple, both 65+, $120,000 AGI (2026).</strong> Their standard deduction is $32,200 plus 2 × $1,650 =
+    $35,500. MAGI is under $150,000, so each spouse gets the full $6,000 — <strong>$12,000</strong> total. Taxable income drops
+    from $84,500 to $72,500 in the 12% bracket, saving about <strong>$1,440</strong>.
+  </p>
+  <p>
+    <strong>Single filer, 66, $95,000 MAGI (2026).</strong> MAGI is $20,000 over $75,000, so the deduction is reduced by
+    6% × $20,000 = $1,200, to <strong>$4,800</strong>. In the 22% bracket, that saves about <strong>$1,056</strong>.
+  </p>
+
+  <h2 id="social-security">Does this mean no tax on Social Security?</h2>
+  <p>
+    Not directly. The rules for taxing Social Security benefits haven’t changed: up to 85% of benefits can still be taxable
+    depending on your “combined income”. But the new deduction can offset some or all of the tax on those benefits,
+    especially for middle-income retirees. Because it doesn’t reduce AGI, it also won’t lower Medicare premiums — see the
+    <a href="/irmaa-calculator/">IRMAA calculator</a> for how income affects Parts B and D.
+  </p>
+
+  <h2 id="method">How the calculator works</h2>
+  <div class="formula">Per-person deduction = max(0, $6,000 − 6% × max(0, MAGI − threshold))
+Total = per-person deduction × qualifying people (1, or 2 on a joint return)
+Savings = federal tax before − federal tax after</div>
+  <p>
+    Your base deduction is the larger of the standard deduction (including the extra amount for age 65+) and your itemized
+    deductions. Credits and state taxes aren’t included; this is an estimate, not tax advice.
+  </p>
+</ToolLayout>
+
+<script>
+  import { bindCalculator, outputs, verdict } from '../lib/ui/form';
+  import { money } from '../lib/ui/format';
+  import { readTaxBasics } from '../lib/ui/tax';
+  import { seniorDeduction, taxSavings } from '../lib/calc/tax';
+
+  const out = outputs('sen');
+
+  bindCalculator('sen', {
+    compute(f) {
+      const b = readTaxBasics(f);
+      const d = seniorDeduction(b.people65, b.agi, b.status);
+      const s = taxSavings({ ...b, otherDeductions: 0, deduction: d.allowed });
+
+      out.text('hero', money(s.savings));
+      out.text('heroSub', `On your ${b.year} federal return`);
+      out.text('deduction', money(d.allowed));
+      out.text('reduction', money(Math.min(d.reduction, 6000)));
+      out.text('marginal', `${s.marginal}%`);
+
+      let kind: 'good' | 'warn' | 'bad' | 'info' = 'good';
+      let msg = `You can deduct <strong>${money(d.allowed)}</strong>, saving about <strong>${money(s.savings)}</strong> in federal income tax.`;
+      if (d.ineligible) {
+        kind = 'bad';
+        msg = 'Married people must file jointly to claim the senior deduction.';
+      } else if (b.people65 === 0) {
+        kind = 'bad';
+        msg = 'The deduction is only for filers who are 65 or older by the end of the tax year.';
+      } else if (d.allowed === 0) {
+        kind = 'bad';
+        msg = `Your MAGI is above the phase-out range (${b.status === 'mfj' ? '$250,000' : '$175,000'}), so the deduction is fully phased out.`;
+      } else if (d.reduction > 0) {
+        kind = 'warn';
+        msg = `Your deduction is reduced by <strong>${money(d.reduction)}</strong> per person because MAGI is above ${b.status === 'mfj' ? '$150,000' : '$75,000'}. It saves about <strong>${money(s.savings)}</strong>.`;
+      }
+      if (s.taxableBefore <= 0 && d.allowed > 0) {
+        kind = 'info';
+        msg = 'Your standard or itemized deduction already reduces your taxable income to zero, so this deduction wouldn’t lower your federal income tax.';
+      }
+      out.html('verdict', verdict(kind, msg));
+      out.html(
+        'table',
+        `<div class="table-wrap" style="max-height:none"><table class="data"><tbody>
+          <tr><td>Standard / itemized deduction</td><td>${money(s.baseDeduction)}</td></tr>
+          <tr><td>Taxable income before</td><td>${money(s.taxableBefore)}</td></tr>
+          <tr><td>Taxable income after</td><td>${money(s.taxableAfter)}</td></tr>
+          <tr><td>Federal income tax before</td><td>${money(s.taxBefore)}</td></tr>
+          <tr><td>Federal income tax after</td><td>${money(s.taxAfter)}</td></tr>
+        </tbody></table></div>`,
+      );
+    },
+  });
+</script>

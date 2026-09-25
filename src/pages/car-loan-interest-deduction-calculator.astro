@@ -1,0 +1,268 @@
+---
+import ToolLayout from '../layouts/ToolLayout.astro';
+import Calc from '../components/calc/Calc.astro';
+import NumberField from '../components/calc/NumberField.astro';
+import SelectField from '../components/calc/SelectField.astro';
+import SegField from '../components/calc/SegField.astro';
+import CheckField from '../components/calc/CheckField.astro';
+import TaxBasics from '../components/calc/TaxBasics.astro';
+import AdSlot from '../components/AdSlot.astro';
+
+const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+const sections = [
+  { id: 'how-to-use', title: 'How to use this calculator' },
+  { id: 'rules', title: 'Who qualifies for the car loan interest deduction' },
+  { id: 'phase-out', title: 'The $10,000 cap and income phase-out' },
+  { id: 'example', title: 'Worked examples' },
+  { id: 'claiming', title: 'How to claim it' },
+  { id: 'method', title: 'How the calculator works' },
+];
+
+const faq = [
+  {
+    q: 'What is the new car loan interest deduction?',
+    a: 'Starting with tax year 2025 and running through 2028, you can deduct up to $10,000 a year of interest paid on a loan used to buy a new passenger vehicle for personal use, if the vehicle’s final assembly took place in the United States. It was created by the One Big Beautiful Bill Act (Public Law 119-21).',
+  },
+  {
+    q: 'Do I have to itemize to claim it?',
+    a: 'No. It’s claimed on the new Schedule 1-A and reduces your taxable income whether you take the standard deduction or itemize. It does not reduce your adjusted gross income (AGI).',
+  },
+  {
+    q: 'Does a used car or a lease qualify?',
+    a: 'No. The vehicle must be new — its original use must start with you — and the debt must be a loan secured by the vehicle. Leases don’t qualify. Refinanced loans can qualify to the extent they refinance an original qualifying loan.',
+  },
+  {
+    q: 'How do I know where my car was assembled?',
+    a: 'Check the vehicle information label (the window sticker), which lists the final assembly point, or use the NHTSA VIN decoder. You’ll need to report the vehicle’s VIN on your return.',
+  },
+  {
+    q: 'What income is too high for the deduction?',
+    a: 'The deduction shrinks by $200 for every $1,000 (or part of $1,000) that your modified AGI exceeds $100,000, or $200,000 on a joint return. The full $10,000 is gone at $150,000 of MAGI for single filers and $250,000 for joint filers.',
+  },
+  {
+    q: 'How much will this save me?',
+    a: 'The deduction reduces taxable income, so your savings equal the deduction times your marginal tax rate — for most people 10% to 24%. $2,400 of interest saves about $528 in the 22% bracket. The calculator applies the actual 2025 or 2026 brackets.',
+  },
+];
+
+const sources = [
+  {
+    title: 'One, Big, Beautiful Bill provisions — deductions for car loan interest, tips, overtime and seniors',
+    url: 'https://www.irs.gov/newsroom/one-big-beautiful-bill-provisions',
+    publisher: 'Internal Revenue Service',
+  },
+  {
+    title: 'Public Law 119-21 (H.R. 1), One Big Beautiful Bill Act',
+    url: 'https://www.congress.gov/bill/119th-congress/house-bill/1',
+    publisher: 'Congress.gov',
+  },
+  {
+    title: 'VIN decoder',
+    url: 'https://vpic.nhtsa.dot.gov/decoder/',
+    publisher: 'National Highway Traffic Safety Administration',
+  },
+  {
+    title: 'Rev. Proc. 2025-32 — 2026 inflation adjustments (brackets and standard deduction)',
+    url: 'https://www.irs.gov/newsroom/irs-releases-tax-inflation-adjustments-for-tax-year-2026-including-amendments-from-the-one-big-beautiful-bill',
+    publisher: 'Internal Revenue Service',
+  },
+];
+---
+
+<ToolLayout
+  slug="car-loan-interest-deduction-calculator"
+  sections={sections}
+  faq={faq}
+  sources={sources}
+  related={['new-tax-deductions-calculator', 'no-tax-on-overtime-calculator', 'no-tax-on-tips-calculator', 'senior-deduction-calculator']}
+>
+  <p slot="intro">
+    Estimate the new federal deduction for interest on a loan for a new, U.S.-assembled vehicle — up to $10,000 a year for tax
+    years 2025–2028. Enter your interest or your loan details, and see the deduction after the income phase-out and the federal
+    tax it actually saves.
+  </p>
+
+  <Calc id="car" slot="calculator" inputsTitle="Your loan & tax details">
+    <Fragment slot="inputs">
+      <SegField
+        name="mode"
+        label="Car loan interest"
+        value="known"
+        options={[
+          { value: 'known', label: 'I know the interest' },
+          { value: 'loan', label: 'Estimate from my loan' },
+        ]}
+      />
+      <div data-when="mode=known">
+        <NumberField name="interest" label="Interest paid this year" value={2400} prefix="$" format="money" min={0} hint="From your lender’s year-end statement." />
+      </div>
+      <div data-when="mode=loan">
+        <div class="field-row">
+          <NumberField name="principal" label="Amount financed" value={38000} prefix="$" format="money" min={0} />
+          <NumberField name="apr" label="Loan APR" value={6.9} suffix="%" min={0} max={40} />
+        </div>
+        <div class="field-row">
+          <SelectField name="term" label="Loan term" value="72" options={[36, 48, 60, 72, 84].map((m) => ({ value: m, label: `${m} months` }))} />
+          <SelectField name="startMonth" label="First payment month" value="3" options={months.map((m, i) => ({ value: i + 1, label: m }))} />
+        </div>
+        <SelectField name="startYear" label="First payment year" value="2025" options={[2025, 2026].map((y) => ({ value: y, label: String(y) }))} />
+      </div>
+      <TaxBasics agi={85000} />
+      <CheckField name="eligible" label="New vehicle, final assembly in the U.S., bought after 2024 for personal use, with a loan secured by the vehicle" checked />
+    </Fragment>
+
+    <Fragment slot="results">
+      <div class="result-hero" aria-live="polite">
+        <p class="label">Estimated federal tax savings</p>
+        <p class="value" data-out="hero">—</p>
+        <p class="sub" data-out="heroSub"></p>
+      </div>
+      <div class="stats cols-3">
+        <div class="stat"><p class="label">Interest paid</p><p class="value" data-out="interest">—</p></div>
+        <div class="stat"><p class="label">Deduction allowed</p><p class="value" data-out="deduction">—</p></div>
+        <div class="stat"><p class="label">Your marginal rate</p><p class="value" data-out="marginal">—</p></div>
+      </div>
+      <div data-out="verdict"></div>
+      <div data-out="table"></div>
+    </Fragment>
+  </Calc>
+
+  <h2 id="how-to-use">How to use this calculator</h2>
+  <ol>
+    <li><strong>Enter the interest you paid in the tax year</strong>, from your lender’s annual statement. Don’t have it? Choose <em>Estimate from my loan</em> and enter the amount financed, APR, term and first payment date.</li>
+    <li><strong>Choose the tax year and filing status</strong>, and enter your adjusted gross income.</li>
+    <li><strong>Confirm eligibility.</strong> Only qualifying new vehicles and loans count — see the rules below.</li>
+    <li><strong>Read your savings.</strong> We apply the $10,000 cap and income phase-out, then run your taxable income through the federal brackets to show the real tax reduction.</li>
+  </ol>
+
+  <h2 id="rules">Who qualifies for the car loan interest deduction</h2>
+  <p>You can deduct qualified passenger vehicle loan interest for tax years 2025 through 2028 if all of these are true:</p>
+  <ul>
+    <li><strong>New vehicle:</strong> the original use of the vehicle starts with you. Used vehicles don’t qualify.</li>
+    <li><strong>Assembled in the U.S.:</strong> the vehicle’s final assembly occurred in the United States.</li>
+    <li><strong>Loan taken out after December 31, 2024</strong> to buy the vehicle, and <strong>secured by a lien</strong> on it.</li>
+    <li><strong>Personal use:</strong> not a business or fleet vehicle.</li>
+    <li><strong>Eligible vehicle type:</strong> a car, minivan, van, SUV, pickup truck or motorcycle with a gross vehicle weight rating under 14,000 pounds.</li>
+    <li><strong>Not a lease</strong>, and not a loan from a related party.</li>
+    <li><strong>VIN reported</strong> on your tax return.</li>
+  </ul>
+
+  <AdSlot slot="inContent" />
+
+  <h2 id="phase-out">The $10,000 cap and income phase-out</h2>
+  <p>
+    The deduction is capped at <strong>$10,000 per return</strong> each year. It then shrinks by <strong>$200 for each $1,000,
+    or part of $1,000,</strong> by which your modified adjusted gross income exceeds the threshold:
+  </p>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Filing status</th><th>Phase-out starts</th><th>Fully phased out (for $10,000 of interest)</th></tr></thead>
+      <tbody>
+        <tr><td>Married filing jointly</td><td>$200,000</td><td>$250,000</td></tr>
+        <tr><td>All other filers</td><td>$100,000</td><td>$150,000</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    Most car buyers pay far less than $10,000 of interest a year — a $38,000 loan at 6.9% generates roughly $2,000–$2,500 of
+    interest in its first full year — so the cap rarely binds; the phase-out matters more for higher earners.
+  </p>
+
+  <h2 id="example">Worked examples</h2>
+  <p>
+    <strong>Single filer, $85,000 AGI, $2,400 of interest (2026).</strong> Income is below $100,000, so the full $2,400 is
+    deductible. Taxable income falls from $68,900 to $66,500, all within the 22% bracket, saving about <strong>$528</strong>.
+  </p>
+  <p>
+    <strong>Married couple, $210,000 AGI, $4,000 of interest (2026).</strong> MAGI is $10,000 over the joint threshold, so the
+    deduction is reduced by 10 × $200 = $2,000, leaving <strong>$2,000</strong>. In the 22% bracket, that saves about
+    <strong>$440</strong>.
+  </p>
+
+  <h2 id="claiming">How to claim it</h2>
+  <ul>
+    <li>Report the deduction on <strong>Schedule 1-A (Form 1040)</strong>, which carries it to your Form 1040 as a deduction from taxable income.</li>
+    <li>Include the vehicle’s <strong>VIN</strong>. Keep your purchase contract and the lender’s interest statement.</li>
+    <li>Lenders are generally required to report qualifying interest to the IRS and to borrowers; use your lender’s year-end figure when you file.</li>
+    <li>State income taxes may not follow the federal deduction — check your state’s rules.</li>
+  </ul>
+  <div class="callout">
+    <span class="callout-title">Stacking the new deductions</span>
+    If you also receive tips or overtime pay, or you’re 65 or older, you may qualify for more than one of the new deductions.
+    Estimate them together with our <a href="/new-tax-deductions-calculator/">Schedule 1-A calculator</a>.
+  </div>
+
+  <h2 id="method">How the calculator works</h2>
+  <div class="formula">Deduction = min(interest, $10,000) − $200 × ceil(max(0, MAGI − threshold) ÷ $1,000)
+Taxable income = AGI − max(standard deduction, itemized) − deduction
+Savings = tax on taxable income before − tax after</div>
+  <p>
+    When you estimate from a loan, we build the amortization schedule and add up the interest on payments falling in the
+    selected tax year. We use the IRS bracket and standard deduction figures for 2025 and 2026; your actual result may differ
+    because of credits, other income, and state taxes. This is an estimate, not tax advice.
+  </p>
+</ToolLayout>
+
+<script>
+  import { bindCalculator, outputs, verdict } from '../lib/ui/form';
+  import { money } from '../lib/ui/format';
+  import { readTaxBasics } from '../lib/ui/tax';
+  import { carLoanInterestDeduction, taxSavings } from '../lib/calc/tax';
+  import { interestPaidInYear } from '../lib/calc/loan';
+
+  const out = outputs('car');
+
+  bindCalculator('car', {
+    compute(f) {
+      const b = readTaxBasics(f);
+      const interest =
+        f.str('mode') === 'loan'
+          ? interestPaidInYear(f.num('principal'), f.num('apr'), Number(f.str('term')) || 60, Number(f.str('startYear')) || 2025, Number(f.str('startMonth')) || 1, b.year)
+          : f.num('interest');
+      const eligible = f.bool('eligible');
+      const d = carLoanInterestDeduction(eligible ? interest : 0, b.agi, b.status);
+      const s = taxSavings({ ...b, otherDeductions: 0, deduction: d.allowed });
+
+      out.text('hero', money(s.savings));
+      out.text('heroSub', `On your ${b.year} federal return`);
+      out.text('interest', money(interest));
+      out.text('deduction', money(d.allowed));
+      out.text('marginal', `${s.marginal}%`);
+
+      let msg: string;
+      let kind: 'good' | 'warn' | 'bad' | 'info' = 'good';
+      if (!eligible) {
+        kind = 'bad';
+        msg = 'Only interest on a qualifying loan for a new, U.S.-assembled vehicle bought after 2024 for personal use is deductible.';
+      } else if (d.allowed === 0 && interest > 0) {
+        kind = 'bad';
+        msg = `Your income is above the phase-out range, so the deduction is reduced to zero (reduction: ${money(d.reduction)}).`;
+      } else if (d.reduction > 0) {
+        kind = 'warn';
+        msg = `Your deduction is reduced by <strong>${money(d.reduction)}</strong> because your MAGI is above ${b.status === 'mfj' ? '$200,000' : '$100,000'}.`;
+      } else if (interest > d.cap) {
+        kind = 'warn';
+        msg = 'Your interest exceeds the $10,000 annual cap, so the deduction is limited to $10,000.';
+      } else {
+        msg = `The full <strong>${money(d.allowed)}</strong> of interest is deductible, saving about <strong>${money(s.savings)}</strong> in federal income tax.`;
+      }
+      if (s.taxableBefore <= 0) {
+        kind = 'info';
+        msg = 'Your standard or itemized deduction already reduces your taxable income to zero, so this deduction wouldn’t lower your federal income tax.';
+      }
+      out.html('verdict', verdict(kind, msg));
+
+      out.html(
+        'table',
+        `<div class="table-wrap" style="max-height:none"><table class="data"><tbody>
+          <tr><td>Standard / itemized deduction</td><td>${money(s.baseDeduction)}</td></tr>
+          <tr><td>Taxable income before</td><td>${money(s.taxableBefore)}</td></tr>
+          <tr><td>Taxable income after</td><td>${money(s.taxableAfter)}</td></tr>
+          <tr><td>Federal income tax before</td><td>${money(s.taxBefore)}</td></tr>
+          <tr><td>Federal income tax after</td><td>${money(s.taxAfter)}</td></tr>
+        </tbody></table></div>`,
+      );
+    },
+  });
+</script>

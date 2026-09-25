@@ -1,0 +1,74 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import ToolCard from '../components/ToolCard.astro';
+import { categories, type Category } from '../data/categories';
+import { toolsInCategory } from '../data/tools';
+import { site } from '../site.config';
+
+export function getStaticPaths() {
+  return categories.map((c) => ({ params: { category: c.id }, props: { category: c } }));
+}
+
+interface Props {
+  category: Category;
+}
+const { category } = Astro.props;
+const list = toolsInCategory(category.id);
+const path = `/${category.id}/`;
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: `${category.name} Calculators`,
+    url: `${site.url}${path}`,
+    description: category.description,
+    mainEntity: {
+      '@type': 'ItemList',
+      itemListElement: list.map((t, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        url: `${site.url}/${t.slug}/`,
+        name: t.title,
+      })),
+    },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: `${site.url}/` },
+      { '@type': 'ListItem', position: 2, name: category.name, item: `${site.url}${path}` },
+    ],
+  },
+];
+---
+
+<BaseLayout title={`${category.name} Calculators`} description={category.description} path={path} jsonLd={jsonLd}>
+  <div class="container">
+    <Breadcrumbs items={[{ name: 'Home', href: '/' }, { name: category.name, href: path }]} />
+    <header class="page-hero">
+      <h1>{category.name} calculators</h1>
+      <div class="lede prose" set:html={category.intro} />
+    </header>
+    <div class="card-grid" style="margin-top:10px">
+      {list.map((t) => <ToolCard tool={t} />)}
+    </div>
+    <section class="prose section" set:html={category.guide} />
+    <section class="section" style="padding-top:0">
+      <h2>Other calculator categories</h2>
+      <ul class="side-links" style="max-width:520px">
+        {
+          categories
+            .filter((c) => c.id !== category.id)
+            .map((c) => (
+              <li>
+                <a href={`/${c.id}/`}>{c.name}</a>
+              </li>
+            ))
+        }
+      </ul>
+    </section>
+  </div>
+</BaseLayout>

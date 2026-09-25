@@ -1,0 +1,48 @@
+---
+interface Props {
+  name: string;
+  label: string;
+  value: number | string;
+  prefix?: string;
+  suffix?: string;
+  hint?: string;
+  /** money = thousands separators on blur. */
+  format?: 'money' | 'number';
+  min?: number;
+  max?: number;
+  /** Error text shown when the tool marks this field invalid. */
+  error?: string;
+  /** Inside a repeating row: no ids (rows are cloned from a template). */
+  row?: boolean;
+}
+const { name, label, value, prefix, suffix, hint, format = 'number', min, max, error, row = false } = Astro.props;
+const display =
+  typeof value === 'number' && format === 'money'
+    ? new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 }).format(value)
+    : String(value);
+const hintId = !row && hint ? `hint-${name}` : undefined;
+---
+
+<div class="field">
+  <label>
+    <span class="label">{label}</span>
+    <span class="input-wrap">
+      {prefix && <span class="affix">{prefix}</span>}
+      <input
+        name={name}
+        type="text"
+        inputmode="decimal"
+        autocomplete="off"
+        spellcheck="false"
+        value={display}
+        data-format={format}
+        data-min={min}
+        data-max={max}
+        aria-describedby={hintId}
+      />
+      {suffix && <span class="affix">{suffix}</span>}
+    </span>
+  </label>
+  {hint && <p class="hint" id={hintId}>{hint}</p>}
+  {error && <p class="error" role="alert">{error}</p>}
+</div>

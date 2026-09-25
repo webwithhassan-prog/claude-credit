@@ -1,0 +1,238 @@
+---
+import ToolLayout from '../layouts/ToolLayout.astro';
+import Calc from '../components/calc/Calc.astro';
+import NumberField from '../components/calc/NumberField.astro';
+import DateField from '../components/calc/DateField.astro';
+import CheckField from '../components/calc/CheckField.astro';
+import AdSlot from '../components/AdSlot.astro';
+
+const sections = [
+  { id: 'how-to-use', title: 'How to use this calculator' },
+  { id: 'how-back-pay-works', title: 'How SSDI back pay works' },
+  { id: 'waiting-period', title: 'The five-month waiting period' },
+  { id: 'retroactive', title: 'Retroactive benefits: the 12-month limit' },
+  { id: 'example', title: 'Worked example' },
+  { id: 'fees-taxes', title: 'Attorney fees and taxes on back pay' },
+  { id: 'ssi', title: 'SSI back pay is different' },
+];
+
+const faq = [
+  {
+    q: 'How is SSDI back pay calculated?',
+    a: 'Social Security counts the months from your first month of entitlement — after a five-month waiting period that starts with your first full month of disability — up to the month before your approval, limited to 12 months before the month you applied. Multiply those months by your monthly benefit to estimate the lump sum.',
+  },
+  {
+    q: 'How much can a disability lawyer take from back pay?',
+    a: 'Under a standard fee agreement, a representative’s fee is 25% of your past-due benefits, capped at $9,200 (the cap since November 30, 2024). Social Security withholds the fee and pays the representative directly. Fees are paid only if you win.',
+  },
+  {
+    q: 'How long does it take to receive SSDI back pay after approval?',
+    a: 'Many people receive the SSDI lump sum within a few weeks to a few months after approval, once Social Security finishes calculating benefits and any fees. SSI back pay may be paid in installments.',
+  },
+  {
+    q: 'Is SSDI back pay taxable?',
+    a: 'Part of it can be, depending on your total income. Because the lump sum may include benefits for earlier years, the IRS lets you use a lump-sum election that treats those benefits as income of the years they were for, which can lower the tax. See IRS Publication 915.',
+  },
+  {
+    q: 'Does back pay include the waiting period months?',
+    a: 'No. No benefits are paid for the five full months of the waiting period (except for people with ALS). Back pay starts with the sixth full month of disability, or 12 months before your application, whichever is later.',
+  },
+  {
+    q: 'When does Medicare start for SSDI?',
+    a: 'Generally after 24 months of entitlement to disability benefits — so about 29 months after your disability began, counting the waiting period. People with ALS get Medicare the month benefits start, and people with end-stage renal disease have separate rules.',
+  },
+];
+
+const sources = [
+  {
+    title: 'Disability benefits — how you qualify and when payments begin',
+    url: 'https://www.ssa.gov/disability',
+    publisher: 'Social Security Administration',
+  },
+  {
+    title: 'Fee agreements — maximum fee amount',
+    url: 'https://www.ssa.gov/representation/fee_agreements.htm',
+    publisher: 'Social Security Administration',
+  },
+  {
+    title: 'Publication 915, Social Security and Equivalent Railroad Retirement Benefits',
+    url: 'https://www.irs.gov/publications/p915',
+    publisher: 'Internal Revenue Service',
+  },
+  {
+    title: 'Cost-of-living adjustment (COLA) information for 2026',
+    url: 'https://www.ssa.gov/cola/',
+    publisher: 'Social Security Administration',
+  },
+];
+---
+
+<ToolLayout
+  slug="ssdi-back-pay-calculator"
+  sections={sections}
+  faq={faq}
+  sources={sources}
+  related={['aca-subsidy-calculator', 'irmaa-calculator', 'senior-deduction-calculator', 'debt-to-income-ratio-calculator']}
+>
+  <p slot="intro">
+    Estimate your Social Security Disability Insurance (SSDI) back pay from your disability onset, application and approval
+    dates. The calculator applies the five-month waiting period, the 12-month retroactive limit and the representative fee cap,
+    and shows the months included.
+  </p>
+
+  <Calc id="ssdi" slot="calculator" inputsTitle="Your dates & benefit">
+    <Fragment slot="inputs">
+      <DateField name="onset" label="Disability onset date" value="2024-10-10" />
+      <div class="field-row">
+        <DateField name="applied" label="Application date" value="2025-01-15" />
+        <DateField name="approved" label="Approval date" value="2026-06-20" />
+      </div>
+      <NumberField name="benefit" label="Monthly SSDI benefit" value={1900} prefix="$" format="money" min={0} hint="From your award letter or your Social Security statement." />
+      <CheckField name="rep" label="I have a lawyer or representative (fee agreement)" checked />
+      <CheckField name="als" label="Diagnosed with ALS (no waiting period)" />
+    </Fragment>
+
+    <Fragment slot="results">
+      <div class="result-hero" aria-live="polite">
+        <p class="label">Estimated back pay</p>
+        <p class="value" data-out="hero">—</p>
+        <p class="sub" data-out="heroSub"></p>
+      </div>
+      <div class="stats cols-3">
+        <div class="stat"><p class="label">Months of back pay</p><p class="value" data-out="months">—</p></div>
+        <div class="stat"><p class="label">Representative fee</p><p class="value" data-out="fee">—</p></div>
+        <div class="stat"><p class="label">You receive</p><p class="value" data-out="net">—</p></div>
+      </div>
+      <div data-out="verdict"></div>
+      <h3 class="results-heading">Your timeline</h3>
+      <div data-out="table"></div>
+    </Fragment>
+  </Calc>
+
+  <h2 id="how-to-use">How to use this calculator</h2>
+  <ol>
+    <li><strong>Enter your disability onset date</strong> — the date Social Security finds (or you expect it to find) your disability began.</li>
+    <li><strong>Enter your application date</strong> — the date you filed, or your protective filing date if earlier.</li>
+    <li><strong>Enter your approval date</strong>, or the date you expect a decision.</li>
+    <li><strong>Enter your monthly benefit</strong>, based on your earnings record.</li>
+    <li><strong>Tick the representative box</strong> if you have a lawyer or advocate paid under a fee agreement.</li>
+  </ol>
+
+  <h2 id="how-back-pay-works">How SSDI back pay works</h2>
+  <p>
+    Disability claims often take many months — or years with appeals — to be approved. When you win, Social Security pays the
+    benefits you were owed for the months before approval as a lump sum, called <strong>back pay</strong> or past-due benefits.
+    How far back it goes depends on three dates: when your disability began, when you applied and when you were approved.
+  </p>
+
+  <AdSlot slot="inContent" />
+
+  <h2 id="waiting-period">The five-month waiting period</h2>
+  <p>
+    SSDI isn’t paid for the first five <strong>full calendar months</strong> of disability. The waiting period starts with the
+    first full month you’re disabled: if your onset date is the 1st of a month, that month counts; otherwise it starts the next
+    month. Your first month of entitlement is the sixth full month. People with ALS have no waiting period.
+  </p>
+
+  <h2 id="retroactive">Retroactive benefits: the 12-month limit</h2>
+  <p>
+    SSDI can be paid for up to <strong>12 months before the month you applied</strong>, but never for months before the waiting
+    period ends. If your disability started long before you applied, your back pay will be capped at those 12 retroactive months
+    plus the months between your application and approval.
+  </p>
+  <div class="formula">First month of entitlement = first full month of disability + 5 months   (0 for ALS)
+First payable month = later of (first month of entitlement, application month − 12)
+Back pay = months from first payable month to the month before approval × monthly benefit</div>
+
+  <h2 id="example">Worked example</h2>
+  <p>
+    Chris became disabled on <strong>October 10, 2024</strong>, applied on <strong>January 15, 2025</strong> and was approved on
+    <strong>June 20, 2026</strong>, with a monthly benefit of <strong>$1,900</strong> and a representative.
+  </p>
+  <ul>
+    <li>First full month of disability: November 2024. Waiting period: November 2024 – March 2025.</li>
+    <li>First month of entitlement: <strong>April 2025</strong> (the 12-month retroactive limit, January 2024, doesn’t apply).</li>
+    <li>Back pay months: April 2025 through May 2026 = <strong>14 months</strong> → <strong>$26,600</strong>.</li>
+    <li>Representative fee: 25% = $6,650 (under the $9,200 cap). Chris receives about <strong>$19,950</strong>.</li>
+  </ul>
+
+  <h2 id="fees-taxes">Attorney fees and taxes on back pay</h2>
+  <ul>
+    <li><strong>Fees:</strong> representatives are usually paid 25% of past-due benefits, up to $9,200 under a fee agreement. Social Security must approve the fee and pays it from your back pay.</li>
+    <li><strong>Cost-of-living adjustments:</strong> benefits rise each January with the COLA (2.8% for 2026), so actual back pay may be slightly higher than this estimate.</li>
+    <li><strong>Offsets:</strong> workers’ compensation and certain public disability benefits can reduce SSDI.</li>
+    <li><strong>Taxes:</strong> use the lump-sum election in IRS Publication 915 to spread past-year benefits back to the years they belong to.</li>
+    <li><strong>Work while waiting:</strong> earning above the substantial gainful activity level ($1,690 a month in 2026, or $2,830 if blind) can affect your claim.</li>
+  </ul>
+
+  <h2 id="ssi">SSI back pay is different</h2>
+  <p>
+    Supplemental Security Income (SSI) is a needs-based program with no waiting period — but also no retroactive benefits before
+    your application. SSI back pay starts the month after you applied, and large amounts may be paid in up to three installments
+    six months apart. This calculator estimates SSDI only.
+  </p>
+  <div class="callout">
+    <span class="callout-title">An estimate, not a decision</span>
+    Social Security determines your established onset date, benefit amount and payable months. Use this estimate to plan and to
+    check your award letter, and contact Social Security or your representative with questions.
+  </div>
+</ToolLayout>
+
+<script>
+  import { bindCalculator, outputs, verdict } from '../lib/ui/form';
+  import { money } from '../lib/ui/format';
+  import { monthLabel, SSDI_FEE_CAP, ssdiBackPay } from '../lib/calc/benefits';
+
+  const out = outputs('ssdi');
+
+  bindCalculator('ssdi', {
+    compute(f) {
+      const r = ssdiBackPay({
+        onset: f.str('onset'),
+        applied: f.str('applied'),
+        approved: f.str('approved'),
+        monthlyBenefit: f.num('benefit'),
+        hasRepresentative: f.bool('rep'),
+        als: f.bool('als'),
+      });
+      if (r.invalid) {
+        out.text('hero', '—');
+        out.text('heroSub', 'Check your dates — approval can’t be before the application.');
+        ['months', 'fee', 'net'].forEach((k) => out.text(k, '—'));
+        out.html('verdict', '');
+        out.html('table', '');
+        return;
+      }
+      out.text('hero', money(r.backPay));
+      out.text('heroSub', r.months > 0 ? `${monthLabel(r.firstPayable)} – ${monthLabel(r.lastPastDue)}` : 'No past-due months yet');
+      out.text('months', String(r.months));
+      out.text('fee', money(r.fee));
+      out.text('net', money(r.net));
+
+      let msg: string;
+      let kind: 'good' | 'warn' | 'info' = 'info';
+      if (r.months === 0) {
+        msg = 'Your approval comes before your first month of entitlement, so there is no back pay — regular payments start once you’re entitled.';
+      } else if (r.retroCapped) {
+        kind = 'warn';
+        msg = `Your disability began long before you applied, so back pay is limited to 12 months before your application (from <strong>${monthLabel(r.retroLimit)}</strong>).`;
+      } else {
+        kind = 'good';
+        msg = `You’re owed <strong>${r.months} months</strong> of benefits${r.fee > 0 ? `; the representative fee of <strong>${money(r.fee)}</strong> is ${r.fee >= SSDI_FEE_CAP ? 'at the $9,200 cap' : '25% of past-due benefits'}` : ''}.`;
+      }
+      out.html('verdict', verdict(kind, msg));
+
+      const rows = [
+        ['First full month of disability', monthLabel(r.firstFullMonth)],
+        ['Waiting period ends', r.entitlementMonth > r.firstFullMonth ? monthLabel(r.entitlementMonth - 1) : 'No waiting period'],
+        ['First month of entitlement', monthLabel(r.entitlementMonth)],
+        ['Earliest retroactive month (12 months before applying)', monthLabel(r.retroLimit)],
+        ['Back pay covers', r.months > 0 ? `${monthLabel(r.firstPayable)} – ${monthLabel(r.lastPastDue)}` : '—'],
+      ];
+      out.html(
+        'table',
+        `<div class="table-wrap" style="max-height:none"><table class="data"><tbody>${rows.map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</tbody></table></div>`,
+      );
+    },
+  });
+</script>

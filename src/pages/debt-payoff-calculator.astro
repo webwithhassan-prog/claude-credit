@@ -1,0 +1,340 @@
+---
+import ToolLayout from '../layouts/ToolLayout.astro';
+import Calc from '../components/calc/Calc.astro';
+import NumberField from '../components/calc/NumberField.astro';
+import TextField from '../components/calc/TextField.astro';
+import RowCard from '../components/calc/RowCard.astro';
+import SegField from '../components/calc/SegField.astro';
+import AdSlot from '../components/AdSlot.astro';
+import Icon from '../components/Icon.astro';
+
+const debts = [
+  { name: 'Visa card', balance: 4200, apr: 24.99, min: 126 },
+  { name: 'Store card', balance: 1500, apr: 19.99, min: 45 },
+  { name: 'Car loan', balance: 11000, apr: 7.49, min: 310 },
+  { name: 'Personal loan', balance: 6500, apr: 12.9, min: 220 },
+];
+
+const sections = [
+  { id: 'how-to-use', title: 'How to use this calculator' },
+  { id: 'avalanche-vs-snowball', title: 'Avalanche vs snowball: what’s the difference?' },
+  { id: 'example', title: 'Worked example' },
+  { id: 'which-to-choose', title: 'Which method should you choose?' },
+  { id: 'rollover', title: 'Why the rollover matters so much' },
+  { id: 'method', title: 'How the calculator works' },
+];
+
+const faq = [
+  {
+    q: 'Is the debt avalanche or the debt snowball better?',
+    a: 'Mathematically, the avalanche method (highest interest rate first) always costs the same or less in interest, because every extra dollar goes where it is most expensive. The snowball method (smallest balance first) often wins in practice for people who need early wins to stay motivated. The difference in cost is frequently small — run your own debts through the calculator to see it in dollars.',
+  },
+  {
+    q: 'What counts as the “extra payment”?',
+    a: 'It is anything you can pay each month on top of the combined minimum payments. The calculator keeps your total monthly budget (all minimums plus the extra) the same every month. When a debt is paid off, its minimum payment is “rolled over” to the next target, so the amount attacking your debt grows over time.',
+  },
+  {
+    q: 'Should I include my mortgage?',
+    a: 'Usually not. Mortgages have low rates, long terms and potential tax benefits, and most payoff plans focus on consumer debt such as credit cards, personal loans, car loans and medical bills. You can include it if you want to see a full debt-free date.',
+  },
+  {
+    q: 'What if two debts have the same interest rate?',
+    a: 'With the avalanche method, the calculator targets the smaller balance first when rates tie. With the snowball method, it targets the higher rate first when balances tie.',
+  },
+  {
+    q: 'Does the calculator handle minimum payments that change?',
+    a: 'It uses a fixed minimum for each debt, which matches instalment loans and is a conservative assumption for credit cards (whose minimums shrink as balances fall). Keeping payments fixed is also the fastest way out of debt, so it is the best plan to follow.',
+  },
+  {
+    q: 'Would a consolidation loan or balance transfer be faster?',
+    a: 'Sometimes. If you can move high-rate balances to a lower rate, less of each payment goes to interest. Compare the options with our <a href="/debt-consolidation-calculator/">debt consolidation calculator</a> and <a href="/balance-transfer-calculator/">balance transfer calculator</a>. Homeowners can also compare a <a href="/heloc-payment-calculator/">HELOC</a>, which usually has a lower rate but is secured by the house.',
+  },
+];
+
+const sources = [
+  {
+    title: 'Debt collection and managing debt — consumer resources',
+    url: 'https://www.consumerfinance.gov/consumer-tools/debt-collection/',
+    publisher: 'Consumer Financial Protection Bureau',
+  },
+  {
+    title: 'How to get out of debt',
+    url: 'https://consumer.ftc.gov/articles/how-get-out-debt',
+    publisher: 'Federal Trade Commission',
+  },
+  {
+    title: 'G.19 Consumer Credit — interest rates',
+    url: 'https://www.federalreserve.gov/releases/g19/current/default.htm',
+    publisher: 'Board of Governors of the Federal Reserve System',
+  },
+];
+---
+
+<ToolLayout
+  slug="debt-payoff-calculator"
+  sections={sections}
+  faq={faq}
+  sources={sources}
+  related={['credit-card-payoff-calculator', 'debt-consolidation-calculator', 'balance-transfer-calculator', 'debt-to-income-ratio-calculator']}
+>
+  <p slot="intro">
+    List your debts, add what you can pay beyond the minimums, and get a month-by-month plan to become debt-free. The
+    calculator runs the <strong>debt avalanche</strong> and <strong>debt snowball</strong> methods side by side so you can
+    see your payoff order, debt-free date and exactly how much interest each approach costs.
+  </p>
+
+  <Calc id="dp" slot="calculator" inputsTitle="Your debts">
+    <Fragment slot="inputs">
+      <div data-rows data-key="d_name" data-min="1" data-max="10" data-label="Debt">
+        <div class="rows" data-rows-list>
+          {
+            debts.map((d, i) => (
+              <RowCard title={`Debt ${i + 1}`}>
+                <TextField name="d_name" label="Name" value={d.name} />
+                <NumberField name="d_bal" label="Balance" value={d.balance} prefix="$" format="money" min={0} row />
+                <NumberField name="d_apr" label="APR" value={d.apr} suffix="%" min={0} max={100} row />
+                <NumberField name="d_min" label="Minimum payment" value={d.min} prefix="$" format="money" min={0} row />
+              </RowCard>
+            ))
+          }
+        </div>
+        <template data-rows-template>
+          <RowCard title="Debt">
+            <TextField name="d_name" label="Name" value="" placeholder="Debt name" />
+            <NumberField name="d_bal" label="Balance" value="" prefix="$" format="money" min={0} row />
+            <NumberField name="d_apr" label="APR" value="" suffix="%" min={0} max={100} row />
+            <NumberField name="d_min" label="Minimum payment" value="" prefix="$" format="money" min={0} row />
+          </RowCard>
+        </template>
+        <button type="button" class="btn btn-sm rows-add" data-rows-add><Icon name="plus" size={16} /> Add a debt</button>
+      </div>
+      <NumberField name="extra" label="Extra monthly payment" value={250} prefix="$" format="money" min={0} hint="Money you can pay each month on top of all the minimums." />
+      <SegField
+        name="strategy"
+        label="Show the plan for"
+        value="avalanche"
+        options={[
+          { value: 'avalanche', label: 'Avalanche (highest APR)' },
+          { value: 'snowball', label: 'Snowball (smallest balance)' },
+        ]}
+      />
+    </Fragment>
+
+    <Fragment slot="results">
+      <div class="result-hero" aria-live="polite">
+        <p class="label" data-out="heroLabel">Debt-free in</p>
+        <p class="value" data-out="hero">—</p>
+        <p class="sub" data-out="heroSub"></p>
+      </div>
+      <div data-out="verdict"></div>
+      <div data-out="compare"></div>
+      <h3 class="results-heading">Total debt over time</h3>
+      <div class="chart" data-out="chart"></div>
+      <h3 class="results-heading">Your payoff order</h3>
+      <div data-out="order"></div>
+    </Fragment>
+  </Calc>
+
+  <h2 id="how-to-use">How to use this calculator</h2>
+  <ol>
+    <li><strong>Add each debt.</strong> Enter the current balance, the interest rate (APR) and the required minimum payment for every credit card, loan or bill you want to pay off. Use <em>Add a debt</em> for up to 10 debts.</li>
+    <li><strong>Enter your extra payment.</strong> This is the amount you can commit every month on top of all the minimums — even $50 makes a visible difference.</li>
+    <li><strong>Compare the methods.</strong> The results table shows your debt-free date and total interest for the avalanche method, the snowball method, and paying only minimums.</li>
+    <li><strong>Follow the plan.</strong> Pick a method to see the exact order to attack your debts and the month each one will be paid off. Copy the link to save your plan.</li>
+  </ol>
+
+  <h2 id="avalanche-vs-snowball">Avalanche vs snowball: what’s the difference?</h2>
+  <p>Both methods use the same routine: pay the minimum on every debt, then send every spare dollar to one <em>target</em> debt. When the target is paid off, its payment rolls into the next target. The only difference is the order.</p>
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr><th></th><th>Debt avalanche</th><th>Debt snowball</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Target first</td><td>Highest interest rate</td><td>Smallest balance</td></tr>
+        <tr><td>Total interest</td><td>Lowest possible</td><td>Same or slightly higher</td></tr>
+        <tr><td>First debt paid off</td><td>Can take longer</td><td>Usually fastest</td></tr>
+        <tr><td>Best for</td><td>Saving the most money</td><td>Staying motivated with quick wins</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    The avalanche method is the mathematically optimal choice because each extra dollar cancels the most expensive
+    interest first. The snowball method trades a little extra interest for faster early victories — and for many people
+    those early wins are what keeps the plan alive.
+  </p>
+
+  <AdSlot slot="inContent" />
+
+  <h2 id="example">Worked example</h2>
+  <p>Take the four debts pre-filled in the calculator — about <strong>$23,200</strong> in total — with <strong>$250 a month</strong> extra on top of $701 in minimum payments:</p>
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr><th>Plan</th><th>Debt-free in</th><th>Total interest</th><th>First debt gone</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Minimum payments only</td><td>4 years 10 months</td><td>$6,586</td><td>—</td></tr>
+        <tr><td>Snowball + $250</td><td>2 years 4 months</td><td>$3,375</td><td>Month 6 (store card)</td></tr>
+        <tr><td>Avalanche + $250</td><td>2 years 4 months</td><td>$3,294</td><td>Month 13 (Visa card)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    Adding $250 a month cuts the payoff time in half and saves over $3,200 in interest with either method. Between the
+    two methods, the avalanche saves another <strong>$81</strong> — but the snowball clears the first debt seven months
+    sooner. That is the classic trade-off: a small amount of money versus a big psychological boost.
+  </p>
+
+  <h2 id="which-to-choose">Which method should you choose?</h2>
+  <ul>
+    <li><strong>Choose the avalanche</strong> if your highest-rate debt is also large (for example, a big credit card balance at 25%+), or if you’re disciplined and motivated by the total you save.</li>
+    <li><strong>Choose the snowball</strong> if you have several small balances you can knock out quickly, or you’ve started and stopped payoff plans before.</li>
+    <li><strong>Use a hybrid</strong> if one small debt is almost gone: clear it first for a quick win, then switch to avalanche order.</li>
+  </ul>
+  <p>
+    Whatever you pick, the method matters far less than <strong>the size of your extra payment and sticking with it</strong>.
+    Moving from $0 to $250 extra in the example saves about $3,200; switching methods changes the result by less than $100.
+  </p>
+
+  <h2 id="rollover">Why the rollover matters so much</h2>
+  <p>
+    When a debt is paid off, its minimum payment doesn’t disappear from your budget — it joins the attack on the next
+    debt. In the example, after the Visa card is paid off, its $126 minimum plus the $250 extra (and the store card’s $45 once
+    that is gone) all flow to the next target. Your payment grows each time a debt falls, which is why the plan speeds
+    up toward the end. Even with <em>no</em> extra payment, rolling over freed-up minimums shortens the example payoff from
+    58 to 42 months.
+  </p>
+  <div class="callout tip">
+    <span class="callout-title">Find the money for your extra payment</span>
+    Review subscriptions, pause retirement contributions above your employer match only if your debt rates are very high,
+    sell unused items, and direct raises, bonuses and tax refunds straight to your target debt.
+  </div>
+
+  <h2 id="method">How the calculator works</h2>
+  <p>
+    The calculator simulates your debts month by month. Each month it (1) adds interest to every balance at APR ÷ 12,
+    (2) pays the minimum on every debt, and (3) sends everything left in your monthly budget — the extra payment plus
+    any freed-up minimums — to the target debt, then the next one in order. It stops when every balance reaches zero.
+  </p>
+  <div class="formula">Monthly budget = Σ minimum payments + extra payment   (constant every month)
+Interest this month on debt i = balance_i × APR_i ÷ 12
+Avalanche order: sort by APR (high → low)     Snowball order: sort by balance (low → high)</div>
+  <p>
+    If your total budget cannot cover the monthly interest, the balances never fall and the calculator tells you so.
+    Results are estimates: actual card interest is charged daily, and your minimums, rates and fees may change.
+  </p>
+</ToolLayout>
+
+<script>
+  import { bindCalculator, outputs, verdict } from '../lib/ui/form';
+  import { initRows, rowReaders } from '../lib/ui/rows';
+  import { duration, esc, money, monthFromNow } from '../lib/ui/format';
+  import { compareBars, lineChart } from '../lib/ui/chart';
+  import { debtPayoffPlan, minimumsOnlyPlan, type Debt } from '../lib/calc/debt';
+
+  const form = document.getElementById('dp') as HTMLFormElement;
+  initRows(form);
+  const out = outputs('dp');
+
+  bindCalculator('dp', {
+    compute(f) {
+      const debts: Debt[] = rowReaders(form, 'd_name')
+        .map((r, i) => ({
+          name: r.str('d_name').trim() || `Debt ${i + 1}`,
+          balance: r.num('d_bal'),
+          apr: r.num('d_apr'),
+          minPayment: r.num('d_min'),
+        }))
+        .filter((d) => d.balance > 0);
+
+      if (!debts.length) {
+        out.text('hero', '—');
+        out.text('heroSub', 'Add at least one debt with a balance.');
+        ['verdict', 'compare', 'chart', 'order'].forEach((k) => out.html(k, ''));
+        return;
+      }
+
+      const extra = f.num('extra');
+      const strategy = f.str('strategy') === 'snowball' ? 'snowball' : 'avalanche';
+      const av = debtPayoffPlan(debts, extra, 'avalanche');
+      const sb = debtPayoffPlan(debts, extra, 'snowball');
+      const base = minimumsOnlyPlan(debts);
+      const plan = strategy === 'avalanche' ? av : sb;
+      const total = debts.reduce((s, d) => s + d.balance, 0);
+      const budget = debts.reduce((s, d) => s + d.minPayment, 0) + extra;
+
+      out.text('heroLabel', `Debt-free with the ${strategy} method in`);
+      out.text('hero', plan.neverPaysOff ? 'Never' : duration(plan.months));
+      out.text(
+        'heroSub',
+        plan.neverPaysOff
+          ? 'Your monthly budget does not cover the interest.'
+          : `${monthFromNow(plan.months)} · ${money(total)} of debt · ${money(budget)} a month`,
+      );
+
+      if (plan.neverPaysOff) {
+        out.html('verdict', verdict('bad', 'Your minimums plus extra payment are less than the interest being added each month. Increase the extra payment to start making progress.'));
+      } else {
+        const diff = sb.totalInterest - av.totalInterest;
+        const firstAv = Math.min(...av.payoffMonth);
+        const firstSb = Math.min(...sb.payoffMonth);
+        const msg =
+          Math.abs(diff) < 1
+            ? 'Both methods cost the same here — pick the one you’ll stick with.'
+            : `The avalanche saves <strong>${money(diff)}</strong> in interest; the snowball pays off your first debt ${firstSb < firstAv ? `<strong>${firstAv - firstSb} month${firstAv - firstSb === 1 ? '' : 's'} sooner</strong>` : 'at the same time'}.`;
+        const vsBase = Number.isFinite(base.totalInterest)
+          ? ` Compared with paying only minimums, you save <strong>${money(base.totalInterest - plan.totalInterest)}</strong>.`
+          : '';
+        out.html('verdict', verdict('good', msg + vsBase));
+      }
+
+      const row = (label: string, r: { months: number; totalInterest: number }) =>
+        `<tr><td>${label}</td><td>${Number.isFinite(r.months) ? duration(r.months) : 'Never'}</td><td>${money(r.totalInterest)}</td></tr>`;
+      out.html(
+        'compare',
+        `<div class="table-wrap" style="max-height:none;margin-bottom:16px"><table class="data"><thead><tr><th>Plan</th><th>Debt-free in</th><th>Total interest</th></tr></thead><tbody>
+          ${row('Avalanche', av)}${row('Snowball', sb)}${row('Minimums only', base)}</tbody></table></div>` +
+          compareBars(
+            [
+              { label: 'Avalanche interest', value: av.totalInterest, color: 'var(--chart-1)' },
+              { label: 'Snowball interest', value: sb.totalInterest, color: 'var(--chart-3)' },
+              { label: 'Minimums-only interest', value: base.totalInterest, color: 'var(--chart-2)' },
+            ],
+            (n) => money(n),
+          ),
+      );
+
+      if (!plan.neverPaysOff) {
+        const baseline = debtPayoffPlan(debts, 0, strategy);
+        const len = Math.max(av.balances.length, sb.balances.length);
+        const pad = (arr: number[], n: number) => [...arr, ...Array(Math.max(0, n - arr.length)).fill(0)];
+        const n = Math.min(Math.max(len, baseline.neverPaysOff ? len : baseline.balances.length), 600);
+        lineChart(out.el('chart'), {
+          ariaLabel: `Total debt falls from ${money(total)} to zero in ${duration(plan.months)}`,
+          xLabel: (i) => (i === 0 ? 'Now' : `${i} mo`),
+          series: [
+            { name: 'Avalanche', values: pad(av.balances, n), color: 'var(--chart-1)', area: strategy === 'avalanche' },
+            { name: 'Snowball', values: pad(sb.balances, n), color: 'var(--chart-3)', area: strategy === 'snowball' },
+            ...(baseline.neverPaysOff ? [] : [{ name: 'No extra payment', values: pad(baseline.balances, n).slice(0, n), color: 'var(--chart-2)', dashed: true }]),
+          ],
+        });
+        const items = plan.order
+          .map((i) => ({ d: debts[i], m: plan.payoffMonth[i] }))
+          .sort((a, b) => a.m - b.m)
+          .map(
+            (x, k) =>
+              `<tr><td>${k + 1}. ${esc(x.d.name)}</td><td>${money(x.d.balance)}</td><td>${x.d.apr.toFixed(2)}%</td><td>${Number.isFinite(x.m) ? `${monthFromNow(x.m)}` : 'Never'}</td></tr>`,
+          )
+          .join('');
+        out.html(
+          'order',
+          `<div class="table-wrap" style="max-height:none"><table class="data"><thead><tr><th>Debt</th><th>Balance</th><th>APR</th><th>Paid off</th></tr></thead><tbody>${items}</tbody></table></div>`,
+        );
+      } else {
+        out.html('chart', '');
+        out.html('order', '');
+      }
+    },
+  });
+</script>

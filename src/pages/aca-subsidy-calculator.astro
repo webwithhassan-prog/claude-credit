@@ -1,0 +1,279 @@
+---
+import ToolLayout from '../layouts/ToolLayout.astro';
+import Calc from '../components/calc/Calc.astro';
+import NumberField from '../components/calc/NumberField.astro';
+import SelectField from '../components/calc/SelectField.astro';
+import SegField from '../components/calc/SegField.astro';
+import AdSlot from '../components/AdSlot.astro';
+
+const sections = [
+  { id: 'how-to-use', title: 'How to use this calculator' },
+  { id: 'how-ptc-works', title: 'How the premium tax credit is calculated' },
+  { id: 'what-changed', title: 'What changed for 2026: the subsidy cliff is back' },
+  { id: 'table-2026', title: '2026 applicable percentage table' },
+  { id: 'example', title: 'Worked examples' },
+  { id: 'lower-magi', title: 'Ways to keep your MAGI under the cliff' },
+  { id: 'reconcile', title: 'Reconciling at tax time' },
+];
+
+const faq = [
+  {
+    q: 'What is the income limit for ACA subsidies in 2026?',
+    a: 'For 2026 coverage, the premium tax credit is generally available when household income is between 100% and 400% of the federal poverty line. Using the 2025 poverty guidelines, 400% is $62,600 for a single person, $84,600 for two people and $128,600 for a family of four in the 48 contiguous states. Alaska and Hawaii have higher limits.',
+  },
+  {
+    q: 'Did the enhanced ACA subsidies expire?',
+    a: 'Yes. The expanded credits created in 2021 and extended through 2025 — which removed the 400% cap and limited premiums to 8.5% of income — expired at the end of 2025. For 2026, the original schedule applies again, with required contributions from 2.10% to 9.96% of income. Use the “2021–2025 enhanced rules” option to see what you would have received under the old rules.',
+  },
+  {
+    q: 'What is the benchmark plan?',
+    a: 'The second-lowest-cost silver plan (SLCSP) available to your household in your area. Your credit is the benchmark premium minus your required contribution. You can apply the credit to any metal level: a cheaper bronze plan may cost little or nothing, while a gold plan costs more out of pocket.',
+  },
+  {
+    q: 'What counts as income for ACA subsidies?',
+    a: 'Modified adjusted gross income (MAGI): your AGI plus untaxed foreign income, non-taxable Social Security benefits and tax-exempt interest, for everyone in your tax household who is required to file. It’s an estimate of the coming year’s income, reconciled on your tax return.',
+  },
+  {
+    q: 'What if my income is below 100% of the poverty line?',
+    a: 'In states that expanded Medicaid, adults with income up to 138% of the poverty line generally qualify for Medicaid instead of Marketplace subsidies. In non-expansion states, people below 100% usually don’t qualify for premium tax credits.',
+  },
+  {
+    q: 'Do I have to pay back excess subsidies?',
+    a: 'If you received advance credits and your actual income turns out higher, you repay the excess when you file. Starting with the 2026 tax year, the former repayment caps no longer apply, so the full excess must be repaid. Report income changes to the Marketplace promptly.',
+  },
+];
+
+const sources = [
+  {
+    title: 'Rev. Proc. 2025-25 — 2026 applicable percentage table',
+    url: 'https://www.irs.gov/pub/irs-drop/rp-25-25.pdf',
+    publisher: 'Internal Revenue Service',
+  },
+  {
+    title: 'Poverty guidelines (2025)',
+    url: 'https://aspe.hhs.gov/topics/poverty-economic-mobility/poverty-guidelines',
+    publisher: 'U.S. Department of Health and Human Services (ASPE)',
+  },
+  {
+    title: 'Premium tax credit — the basics',
+    url: 'https://www.irs.gov/affordable-care-act/individuals-and-families/the-premium-tax-credit-the-basics',
+    publisher: 'Internal Revenue Service',
+  },
+  {
+    title: 'Find plans and prices (benchmark silver premiums)',
+    url: 'https://www.healthcare.gov/see-plans/',
+    publisher: 'HealthCare.gov',
+  },
+];
+---
+
+<ToolLayout
+  slug="aca-subsidy-calculator"
+  sections={sections}
+  faq={faq}
+  sources={sources}
+  related={['irmaa-calculator', 'senior-deduction-calculator', 'new-tax-deductions-calculator', 'ssdi-back-pay-calculator']}
+>
+  <p slot="intro">
+    Estimate your 2026 ACA premium tax credit from your household size, expected income and the benchmark silver plan
+    premium. See your required contribution, your net premium, and whether the return of the <strong>400% income cliff</strong>
+    affects you — with a side-by-side view of the expired 2021–2025 rules.
+  </p>
+
+  <Calc id="aca" slot="calculator" inputsTitle="Your household">
+    <Fragment slot="inputs">
+      <div class="field-row">
+        <NumberField name="size" label="Household size" value={2} min={1} max={12} hint="You, your spouse and tax dependents." />
+        <SelectField
+          name="region"
+          label="State"
+          value="contiguous"
+          options={[
+            { value: 'contiguous', label: '48 states + DC' },
+            { value: 'alaska', label: 'Alaska' },
+            { value: 'hawaii', label: 'Hawaii' },
+          ]}
+        />
+      </div>
+      <NumberField name="magi" label="Expected 2026 household income (MAGI)" value={84000} prefix="$" format="money" min={0} />
+      <NumberField name="benchmark" label="Benchmark silver premium (monthly)" value={2000} prefix="$" format="money" min={0} hint="Second-lowest-cost silver plan for your household — shown on HealthCare.gov or your state exchange." />
+      <NumberField name="plan" label="Premium of the plan you want (monthly)" value={0} prefix="$" format="money" min={0} hint="Leave 0 to use the benchmark plan." />
+      <SegField
+        name="schedule"
+        label="Rules"
+        value="current"
+        options={[
+          { value: 'current', label: '2026 rules' },
+          { value: 'enhanced', label: '2021–2025 enhanced rules' },
+        ]}
+      />
+    </Fragment>
+
+    <Fragment slot="results">
+      <div class="result-hero" aria-live="polite">
+        <p class="label">Estimated premium tax credit</p>
+        <p class="value" data-out="hero">—</p>
+        <p class="sub" data-out="heroSub"></p>
+      </div>
+      <div class="stats cols-3">
+        <div class="stat"><p class="label">Income as % of poverty line</p><p class="value" data-out="fpl">—</p></div>
+        <div class="stat"><p class="label">Your required contribution</p><p class="value" data-out="contribution">—</p></div>
+        <div class="stat"><p class="label">You pay for the plan</p><p class="value" data-out="net">—</p></div>
+      </div>
+      <div data-out="verdict"></div>
+      <h3 class="results-heading">2026 rules vs the expired enhanced rules</h3>
+      <div data-out="bars"></div>
+    </Fragment>
+  </Calc>
+
+  <h2 id="how-to-use">How to use this calculator</h2>
+  <ol>
+    <li><strong>Enter your household size</strong> — everyone on your tax return, including dependents.</li>
+    <li><strong>Enter your expected 2026 MAGI</strong> for the whole household.</li>
+    <li><strong>Enter the benchmark premium.</strong> On HealthCare.gov or your state exchange, preview plans for your ZIP code and ages; the second-lowest-cost silver plan is the benchmark.</li>
+    <li><strong>Optionally enter the premium of the plan you want</strong> to see your net monthly cost.</li>
+    <li><strong>Compare rules.</strong> Switch to the 2021–2025 enhanced rules to see how much the expiration changes your subsidy.</li>
+  </ol>
+
+  <h2 id="how-ptc-works">How the premium tax credit is calculated</h2>
+  <p>
+    The premium tax credit (PTC) caps what you must pay for the benchmark silver plan at a percentage of your income — the
+    <strong>applicable percentage</strong>, which rises with income. The government pays the rest of the benchmark premium.
+  </p>
+  <div class="formula">Income % of poverty line = MAGI ÷ poverty guideline for your household size
+Required contribution = MAGI × applicable percentage
+Premium tax credit = benchmark premium − required contribution   (not less than $0, not more than your plan’s premium)</div>
+  <p>
+    For 2026 coverage, the poverty guideline is <strong>$15,650</strong> for one person plus <strong>$5,500</strong> for each
+    additional person in the 48 contiguous states and DC ($19,550 + $6,880 in Alaska; $17,990 + $6,330 in Hawaii).
+  </p>
+
+  <AdSlot slot="inContent" />
+
+  <h2 id="what-changed">What changed for 2026: the subsidy cliff is back</h2>
+  <p>
+    From 2021 through 2025, enhanced credits meant no one paid more than 8.5% of income for the benchmark plan, and households
+    above 400% of the poverty line still qualified. Those enhancements expired at the end of 2025. For 2026:
+  </p>
+  <ul>
+    <li><strong>The 400% cliff returns.</strong> Earn $1 over 400% of the poverty line and the credit drops to zero.</li>
+    <li><strong>Required contributions rise</strong> at every income level — from 2.10% to 9.96% of income, versus 0% to 8.5% before.</li>
+    <li><strong>Full repayment of excess advance credits</strong> applies starting with 2026 returns, so accurate income estimates matter more than ever.</li>
+  </ul>
+
+  <h2 id="table-2026">2026 applicable percentage table</h2>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Household income (% of poverty line)</th><th>2026 contribution</th><th>2021–2025 enhanced</th></tr></thead>
+      <tbody>
+        <tr><td>Up to 133%</td><td>2.10%</td><td>0%</td></tr>
+        <tr><td>133% – 150%</td><td>3.14% – 4.19%</td><td>0%</td></tr>
+        <tr><td>150% – 200%</td><td>4.19% – 6.60%</td><td>0% – 2%</td></tr>
+        <tr><td>200% – 250%</td><td>6.60% – 8.44%</td><td>2% – 4%</td></tr>
+        <tr><td>250% – 300%</td><td>8.44% – 9.96%</td><td>4% – 6%</td></tr>
+        <tr><td>300% – 400%</td><td>9.96%</td><td>6% – 8.5%</td></tr>
+        <tr><td>Above 400%</td><td>No credit</td><td>8.5%</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="example">Worked examples</h2>
+  <p>
+    <strong>Single adult, $40,000 MAGI, $600 benchmark premium.</strong> Income is 255.6% of the poverty line, so the
+    contribution is about 8.61% of income — <strong>$287 a month</strong>. The credit is $600 − $287 = <strong>$313 a month</strong>.
+  </p>
+  <p>
+    <strong>Family of four, $75,000 MAGI, $1,700 benchmark.</strong> Income is 233% of the poverty line; the contribution is
+    about 7.82% — $489 a month — so the credit is about <strong>$1,211 a month</strong>.
+  </p>
+  <p>
+    <strong>The cliff: a couple in their early 60s with a $2,000 benchmark premium.</strong> At <strong>$84,000</strong> of MAGI
+    (397% of the poverty line) they receive about <strong>$1,303 a month — $15,634 a year</strong>. At <strong>$85,000</strong>
+    (402%) they receive <strong>nothing</strong>. Under the expired enhanced rules, they would have received about $1,398 a month
+    at $85,000.
+  </p>
+
+  <h2 id="lower-magi">Ways to keep your MAGI under the cliff</h2>
+  <ul>
+    <li><strong>Contribute to a traditional 401(k), 403(b) or deductible IRA</strong> — these reduce MAGI dollar for dollar.</li>
+    <li><strong>Fund a Health Savings Account</strong> if you have an HSA-eligible bronze or silver plan.</li>
+    <li><strong>Self-employed?</strong> Retirement plan contributions (SEP or Solo 401(k)) and half of self-employment tax reduce AGI.</li>
+    <li><strong>Time income</strong> such as Roth conversions, capital gains or bonuses into a different year when possible.</li>
+    <li><strong>Note:</strong> the new deductions for tips, overtime and seniors reduce taxable income but <em>not</em> MAGI, so they don’t help with the cliff.</li>
+  </ul>
+  <div class="callout warn">
+    <span class="callout-title">Plan with a professional near the cliff</span>
+    When a small amount of income can change your credit by thousands of dollars, it’s worth confirming your estimate with a
+    Marketplace navigator or tax professional before enrolling.
+  </div>
+
+  <h2 id="reconcile">Reconciling at tax time</h2>
+  <p>
+    Advance credits are based on the income you estimate when you enroll. When you file your return, Form 8962 compares the
+    advance payments with the credit you actually qualify for. If your income came in lower, you get the difference as a refund;
+    if higher, you repay the excess. This calculator is an estimate for planning — your Marketplace eligibility notice and tax
+    return are what count.
+  </p>
+</ToolLayout>
+
+<script>
+  import { bindCalculator, outputs, verdict } from '../lib/ui/form';
+  import { money, percent } from '../lib/ui/format';
+  import { compareBars } from '../lib/ui/chart';
+  import { acaSubsidy, type FplRegion } from '../lib/calc/benefits';
+
+  const out = outputs('aca');
+
+  bindCalculator('aca', {
+    compute(f) {
+      const region = (['contiguous', 'alaska', 'hawaii'].includes(f.str('region')) ? f.str('region') : 'contiguous') as FplRegion;
+      const input = {
+        householdSize: Math.max(1, Math.round(f.num('size', 1))),
+        magi: f.num('magi'),
+        region,
+        benchmarkMonthly: f.num('benchmark'),
+        planMonthly: f.num('plan'),
+      };
+      const schedule = f.str('schedule') === 'enhanced' ? 'enhanced' : 'current';
+      const r = acaSubsidy({ ...input, schedule });
+      const cur = acaSubsidy({ ...input, schedule: 'current' });
+      const enh = acaSubsidy({ ...input, schedule: 'enhanced' });
+
+      out.text('hero', `${money(r.creditMonthly)}/mo`);
+      out.text('heroSub', `${money(r.creditAnnual)} a year under ${schedule === 'current' ? '2026' : 'the 2021–2025 enhanced'} rules`);
+      out.text('fpl', percent(r.fplPercent, 0));
+      out.text('contribution', r.eligible ? `${money(r.contributionMonthly)}/mo (${percent(r.applicablePercent as number, 2)})` : '—');
+      out.text('net', `${money(r.netMonthly)}/mo`);
+
+      let kind: 'good' | 'warn' | 'bad' | 'info' = 'good';
+      let msg: string;
+      if (r.belowFloor) {
+        kind = 'info';
+        msg = `Your income is below the poverty line (${money(r.fpl)}). In most states, adults under 138% (${money(r.medicaidLine)}) qualify for Medicaid instead.`;
+      } else if (r.aboveCliff) {
+        kind = 'bad';
+        msg = `Your income is <strong>${money(r.overCliffBy)}</strong> above the 400% limit of <strong>${money(r.cliffIncome)}</strong>, so you get no credit in 2026. Lowering MAGI below the limit (for example with pre-tax retirement or HSA contributions) could restore about <strong>${money(acaSubsidy({ ...input, magi: r.cliffIncome, schedule: 'current' }).creditAnnual)}</strong> a year.`;
+      } else if (r.creditMonthly <= 0) {
+        kind = 'info';
+        msg = 'Your required contribution is higher than the benchmark premium, so no credit is needed — the benchmark plan already costs less than the cap.';
+      } else if (schedule === 'current' && input.magi > r.cliffIncome * 0.95) {
+        kind = 'warn';
+        msg = `You’re within <strong>${money(r.cliffIncome - input.magi)}</strong> of the 400% cliff. If your income rises above <strong>${money(r.cliffIncome)}</strong>, you’d lose the entire <strong>${money(r.creditAnnual)}</strong> credit.`;
+      } else {
+        msg = `You’d pay about <strong>${money(r.contributionMonthly)}</strong> a month for the benchmark silver plan; the credit covers the other <strong>${money(r.creditMonthly)}</strong>.`;
+      }
+      out.html('verdict', verdict(kind, msg));
+
+      out.html(
+        'bars',
+        compareBars(
+          [
+            { label: '2026 rules — yearly credit', value: cur.creditAnnual, color: 'var(--chart-1)' },
+            { label: '2021–2025 enhanced — yearly credit', value: enh.creditAnnual, color: 'var(--chart-3)' },
+          ],
+          (n) => money(n),
+        ),
+      );
+    },
+  });
+</script>

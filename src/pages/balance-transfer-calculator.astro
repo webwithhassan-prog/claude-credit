@@ -1,0 +1,270 @@
+---
+import ToolLayout from '../layouts/ToolLayout.astro';
+import Calc from '../components/calc/Calc.astro';
+import NumberField from '../components/calc/NumberField.astro';
+import AdSlot from '../components/AdSlot.astro';
+
+const sections = [
+  { id: 'how-to-use', title: 'How to use this calculator' },
+  { id: 'how-it-works', title: 'How a balance transfer works' },
+  { id: 'example', title: 'Worked example' },
+  { id: 'is-it-worth-it', title: 'When a balance transfer is (and isn’t) worth it' },
+  { id: 'rules', title: 'Rules and fine print to know' },
+  { id: 'method', title: 'How we calculate savings' },
+];
+
+const faq = [
+  {
+    q: 'Is a balance transfer worth the 3%–5% fee?',
+    a: 'Usually yes, if you’re paying a typical credit card APR and can pay off most of the balance during the 0% period. A 4% fee on $8,000 is $320, while a year and a half of interest at 24% on the same balance would be well over $1,500. The fee only wins if you’d pay the debt off very quickly anyway, or if the promotional period is short.',
+  },
+  {
+    q: 'What happens if I don’t pay off the balance before the intro APR ends?',
+    a: 'The remaining balance starts accruing interest at the card’s regular (“go-to”) APR from that point forward. Standard 0% balance-transfer offers are not “deferred interest”, so you are not charged interest retroactively. Some store cards do use deferred interest — read your terms.',
+  },
+  {
+    q: 'How much do I need to pay each month to clear it during the promotion?',
+    a: 'Divide the transferred balance <em>plus the fee</em> by the number of promotional months. The calculator shows this figure as “Payment to clear before the promo ends”.',
+  },
+  {
+    q: 'Will a balance transfer hurt my credit score?',
+    a: 'Applying for a new card causes a hard inquiry and a new account, which may dip your score slightly for a few months. Over time, a lower total balance and a higher combined credit limit usually <em>improve</em> your credit utilization, which can raise your score. Check with our <a href="/credit-utilization-calculator/">credit utilization calculator</a>.',
+  },
+  {
+    q: 'Can I transfer a balance between two cards from the same bank?',
+    a: 'Generally no — issuers don’t allow transfers between their own cards. You’ll need a card from a different issuer.',
+  },
+  {
+    q: 'Should I use the new card for purchases?',
+    a: 'It’s best not to. New purchases may be charged the regular APR, and while payments above the minimum must go to the highest-rate balance first under the Credit CARD Act, mixing purchases with a promotional balance makes the payoff harder to track.',
+  },
+];
+
+const sources = [
+  {
+    title: 'Credit cards — consumer tools and answers',
+    url: 'https://www.consumerfinance.gov/consumer-tools/credit-cards/',
+    publisher: 'Consumer Financial Protection Bureau',
+  },
+  {
+    title: 'Regulation Z §1026.53 — allocation of payments',
+    url: 'https://www.consumerfinance.gov/rules-policy/regulations/1026/53/',
+    publisher: 'Consumer Financial Protection Bureau',
+  },
+  {
+    title: 'Regulation Z §1026.55 — limitations on increasing APRs',
+    url: 'https://www.consumerfinance.gov/rules-policy/regulations/1026/55/',
+    publisher: 'Consumer Financial Protection Bureau',
+  },
+];
+---
+
+<ToolLayout
+  slug="balance-transfer-calculator"
+  sections={sections}
+  faq={faq}
+  sources={sources}
+  related={['credit-card-payoff-calculator', 'debt-consolidation-calculator', 'debt-payoff-calculator', 'credit-utilization-calculator']}
+>
+  <p slot="intro">
+    Find out whether moving a credit card balance to a 0% intro APR card actually saves money after the transfer fee.
+    Compare your total interest both ways, see the payment needed to clear the balance before the promotion ends, and what
+    happens if you don’t.
+  </p>
+
+  <Calc id="bt" slot="calculator" inputsTitle="Your balance & offer">
+    <Fragment slot="inputs">
+      <div class="field-row">
+        <NumberField name="balance" label="Balance to transfer" value={8000} prefix="$" format="money" min={0} />
+        <NumberField name="apr" label="Current card APR" value={23.99} suffix="%" min={0} max={100} />
+      </div>
+      <div class="field-row">
+        <NumberField name="fee" label="Transfer fee" value={4} suffix="%" min={0} max={20} hint="Usually 3%–5%." />
+        <NumberField name="introApr" label="Intro APR" value={0} suffix="%" min={0} max={100} />
+      </div>
+      <div class="field-row">
+        <NumberField name="introMonths" label="Intro period" value={18} suffix="months" min={0} max={60} />
+        <NumberField name="goTo" label="APR after the intro" value={24.24} suffix="%" min={0} max={100} />
+      </div>
+      <NumberField name="payment" label="Monthly payment" value={350} prefix="$" format="money" min={0} hint="Used for both scenarios so the comparison is fair." />
+    </Fragment>
+
+    <Fragment slot="results">
+      <div class="result-hero" aria-live="polite">
+        <p class="label" data-out="heroLabel">Estimated savings</p>
+        <p class="value" data-out="hero">—</p>
+        <p class="sub" data-out="heroSub"></p>
+      </div>
+      <div class="stats cols-3">
+        <div class="stat"><p class="label">Transfer fee</p><p class="value" data-out="fee">—</p></div>
+        <div class="stat"><p class="label">Payment to clear before the promo ends</p><p class="value" data-out="clear">—</p></div>
+        <div class="stat"><p class="label">Balance left when promo ends</p><p class="value" data-out="left">—</p></div>
+      </div>
+      <div data-out="verdict"></div>
+      <h3 class="results-heading">Total cost of the debt</h3>
+      <div data-out="bars"></div>
+      <div data-out="table"></div>
+    </Fragment>
+  </Calc>
+
+  <h2 id="how-to-use">How to use this calculator</h2>
+  <ol>
+    <li><strong>Enter your current balance and APR</strong> from your latest card statement.</li>
+    <li><strong>Enter the offer’s terms</strong>: the balance transfer fee (a percentage of the amount moved), the intro APR (often 0%), how many months it lasts, and the regular APR that applies afterwards.</li>
+    <li><strong>Enter the monthly payment you can afford.</strong> We use the same payment in both scenarios so you’re comparing like with like.</li>
+    <li><strong>Check the verdict.</strong> The results show total interest and fees each way, your payoff time, and the payment needed to be debt-free before the promotion expires.</li>
+  </ol>
+
+  <h2 id="how-it-works">How a balance transfer works</h2>
+  <p>
+    With a balance transfer, a new card issuer pays off your existing card and moves the debt onto the new card, usually at a
+    promotional APR of 0% for 12 to 21 months. In exchange, you pay a one-time <strong>transfer fee</strong> — typically 3% to
+    5% of the amount moved — which is added to your new balance.
+  </p>
+  <p>
+    During the promotional period, every dollar you pay reduces the principal instead of covering interest. That’s why a
+    transfer can dramatically shorten payoff time: at 24% APR, a $350 payment on an $8,000 balance loses about $160 —
+    nearly half — to interest in the first month; at 0%, none of it does.
+  </p>
+
+  <AdSlot slot="inContent" />
+
+  <h2 id="example">Worked example</h2>
+  <p>
+    Chris owes <strong>$8,000</strong> at <strong>23.99% APR</strong> and can pay <strong>$350 a month</strong>. A new card
+    offers 0% for 18 months with a 4% fee, then 24.24%.
+  </p>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th></th><th>Keep current card</th><th>Transfer</th></tr></thead>
+      <tbody>
+        <tr><td>Fee</td><td>$0</td><td>$320</td></tr>
+        <tr><td>Interest paid</td><td>$2,796</td><td>$150</td></tr>
+        <tr><td>Time to pay off</td><td>2 years 7 months</td><td>2 years 1 month</td></tr>
+        <tr><td>Total cost of borrowing</td><td>$2,796</td><td>$470</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    The transfer saves Chris about <strong>$2,326</strong>, even though $2,020 is still owed when the promotion ends. Raising
+    the payment to <strong>$462.22</strong> would clear the full $8,320 (balance plus fee) within the 18 months and avoid interest
+    entirely.
+  </p>
+
+  <h2 id="is-it-worth-it">When a balance transfer is (and isn’t) worth it</h2>
+  <p><strong>It usually makes sense when:</strong></p>
+  <ul>
+    <li>Your current APR is high (18%+) and the balance is large enough that interest outweighs a 3%–5% fee.</li>
+    <li>You can pay off most or all of the balance before the promotion ends.</li>
+    <li>Your credit is good enough to be approved for a limit that covers the balance plus the fee.</li>
+    <li>You’ve stopped adding new charges to the old card.</li>
+  </ul>
+  <p><strong>It may not be worth it when:</strong></p>
+  <ul>
+    <li>You could pay the balance off in a few months anyway — the fee may exceed the interest you’d save.</li>
+    <li>The promotional period is short (6–9 months) relative to your payoff time.</li>
+    <li>You tend to run balances back up on the old card once it’s cleared.</li>
+    <li>You need a longer, fixed schedule — a <a href="/debt-consolidation-calculator/">consolidation loan</a> gives you a guaranteed payoff date at a fixed rate.</li>
+  </ul>
+
+  <h2 id="rules">Rules and fine print to know</h2>
+  <ul>
+    <li><strong>Transfer deadline:</strong> many offers apply only to balances transferred within the first 60–120 days.</li>
+    <li><strong>Late payments:</strong> under the Credit CARD Act, an issuer can generally apply a penalty rate to an existing balance only after a payment is 60 days late — but some offers end the promotional rate after any late payment. Set up autopay for at least the minimum.</li>
+    <li><strong>Payment allocation:</strong> amounts you pay above the minimum must go to the balance with the highest APR first.</li>
+    <li><strong>Same issuer:</strong> you usually can’t move debt between two cards from the same bank.</li>
+    <li><strong>Credit limit:</strong> the amount you can transfer — including the fee — is capped by the new card’s limit, which you learn only after approval.</li>
+  </ul>
+
+  <h2 id="method">How we calculate savings</h2>
+  <p>
+    Both scenarios use your monthly payment and apply interest monthly at APR ÷ 12. In the transfer scenario, the fee is
+    added to the starting balance, the intro APR applies for the promotional months, and the regular APR applies afterward.
+  </p>
+  <div class="formula">Savings = interest if you keep the card − (interest after transferring + transfer fee)
+Payment to clear during promo = (balance + fee) ÷ intro months     (at a 0% intro APR)</div>
+  <p>
+    Results are estimates. Real interest is charged daily, fees may have a minimum dollar amount, and the regular APR on most
+    cards is variable.
+  </p>
+</ToolLayout>
+
+<script>
+  import { bindCalculator, outputs, verdict } from '../lib/ui/form';
+  import { duration, money } from '../lib/ui/format';
+  import { compareBars } from '../lib/ui/chart';
+  import { balanceTransfer } from '../lib/calc/debt';
+
+  const out = outputs('bt');
+
+  bindCalculator('bt', {
+    compute(f) {
+      const input = {
+        balance: f.num('balance'),
+        currentApr: f.num('apr'),
+        feePercent: f.num('fee'),
+        introApr: f.num('introApr'),
+        introMonths: Math.round(f.num('introMonths')),
+        goToApr: f.num('goTo'),
+        monthlyPayment: f.num('payment'),
+      };
+      if (input.balance <= 0) {
+        out.text('hero', '—');
+        out.text('heroSub', 'Enter a balance to compare.');
+        ['verdict', 'bars', 'table'].forEach((k) => out.html(k, ''));
+        return;
+      }
+      const r = balanceTransfer(input);
+      const keepCost = r.keep.totalInterest;
+      const transferCost = r.transfer.totalInterest + r.fee;
+
+      if (r.keep.neverPaysOff && r.transfer.neverPaysOff) {
+        out.text('heroLabel', 'Estimated savings');
+        out.text('hero', '—');
+        out.text('heroSub', 'Your payment is too low to pay off the balance either way.');
+      } else {
+        out.text('heroLabel', r.netSavings >= 0 ? 'You’d save by transferring' : 'Transferring would cost you more');
+        out.text('hero', Number.isFinite(r.netSavings) ? money(Math.abs(r.netSavings)) : 'Thousands');
+        out.text(
+          'heroSub',
+          `Payoff: ${duration(r.transfer.months)} with the transfer vs ${duration(r.keep.months)} without`,
+        );
+      }
+      out.text('fee', money(r.fee));
+      out.text('clear', input.introMonths > 0 ? money(r.paymentToClearInIntro, true) : '—');
+      out.text('left', money(r.transfer.balanceAfterIntro));
+
+      let v: string;
+      if (r.transfer.neverPaysOff) {
+        v = verdict('bad', 'After the promotion ends, your payment would not cover the interest at the regular APR. Increase your payment.');
+      } else if (r.netSavings > 0 && r.transfer.balanceAfterIntro <= 0.5) {
+        v = verdict('good', `You’d clear the whole balance during the promotion and pay only the ${money(r.fee)} fee — a saving of <strong>${money(r.netSavings)}</strong>.`);
+      } else if (r.netSavings > 0) {
+        v = verdict('warn', `The transfer saves money, but <strong>${money(r.transfer.balanceAfterIntro)}</strong> would still be owed when the promo ends. Pay <strong>${money(r.paymentToClearInIntro, true)}</strong> a month to avoid interest completely.`);
+      } else {
+        v = verdict('bad', 'The fee costs more than the interest you’d save — you’re likely to pay this balance off quickly anyway.');
+      }
+      out.html('verdict', v);
+
+      out.html(
+        'bars',
+        compareBars(
+          [
+            { label: 'Keep current card (interest)', value: keepCost, color: 'var(--chart-2)' },
+            { label: 'Transfer (fee + interest)', value: transferCost, color: 'var(--chart-1)' },
+          ],
+          (n) => money(n),
+        ),
+      );
+      out.html(
+        'table',
+        `<div class="table-wrap" style="max-height:none"><table class="data"><thead><tr><th></th><th>Keep</th><th>Transfer</th></tr></thead><tbody>
+          <tr><td>Fee</td><td>${money(0)}</td><td>${money(r.fee)}</td></tr>
+          <tr><td>Interest</td><td>${money(r.keep.totalInterest)}</td><td>${money(r.transfer.totalInterest)}</td></tr>
+          <tr><td>Months to pay off</td><td>${Number.isFinite(r.keep.months) ? r.keep.months : 'Never'}</td><td>${Number.isFinite(r.transfer.months) ? r.transfer.months : 'Never'}</td></tr>
+          <tr><td>Total paid</td><td>${money(r.keep.totalPaid)}</td><td>${money(r.transfer.totalPaid)}</td></tr>
+        </tbody></table></div>`,
+      );
+    },
+  });
+</script>

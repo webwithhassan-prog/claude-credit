@@ -1,0 +1,65 @@
+---
+import ProseLayout from '../layouts/ProseLayout.astro';
+import { categories } from '../data/categories';
+import { tools } from '../data/tools';
+import { site } from '../site.config';
+---
+
+<ProseLayout
+  title="About us"
+  description={`${site.name} builds free, transparent calculators for debt, home equity, business financing, taxes and benefits.`}
+  path="/about/"
+  lede={`${site.name} makes money math understandable. Our free calculators show not just the answer, but how it was reached.`}
+>
+  <h2>Why we built {site.name}</h2>
+  <p>
+    Financial decisions are full of numbers that are easy to get wrong: how long a credit card balance really takes to pay off,
+    what a merchant cash advance costs as an APR, whether a HELOC beats refinancing, or how an income cliff can erase a health
+    insurance subsidy. Many online calculators give a single number with no explanation, hide the assumptions, or ask for your
+    email before showing results.
+  </p>
+  <p>
+    We think you deserve better. Every {site.name} calculator is free, requires no sign-up, runs privately in your browser, and
+    comes with a plain-English explanation of the rules, the formula and a worked example — so you can check the math and act
+    with confidence.
+  </p>
+
+  <h2>What we cover</h2>
+  <p>We currently offer {tools.length} calculators across {categories.length} topics:</p>
+  <ul>
+    {
+      categories.map((c) => (
+        <li>
+          <a href={`/${c.id}/`}>{c.name}</a> — {c.description}
+        </li>
+      ))
+    }
+  </ul>
+
+  <h2>How we build and check our calculators</h2>
+  <ul>
+    <li><strong>Primary sources first.</strong> Tax, Medicare, ACA and Social Security figures come directly from the IRS, CMS, HHS and SSA. Lending rules come from the CFPB, the Federal Reserve, Fannie Mae and HUD. Each page lists its sources.</li>
+    <li><strong>Transparent formulas.</strong> Every page explains the calculation and its assumptions, with a worked example you can reproduce.</li>
+    <li><strong>Tested code.</strong> The math behind every calculator is covered by automated tests that check results against known values — for example, standard amortization results and published premium tables.</li>
+    <li><strong>Dated reviews.</strong> Each page shows when it was last reviewed. We update figures when agencies publish new numbers, typically each fall for the coming year.</li>
+  </ul>
+  <p>Read the full details in our <a href="/editorial-policy/">editorial policy</a>.</p>
+
+  <h2>Privacy by design</h2>
+  <p>
+    Calculations happen on your device. We never ask for your name, contact details or account information, and the numbers you
+    type are not sent to our servers. See our <a href="/privacy-policy/">privacy policy</a>.
+  </p>
+
+  <h2>How we’re funded</h2>
+  <p>
+    {site.name} is free because it’s supported by advertising. Advertisers have no influence over our calculators or content, and
+    we don’t accept payment to rank or recommend products.
+  </p>
+
+  <h2>Get in touch</h2>
+  <p>
+    Found an error, have a suggestion for a new calculator, or want to cite our tools? We’d love to hear from you at
+    <a href={`mailto:${site.email}`}>{site.email}</a> or through our <a href="/contact/">contact page</a>.
+  </p>
+</ProseLayout>

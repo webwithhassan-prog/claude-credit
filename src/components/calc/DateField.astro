@@ -1,0 +1,19 @@
+---
+interface Props {
+  name: string;
+  label: string;
+  value: string;
+  hint?: string;
+}
+const { name, label, value, hint } = Astro.props;
+---
+
+<div class="field">
+  <label>
+    <span class="label">{label}</span>
+    <span class="input-wrap">
+      <input type="date" name={name} value={value} />
+    </span>
+  </label>
+  {hint && <p class="hint">{hint}</p>}
+</div>

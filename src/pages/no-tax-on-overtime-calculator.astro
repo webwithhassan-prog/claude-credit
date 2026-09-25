@@ -1,0 +1,257 @@
+---
+import ToolLayout from '../layouts/ToolLayout.astro';
+import Calc from '../components/calc/Calc.astro';
+import NumberField from '../components/calc/NumberField.astro';
+import SegField from '../components/calc/SegField.astro';
+import TaxBasics from '../components/calc/TaxBasics.astro';
+import AdSlot from '../components/AdSlot.astro';
+
+const sections = [
+  { id: 'how-to-use', title: 'How to use this calculator' },
+  { id: 'qualified-overtime', title: 'What counts as qualified overtime' },
+  { id: 'limits', title: 'Caps and income phase-out' },
+  { id: 'example', title: 'Worked example' },
+  { id: 'what-it-doesnt-do', title: 'What the deduction doesn’t do' },
+  { id: 'method', title: 'How the calculator works' },
+];
+
+const faq = [
+  {
+    q: 'Is all my overtime pay tax-free now?',
+    a: 'No. Only the <strong>premium</strong> part of overtime required by the Fair Labor Standards Act is deductible — the extra half of your regular rate in “time-and-a-half”. If you earn $30 an hour and $45 for overtime hours, $15 of each overtime hour counts. And it’s a deduction from taxable income, not an exclusion, capped at $12,500 ($25,000 for joint filers).',
+  },
+  {
+    q: 'Does double time count?',
+    a: 'Only up to the FLSA-required premium. The FLSA requires time-and-a-half for hours over 40 in a workweek, so only the half-time premium on those hours qualifies. Extra premiums paid under state law (such as daily overtime) or a union contract generally don’t count.',
+  },
+  {
+    q: 'Which years does the overtime deduction apply to?',
+    a: 'Tax years 2025 through 2028. Unless Congress extends it, it ends after 2028.',
+  },
+  {
+    q: 'Do I still pay Social Security and Medicare tax on overtime?',
+    a: 'Yes. The deduction only reduces federal income tax. Payroll taxes (FICA) and most state income taxes still apply to all of your overtime pay.',
+  },
+  {
+    q: 'Who is eligible?',
+    a: 'Workers who are owed overtime under the FLSA (non-exempt employees) and have a valid Social Security number. If you’re married, you must file jointly to claim it. The deduction phases out at higher incomes.',
+  },
+  {
+    q: 'Where do I find my qualified overtime amount?',
+    a: 'Employers must report qualified overtime to employees. For 2025, the IRS let employers use reasonable methods and let employees rely on pay stubs or other statements. From 2026, look for the amount reported on your Form W-2 or a separate statement from your employer.',
+  },
+];
+
+const sources = [
+  {
+    title: 'One, Big, Beautiful Bill provisions — no tax on overtime',
+    url: 'https://www.irs.gov/newsroom/one-big-beautiful-bill-provisions',
+    publisher: 'Internal Revenue Service',
+  },
+  {
+    title: 'Fact Sheet #23: Overtime pay requirements of the FLSA',
+    url: 'https://www.dol.gov/agencies/whd/fact-sheets/23-flsa-overtime-pay',
+    publisher: 'U.S. Department of Labor, Wage and Hour Division',
+  },
+  {
+    title: 'Public Law 119-21 (H.R. 1), One Big Beautiful Bill Act',
+    url: 'https://www.congress.gov/bill/119th-congress/house-bill/1',
+    publisher: 'Congress.gov',
+  },
+];
+---
+
+<ToolLayout
+  slug="no-tax-on-overtime-calculator"
+  sections={sections}
+  faq={faq}
+  sources={sources}
+  related={['new-tax-deductions-calculator', 'no-tax-on-tips-calculator', 'car-loan-interest-deduction-calculator', 'senior-deduction-calculator']}
+>
+  <p slot="intro">
+    Estimate the new federal deduction for overtime pay (tax years 2025–2028). The calculator works out your
+    <strong>qualified overtime</strong> — the extra “half” in time-and-a-half — applies the $12,500 / $25,000 cap and the
+    income phase-out, and shows the federal income tax you’d actually save.
+  </p>
+
+  <Calc id="ot" slot="calculator" inputsTitle="Your overtime & tax details">
+    <Fragment slot="inputs">
+      <SegField
+        name="mode"
+        label="I know my"
+        value="hours"
+        options={[
+          { value: 'hours', label: 'Rate & hours' },
+          { value: 'pay', label: 'Total OT pay' },
+          { value: 'premium', label: 'Qualified amount' },
+        ]}
+      />
+      <div data-when="mode=hours">
+        <div class="field-row">
+          <NumberField name="rate" label="Regular hourly rate" value={30} prefix="$" format="money" min={0} />
+          <NumberField name="hours" label="Overtime hours a week" value={6} suffix="hrs" min={0} max={80} hint="Hours over 40 in a workweek." />
+        </div>
+        <NumberField name="weeks" label="Weeks with overtime this year" value={50} suffix="weeks" min={0} max={53} />
+      </div>
+      <div data-when="mode=pay">
+        <NumberField name="otPay" label="Total overtime pay at 1.5×" value={13500} prefix="$" format="money" min={0} hint="One-third of time-and-a-half pay is the qualified premium." />
+      </div>
+      <div data-when="mode=premium">
+        <NumberField name="premium" label="Qualified overtime compensation" value={4500} prefix="$" format="money" min={0} hint="As reported by your employer." />
+      </div>
+      <TaxBasics agi={72000} />
+    </Fragment>
+
+    <Fragment slot="results">
+      <div class="result-hero" aria-live="polite">
+        <p class="label">Estimated federal tax savings</p>
+        <p class="value" data-out="hero">—</p>
+        <p class="sub" data-out="heroSub"></p>
+      </div>
+      <div class="stats cols-3">
+        <div class="stat"><p class="label">Qualified overtime</p><p class="value" data-out="qualified">—</p></div>
+        <div class="stat"><p class="label">Deduction allowed</p><p class="value" data-out="deduction">—</p></div>
+        <div class="stat"><p class="label">Your marginal rate</p><p class="value" data-out="marginal">—</p></div>
+      </div>
+      <div data-out="verdict"></div>
+      <div data-out="table"></div>
+    </Fragment>
+  </Calc>
+
+  <h2 id="how-to-use">How to use this calculator</h2>
+  <ol>
+    <li><strong>Enter your overtime</strong> in whichever form you know: your hourly rate and overtime hours, the total overtime pay you received, or the qualified overtime amount your employer reported.</li>
+    <li><strong>Choose the tax year and filing status</strong>, then enter your adjusted gross income (including the overtime).</li>
+    <li><strong>See your savings.</strong> We cap the deduction, apply the phase-out, and compare your federal income tax with and without it.</li>
+  </ol>
+
+  <h2 id="qualified-overtime">What counts as qualified overtime</h2>
+  <p>
+    The deduction applies to <strong>qualified overtime compensation</strong>: overtime pay required by section 7 of the Fair
+    Labor Standards Act that exceeds your regular rate of pay. Under the FLSA, non-exempt employees earn at least 1.5 times
+    their regular rate for hours over 40 in a workweek. Only the extra 0.5 counts.
+  </p>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>You earn</th><th>Overtime rate</th><th>Qualified per OT hour</th><th>Not qualified</th></tr></thead>
+      <tbody>
+        <tr><td>$20/hr</td><td>$30/hr</td><td>$10</td><td>$20 (regular pay)</td></tr>
+        <tr><td>$30/hr</td><td>$45/hr</td><td>$15</td><td>$30</td></tr>
+        <tr><td>$40/hr, paid double time</td><td>$80/hr</td><td>$20 (FLSA half-time only)</td><td>$60</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    Overtime required only by state law (for example, daily overtime after 8 hours), by a union contract, or paid voluntarily
+    by an employer beyond FLSA requirements generally doesn’t qualify. Exempt salaried employees who aren’t owed FLSA overtime
+    can’t claim it.
+  </p>
+
+  <AdSlot slot="inContent" />
+
+  <h2 id="limits">Caps and income phase-out</h2>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Filing status</th><th>Maximum deduction</th><th>Phase-out begins (MAGI)</th></tr></thead>
+      <tbody>
+        <tr><td>Married filing jointly</td><td>$25,000</td><td>$300,000</td></tr>
+        <tr><td>Single / head of household</td><td>$12,500</td><td>$150,000</td></tr>
+        <tr><td>Married filing separately</td><td colspan="2">Not eligible</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>The deduction is reduced by <strong>$100 for each $1,000</strong> of modified AGI above the threshold.</p>
+
+  <h2 id="example">Worked example</h2>
+  <p>
+    Dana is a single warehouse supervisor earning <strong>$30 an hour</strong> who works about <strong>6 hours of overtime a
+    week for 50 weeks</strong> — 300 overtime hours — with an AGI of <strong>$72,000</strong> in 2026.
+  </p>
+  <ul>
+    <li>Overtime pay at 1.5×: 300 × $45 = $13,500. Qualified premium: 300 × $15 = <strong>$4,500</strong>.</li>
+    <li>MAGI is under $150,000, so the full $4,500 is deductible.</li>
+    <li>Taxable income drops from $55,900 to $51,400 — all in the 22% bracket — saving about <strong>$990</strong>.</li>
+  </ul>
+
+  <h2 id="what-it-doesnt-do">What the deduction doesn’t do</h2>
+  <ul>
+    <li>It doesn’t reduce <strong>Social Security and Medicare taxes</strong> on your overtime.</li>
+    <li>It doesn’t reduce your <strong>AGI</strong>, so it won’t help with AGI-based limits such as ACA subsidy income or IRMAA.</li>
+    <li>It may not reduce <strong>state income tax</strong>; states decide whether to follow it.</li>
+    <li>It doesn’t change your <strong>paycheck withholding</strong> automatically — you may see the benefit as a larger refund unless you update Form W-4.</li>
+  </ul>
+  <div class="callout">
+    <span class="callout-title">Also get tips or drive a new car?</span>
+    Combine the overtime, tips, car loan interest and senior deductions with our <a href="/new-tax-deductions-calculator/">Schedule 1-A calculator</a>.
+  </div>
+
+  <h2 id="method">How the calculator works</h2>
+  <div class="formula">Qualified overtime = regular rate × 0.5 × FLSA overtime hours   (or total 1.5× OT pay ÷ 3)
+Deduction = min(qualified, cap) − $100 × floor(max(0, MAGI − threshold) ÷ $1,000)
+Savings = federal tax before − federal tax after</div>
+  <p>
+    We use 2025 or 2026 federal brackets and the standard deduction (plus the extra amount for filers 65+), or your itemized
+    deductions if larger. Credits, other income and state taxes aren’t included. This is an estimate, not tax advice.
+  </p>
+</ToolLayout>
+
+<script>
+  import { bindCalculator, outputs, verdict } from '../lib/ui/form';
+  import { money } from '../lib/ui/format';
+  import { readTaxBasics } from '../lib/ui/tax';
+  import { overtimeDeduction, qualifiedOvertimeFromHours, taxSavings } from '../lib/calc/tax';
+
+  const out = outputs('ot');
+
+  bindCalculator('ot', {
+    compute(f) {
+      const b = readTaxBasics(f);
+      const mode = f.str('mode');
+      const qualified =
+        mode === 'pay'
+          ? f.num('otPay') / 3
+          : mode === 'premium'
+            ? f.num('premium')
+            : qualifiedOvertimeFromHours(f.num('rate'), f.num('hours') * f.num('weeks'));
+      const d = overtimeDeduction(qualified, b.agi, b.status);
+      const s = taxSavings({ ...b, otherDeductions: 0, deduction: d.allowed });
+
+      out.text('hero', money(s.savings));
+      out.text('heroSub', `On your ${b.year} federal return`);
+      out.text('qualified', money(qualified));
+      out.text('deduction', money(d.allowed));
+      out.text('marginal', `${s.marginal}%`);
+
+      let kind: 'good' | 'warn' | 'bad' | 'info' = 'good';
+      let msg = `Your full qualified overtime of <strong>${money(d.allowed)}</strong> is deductible, saving about <strong>${money(s.savings)}</strong> in federal income tax.`;
+      if (d.ineligible) {
+        kind = 'bad';
+        msg = 'Married people must file jointly to claim the overtime deduction.';
+      } else if (d.allowed === 0 && qualified > 0) {
+        kind = 'bad';
+        msg = 'Your income is above the phase-out range, so the deduction is reduced to zero.';
+      } else if (d.reduction > 0) {
+        kind = 'warn';
+        msg = `Your deduction is reduced by <strong>${money(d.reduction)}</strong> because your MAGI is above ${b.status === 'mfj' ? '$300,000' : '$150,000'}.`;
+      } else if (qualified > d.cap) {
+        kind = 'warn';
+        msg = `Your qualified overtime exceeds the ${money(d.cap)} cap, so the deduction is limited to the cap.`;
+      }
+      if (s.taxableBefore <= 0 && !d.ineligible) {
+        kind = 'info';
+        msg = 'Your standard or itemized deduction already reduces your taxable income to zero, so this deduction wouldn’t lower your federal income tax.';
+      }
+      out.html('verdict', verdict(kind, msg));
+      out.html(
+        'table',
+        `<div class="table-wrap" style="max-height:none"><table class="data"><tbody>
+          <tr><td>Standard / itemized deduction</td><td>${money(s.baseDeduction)}</td></tr>
+          <tr><td>Taxable income before</td><td>${money(s.taxableBefore)}</td></tr>
+          <tr><td>Taxable income after</td><td>${money(s.taxableAfter)}</td></tr>
+          <tr><td>Federal income tax before</td><td>${money(s.taxBefore)}</td></tr>
+          <tr><td>Federal income tax after</td><td>${money(s.taxAfter)}</td></tr>
+        </tbody></table></div>`,
+      );
+    },
+  });
+</script>

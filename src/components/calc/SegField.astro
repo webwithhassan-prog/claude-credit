@@ -1,0 +1,30 @@
+---
+/** Segmented radio control — good for 2–4 short choices. */
+interface Option {
+  value: string;
+  label: string;
+}
+interface Props {
+  name: string;
+  label: string;
+  options: Option[];
+  value: string;
+  hint?: string;
+}
+const { name, label, options, value, hint } = Astro.props;
+---
+
+<fieldset class="field">
+  <legend>{label}</legend>
+  <div class="seg">
+    {
+      options.map((o) => (
+        <label>
+          <input type="radio" name={name} value={o.value} checked={o.value === value} />
+          <span>{o.label}</span>
+        </label>
+      ))
+    }
+  </div>
+  {hint && <p class="hint">{hint}</p>}
+</fieldset>

@@ -1,0 +1,42 @@
+---
+/**
+ * Calculator shell: inputs on the left, live results on the right.
+ * Each tool page supplies <Fragment slot="inputs"> and <Fragment slot="results">
+ * and a script that calls bindCalculator(id, …).
+ */
+import Icon from '../Icon.astro';
+
+interface Props {
+  id: string;
+  inputsTitle?: string;
+  resultsTitle?: string;
+}
+const { id, inputsTitle = 'Your details', resultsTitle = 'Your results' } = Astro.props;
+---
+
+<form class="calc" id={id} novalidate autocomplete="off">
+  <div class="calc-form">
+    <h2 class="calc-title">{inputsTitle}</h2>
+    <slot name="inputs" />
+    <div class="calc-actions">
+      <button type="submit" class="btn btn-primary">
+        <Icon name="calculator" /><span>Calculate</span>
+      </button>
+      <button type="button" class="btn" data-action="reset">
+        <Icon name="refresh" /><span>Reset</span>
+      </button>
+    </div>
+  </div>
+  <div class="calc-results" data-results>
+    <h2 class="calc-title">{resultsTitle}</h2>
+    <slot name="results" />
+    <div class="results-tools">
+      <button type="button" class="btn btn-sm" data-action="share">
+        <Icon name="link" /><span>Copy link to results</span>
+      </button>
+      <button type="button" class="btn btn-sm" data-action="print">
+        <Icon name="printer" /><span>Print</span>
+      </button>
+    </div>
+  </div>
+</form>

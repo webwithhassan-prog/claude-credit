@@ -1,0 +1,258 @@
+---
+import ToolLayout from '../layouts/ToolLayout.astro';
+import Calc from '../components/calc/Calc.astro';
+import NumberField from '../components/calc/NumberField.astro';
+import SelectField from '../components/calc/SelectField.astro';
+import AdSlot from '../components/AdSlot.astro';
+
+const sections = [
+  { id: 'how-to-use', title: 'How to use this calculator' },
+  { id: 'what-is-irmaa', title: 'What is IRMAA?' },
+  { id: 'brackets-2026', title: '2026 IRMAA brackets' },
+  { id: 'example', title: 'Worked examples' },
+  { id: 'appeal', title: 'How to appeal IRMAA (Form SSA-44)' },
+  { id: 'plan', title: 'Planning to stay under a bracket' },
+];
+
+const faq = [
+  {
+    q: 'What income is used for 2026 IRMAA?',
+    a: 'Social Security uses your modified adjusted gross income from the tax return filed two years earlier — your 2024 return for 2026 premiums. IRMAA MAGI is your adjusted gross income plus tax-exempt interest income.',
+  },
+  {
+    q: 'What is the 2026 Medicare Part B premium?',
+    a: 'The standard Part B premium for 2026 is $202.90 a month, and the annual Part B deductible is $283. Higher-income beneficiaries pay $284.10 to $689.90 a month, depending on their IRMAA bracket.',
+  },
+  {
+    q: 'Is IRMAA a cliff?',
+    a: 'Yes. Going even $1 over a bracket threshold means paying the full surcharge for that bracket — for 2026, crossing $109,000 as an individual adds $81.20 a month to Part B and $14.50 to Part D, about $1,148 a year.',
+  },
+  {
+    q: 'Does IRMAA apply to Medicare Advantage?',
+    a: 'Yes. You pay the Part B IRMAA regardless of how you get your Medicare coverage, and the Part D IRMAA applies if your Medicare Advantage plan includes drug coverage. Both are paid to Medicare — usually deducted from your Social Security check — not to your plan.',
+  },
+  {
+    q: 'Can I lower my IRMAA if my income dropped?',
+    a: 'If your income fell because of a life-changing event — such as retirement or reduced work, marriage, divorce or the death of a spouse — you can ask Social Security to use a more recent year’s income by filing Form SSA-44.',
+  },
+];
+
+const sources = [
+  {
+    title: '2026 Medicare Parts A & B premiums and deductibles',
+    url: 'https://www.cms.gov/newsroom/fact-sheets/2026-medicare-parts-b-premiums-and-deductibles',
+    publisher: 'Centers for Medicare & Medicaid Services',
+  },
+  {
+    title: 'Premiums: rules for higher-income beneficiaries',
+    url: 'https://www.ssa.gov/benefits/medicare/medicare-premiums.html',
+    publisher: 'Social Security Administration',
+  },
+  {
+    title: 'Form SSA-44: Medicare income-related monthly adjustment amount — life-changing event',
+    url: 'https://www.ssa.gov/forms/ssa-44.pdf',
+    publisher: 'Social Security Administration',
+  },
+  {
+    title: 'Part B costs',
+    url: 'https://www.medicare.gov/basics/costs/medicare-costs',
+    publisher: 'Medicare.gov',
+  },
+];
+
+const tiers2026 = [
+  ['$109,000 or less', '$218,000 or less', '$202.90', '$0'],
+  ['$109,001 – $137,000', '$218,001 – $274,000', '$284.10', '$14.50'],
+  ['$137,001 – $171,000', '$274,001 – $342,000', '$405.80', '$37.50'],
+  ['$171,001 – $205,000', '$342,001 – $410,000', '$527.50', '$60.40'],
+  ['$205,001 – $499,999', '$410,001 – $749,999', '$649.20', '$83.30'],
+  ['$500,000 or more', '$750,000 or more', '$689.90', '$91.00'],
+];
+---
+
+<ToolLayout
+  slug="irmaa-calculator"
+  sections={sections}
+  faq={faq}
+  sources={sources}
+  related={['senior-deduction-calculator', 'aca-subsidy-calculator', 'new-tax-deductions-calculator', 'ssdi-back-pay-calculator']}
+>
+  <p slot="intro">
+    Find your 2026 Medicare IRMAA bracket from your modified adjusted gross income and filing status. See your monthly Part B
+    premium, the Part D surcharge, your yearly cost, and exactly how much income you’d need to cut to drop to a lower bracket.
+  </p>
+
+  <Calc id="irmaa" slot="calculator" inputsTitle="Your income & filing status">
+    <Fragment slot="inputs">
+      <div class="field-row">
+        <SelectField
+          name="year"
+          label="Premium year"
+          value="2026"
+          options={[
+            { value: 2026, label: '2026 (uses 2024 income)' },
+            { value: 2025, label: '2025 (uses 2023 income)' },
+          ]}
+        />
+        <SelectField
+          name="status"
+          label="Tax filing status"
+          value="individual"
+          options={[
+            { value: 'individual', label: 'Single / head of household' },
+            { value: 'joint', label: 'Married filing jointly' },
+            { value: 'mfs', label: 'Married filing separately*' },
+          ]}
+          hint="*Lived with your spouse during the year."
+        />
+      </div>
+      <NumberField name="magi" label="MAGI from that tax return" value={120000} prefix="$" format="money" min={0} hint="AGI (Form 1040, line 11) plus tax-exempt interest (line 2a)." />
+      <SelectField
+        name="people"
+        label="People on Medicare in your household"
+        value="1"
+        options={[
+          { value: 1, label: 'One' },
+          { value: 2, label: 'Two' },
+        ]}
+      />
+    </Fragment>
+
+    <Fragment slot="results">
+      <div class="result-hero" aria-live="polite">
+        <p class="label">Your monthly Part B premium</p>
+        <p class="value" data-out="hero">—</p>
+        <p class="sub" data-out="heroSub"></p>
+      </div>
+      <div class="stats cols-3">
+        <div class="stat"><p class="label">Part D surcharge (monthly)</p><p class="value" data-out="partD">—</p></div>
+        <div class="stat"><p class="label">Yearly IRMAA cost (household)</p><p class="value" data-out="annual">—</p></div>
+        <div class="stat"><p class="label">Room before next bracket</p><p class="value" data-out="headroom">—</p></div>
+      </div>
+      <div data-out="verdict"></div>
+      <h3 class="results-heading">Brackets for your filing status</h3>
+      <div data-out="table"></div>
+    </Fragment>
+  </Calc>
+
+  <h2 id="how-to-use">How to use this calculator</h2>
+  <ol>
+    <li><strong>Choose the premium year.</strong> 2026 premiums are based on your 2024 tax return; 2025 premiums on your 2023 return.</li>
+    <li><strong>Choose your filing status</strong> on that return.</li>
+    <li><strong>Enter your MAGI</strong>: adjusted gross income plus tax-exempt interest from that return.</li>
+    <li><strong>Choose how many people in your household are on Medicare</strong> to see the combined yearly cost.</li>
+  </ol>
+
+  <h2 id="what-is-irmaa">What is IRMAA?</h2>
+  <p>
+    The <strong>income-related monthly adjustment amount</strong> is an extra charge added to Medicare Part B and Part D
+    premiums for people with higher incomes. Most beneficiaries pay the standard Part B premium, which covers about 25% of the
+    program’s cost. IRMAA brackets raise that share to 35%, 50%, 65%, 80% or 85%, and add a Part D surcharge on top of your drug
+    plan premium.
+  </p>
+  <p>
+    Social Security determines IRMAA each year from IRS data and notifies you, usually in the fall before the premium year.
+  </p>
+
+  <AdSlot slot="inContent" />
+
+  <h2 id="brackets-2026">2026 IRMAA brackets</h2>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Individual MAGI (2024)</th><th>Joint MAGI (2024)</th><th>Part B monthly</th><th>Part D surcharge</th></tr></thead>
+      <tbody>
+        {tiers2026.map((t) => <tr>{t.map((c) => <td>{c}</td>)}</tr>)}
+      </tbody>
+    </table>
+  </div>
+  <p>
+    If you’re married, lived with your spouse and file separately, there are only three levels for 2026: $202.90 up to
+    $109,000; $649.20 above $109,000 and below $391,000; and $689.90 at $391,000 or more (plus the matching Part D surcharges).
+  </p>
+
+  <h2 id="example">Worked examples</h2>
+  <ul>
+    <li><strong>Single, $120,000 MAGI:</strong> second bracket — Part B $284.10 plus a $14.50 Part D surcharge, or about <strong>$1,148 a year</strong> above standard. Cutting MAGI by $11,000 (to $109,000) would avoid IRMAA entirely.</li>
+    <li><strong>Married couple, $250,000 MAGI, both on Medicare:</strong> second bracket — about <strong>$2,297 a year</strong> in combined surcharges. They have $24,000 of room before the next bracket.</li>
+    <li><strong>Single, $180,000 MAGI:</strong> fourth bracket — Part B $527.50 and Part D +$60.40, about <strong>$4,620 a year</strong> in surcharges.</li>
+  </ul>
+
+  <h2 id="appeal">How to appeal IRMAA (Form SSA-44)</h2>
+  <p>
+    Because IRMAA looks back two years, it often hits people in their first years of retirement, when current income is much
+    lower. If your income dropped because of a qualifying <strong>life-changing event</strong>, file Form SSA-44 with Social
+    Security and provide evidence (such as a retirement letter or tax return):
+  </p>
+  <ul>
+    <li>Work stoppage or reduction (including retirement)</li>
+    <li>Marriage, divorce or annulment, or the death of a spouse</li>
+    <li>Loss of income-producing property, or loss or reduction of a pension</li>
+    <li>An employer settlement payment</li>
+  </ul>
+  <p>If you disagree with the income figure itself, you can also request a reconsideration.</p>
+
+  <h2 id="plan">Planning to stay under a bracket</h2>
+  <ul>
+    <li><strong>Watch one-time income spikes</strong> — Roth conversions, large capital gains and home sales (above the exclusion) can push you over a threshold for one year.</li>
+    <li><strong>Use qualified charitable distributions</strong> from IRAs (age 70½+), which are excluded from AGI.</li>
+    <li><strong>Remember the two-year lag</strong>: income decisions in 2026 affect 2028 premiums.</li>
+    <li><strong>Deductions after AGI don’t help</strong>: the new senior, tips and overtime deductions reduce taxable income but not MAGI.</li>
+  </ul>
+</ToolLayout>
+
+<script>
+  import { bindCalculator, outputs, verdict } from '../lib/ui/form';
+  import { money } from '../lib/ui/format';
+  import { IRMAA, irmaa, type IrmaaStatus, type IrmaaYear } from '../lib/calc/benefits';
+
+  const out = outputs('irmaa');
+  const fmtRange = (lo: number, hi: number) =>
+    !Number.isFinite(hi) ? `${money(lo)} or more` : lo === 0 ? `${money(hi)} or less` : `${money(lo + 1)} – ${money(Math.floor(hi))}`;
+
+  bindCalculator('irmaa', {
+    compute(f) {
+      const year = (Number(f.str('year')) === 2025 ? 2025 : 2026) as IrmaaYear;
+      const status = (['individual', 'joint', 'mfs'].includes(f.str('status')) ? f.str('status') : 'individual') as IrmaaStatus;
+      const magi = f.num('magi');
+      const people = Number(f.str('people')) || 1;
+      const r = irmaa(magi, status, year, people);
+      const t = IRMAA[year];
+
+      out.text('hero', money(r.partBMonthly, true));
+      out.text('heroSub', r.tierIndex === 0 ? `Standard premium — no IRMAA in ${year}` : `Includes ${money(r.partBMonthly - r.standardB, true)} IRMAA over the ${money(r.standardB, true)} standard premium`);
+      out.text('partD', r.partDSurcharge ? `+${money(r.partDSurcharge, true)}` : money(0));
+      out.text('annual', money(r.annualSurchargeHousehold));
+      out.text('headroom', r.headroom !== null ? money(Math.max(0, r.headroom)) : 'Top bracket');
+
+      if (r.tierIndex === 0) {
+        out.html('verdict', verdict('good', `You pay the standard premium. Your MAGI can rise by <strong>${money(Math.max(0, r.headroom ?? 0))}</strong> before IRMAA applies.`));
+      } else {
+        const drop = r.reduceBy !== null ? ` Lowering MAGI by <strong>${money(r.reduceBy)}</strong> would move you down a bracket.` : '';
+        out.html('verdict', verdict(r.tierIndex >= 3 ? 'bad' : 'warn', `IRMAA adds <strong>${money(r.monthlySurchargePerPerson, true)}</strong> a month per person — <strong>${money(r.annualSurchargeHousehold)}</strong> a year for your household.${drop}`));
+      }
+
+      let rows: string[] = [];
+      if (status === 'mfs') {
+        const levels = [
+          { range: `${money(t.tiers[0].individualMax)} or less`, idx: 0 },
+          { range: `${money(t.tiers[0].individualMax + 1)} – ${money(t.mfsMiddleMax - 1)}`, idx: 4 },
+          { range: `${money(t.mfsMiddleMax)} or more`, idx: 5 },
+        ];
+        rows = levels.map((l) => {
+          const x = t.tiers[l.idx];
+          return `<tr${l.idx === r.tierIndex ? ' style="font-weight:700;background:var(--primary-soft)"' : ''}><td>${l.range}</td><td>${money(x.partB, true)}</td><td>${money(x.partD, true)}</td></tr>`;
+        });
+      } else {
+        const key = status === 'joint' ? 'jointMax' : 'individualMax';
+        rows = t.tiers.map((x, i) => {
+          const lo = i === 0 ? 0 : t.tiers[i - 1][key];
+          return `<tr${i === r.tierIndex ? ' style="font-weight:700;background:var(--primary-soft)"' : ''}><td>${fmtRange(lo, x[key])}</td><td>${money(x.partB, true)}</td><td>${money(x.partD, true)}</td></tr>`;
+        });
+      }
+      out.html(
+        'table',
+        `<div class="table-wrap" style="max-height:none"><table class="data"><thead><tr><th>MAGI (${year - 2})</th><th>Part B</th><th>Part D +</th></tr></thead><tbody>${rows.join('')}</tbody></table></div>`,
+      );
+    },
+  });
+</script>

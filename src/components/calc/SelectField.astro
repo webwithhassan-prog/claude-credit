@@ -1,0 +1,33 @@
+---
+interface Option {
+  value: string | number;
+  label: string;
+}
+interface Props {
+  name: string;
+  label: string;
+  options: Option[];
+  value?: string | number;
+  hint?: string;
+}
+const { name, label, options, value, hint } = Astro.props;
+const hintId = hint ? `hint-${name}` : undefined;
+---
+
+<div class="field">
+  <label>
+    <span class="label">{label}</span>
+    <span class="input-wrap">
+      <select name={name} aria-describedby={hintId}>
+        {
+          options.map((o) => (
+            <option value={o.value} selected={String(o.value) === String(value)}>
+              {o.label}
+            </option>
+          ))
+        }
+      </select>
+    </span>
+  </label>
+  {hint && <p class="hint" id={hintId}>{hint}</p>}
+</div>

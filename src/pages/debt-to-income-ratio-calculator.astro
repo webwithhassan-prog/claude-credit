@@ -1,0 +1,290 @@
+---
+import ToolLayout from '../layouts/ToolLayout.astro';
+import Calc from '../components/calc/Calc.astro';
+import NumberField from '../components/calc/NumberField.astro';
+import SelectField from '../components/calc/SelectField.astro';
+import AdSlot from '../components/AdSlot.astro';
+import Meter from '../components/calc/Meter.astro';
+
+const sections = [
+  { id: 'how-to-use', title: 'How to use this calculator' },
+  { id: 'what-is-dti', title: 'What is a debt-to-income ratio?' },
+  { id: 'limits', title: 'DTI limits by loan type' },
+  { id: 'what-counts', title: 'What counts (and doesn’t) in DTI' },
+  { id: 'example', title: 'Worked example' },
+  { id: 'lower-dti', title: 'How to lower your DTI' },
+];
+
+const faq = [
+  {
+    q: 'What is a good debt-to-income ratio?',
+    a: 'Most lenders view a back-end DTI of <strong>36% or less</strong> as healthy, with no more than 28% going to housing. Many mortgage programs accept up to 43%, and conventional loans approved through Fannie Mae’s automated underwriting can go up to 50%. Below 20% is excellent.',
+  },
+  {
+    q: 'Is DTI calculated on gross or net income?',
+    a: 'Gross income — your pay before taxes, retirement contributions and other deductions. That’s why a 43% DTI can feel much tighter than it sounds: it is 43% of your pre-tax income.',
+  },
+  {
+    q: 'Does DTI affect my credit score?',
+    a: 'No. Credit bureaus don’t know your income, so DTI is not part of FICO or VantageScore. Lenders calculate it separately when you apply. Your <a href="/credit-utilization-calculator/">credit utilization</a>, on the other hand, does affect your score.',
+  },
+  {
+    q: 'What DTI do I need for a HELOC or home equity loan?',
+    a: 'Most HELOC and home equity lenders want a back-end DTI of <strong>43% or lower</strong>, including the new HELOC payment; some go to 50% for strong applicants. Estimate the new payment with our <a href="/heloc-payment-calculator/">HELOC payment calculator</a> and add it to your housing costs here.',
+  },
+  {
+    q: 'Should I use my current rent or the new mortgage payment?',
+    a: 'For a mortgage application, lenders use the proposed payment for the new home — principal, interest, property taxes, homeowners insurance, mortgage insurance and HOA dues (PITI). Your current rent drops out once you move. To check your finances today, use your current housing payment.',
+  },
+  {
+    q: 'How are student loans in deferment counted?',
+    a: 'Lenders still count them. Depending on the program, they use the payment on your credit report or repayment plan, or a percentage of the balance when no payment is shown (for example 0.5% of the balance for FHA loans, or 1% for many conventional loans).',
+  },
+];
+
+const sources = [
+  {
+    title: 'What is a debt-to-income ratio?',
+    url: 'https://www.consumerfinance.gov/ask-cfpb/what-is-a-debt-to-income-ratio-en-1791/',
+    publisher: 'Consumer Financial Protection Bureau',
+  },
+  {
+    title: 'Selling Guide B3-6-02: Debt-to-Income Ratios',
+    url: 'https://selling-guide.fanniemae.com/sel/b3-6-02/debt-income-ratios',
+    publisher: 'Fannie Mae',
+  },
+  {
+    title: 'Single Family Housing Policy Handbook 4000.1',
+    url: 'https://www.hud.gov/program_offices/housing/sfh/handbook_references',
+    publisher: 'U.S. Department of Housing and Urban Development (FHA)',
+  },
+  {
+    title: 'Regulation Z §1026.43 — ability-to-repay and qualified mortgage standards',
+    url: 'https://www.consumerfinance.gov/rules-policy/regulations/1026/43/',
+    publisher: 'Consumer Financial Protection Bureau',
+  },
+];
+---
+
+<ToolLayout
+  slug="debt-to-income-ratio-calculator"
+  sections={sections}
+  faq={faq}
+  sources={sources}
+  related={['heloc-payment-calculator', 'home-equity-calculator', 'debt-payoff-calculator', 'credit-utilization-calculator']}
+>
+  <p slot="intro">
+    Calculate your <strong>front-end</strong> (housing) and <strong>back-end</strong> (total) debt-to-income ratios, see how
+    they compare with the limits for conventional, FHA, VA, USDA and home equity loans, and find the largest housing
+    payment that keeps you under your target.
+  </p>
+
+  <Calc id="dti" slot="calculator">
+    <Fragment slot="inputs">
+      <div class="field-row">
+        <NumberField name="income" label="Gross annual income" value={90000} prefix="$" format="money" min={0} hint="Before taxes. Include all borrowers." />
+        <NumberField name="otherIncome" label="Other monthly income" value={0} prefix="$" format="money" min={0} hint="Alimony, rental, side income." />
+      </div>
+      <NumberField name="housing" label="Housing payment (rent or PITI)" value={2100} prefix="$" format="money" min={0} hint="Mortgage principal, interest, taxes, insurance, PMI and HOA — or rent." />
+      <div class="field-row">
+        <NumberField name="auto" label="Car loan payments" value={450} prefix="$" format="money" min={0} />
+        <NumberField name="student" label="Student loan payments" value={300} prefix="$" format="money" min={0} />
+      </div>
+      <div class="field-row">
+        <NumberField name="cards" label="Credit card minimums" value={150} prefix="$" format="money" min={0} />
+        <NumberField name="personal" label="Personal / other loans" value={0} prefix="$" format="money" min={0} />
+      </div>
+      <div class="field-row">
+        <NumberField name="support" label="Support / alimony paid" value={0} prefix="$" format="money" min={0} />
+        <SelectField
+          name="target"
+          label="Target DTI"
+          value="36"
+          options={[
+            { value: '36', label: '36% — comfortable' },
+            { value: '43', label: '43% — common mortgage limit' },
+            { value: '45', label: '45% — conventional manual max' },
+            { value: '50', label: '50% — conventional DU max' },
+          ]}
+        />
+      </div>
+    </Fragment>
+
+    <Fragment slot="results">
+      <div class="result-hero" aria-live="polite">
+        <p class="label">Back-end DTI (all debts)</p>
+        <p class="value" data-out="hero">—</p>
+        <p class="sub" data-out="heroSub"></p>
+      </div>
+      <Meter
+        bands={[[0, '#1c9a6b'], [60, '#d99a1e'], [71.7, '#d0452f']]}
+        labels={[[0, '0%'], [33.3, '20%'], [60, '36%'], [71.7, '43%'], [100, '60%+']]}
+      />
+      <div class="stats cols-3">
+        <div class="stat"><p class="label">Front-end DTI (housing)</p><p class="value" data-out="front">—</p></div>
+        <div class="stat"><p class="label">Monthly debts</p><p class="value" data-out="debts">—</p></div>
+        <div class="stat"><p class="label">Gross monthly income</p><p class="value" data-out="monthly">—</p></div>
+      </div>
+      <div data-out="verdict"></div>
+      <h3 class="results-heading">How lenders will see it</h3>
+      <div data-out="programs"></div>
+    </Fragment>
+  </Calc>
+
+  <h2 id="how-to-use">How to use this calculator</h2>
+  <ol>
+    <li><strong>Enter your gross income.</strong> Use your annual salary before taxes, plus any other regular monthly income such as rental income or alimony received. Applying with someone? Include both incomes and both sets of debts.</li>
+    <li><strong>Enter your housing payment.</strong> Renters enter monthly rent. Homeowners — or anyone applying for a mortgage — enter the full PITI payment: principal, interest, property taxes, homeowners insurance, mortgage insurance and HOA dues.</li>
+    <li><strong>Enter your monthly debt payments.</strong> Use the minimum required payments that appear on your credit report, not what you choose to pay.</li>
+    <li><strong>Pick a target.</strong> The results show your ratios, how common loan programs view them, and the largest housing payment that keeps you at your target DTI.</li>
+  </ol>
+
+  <h2 id="what-is-dti">What is a debt-to-income ratio?</h2>
+  <p>
+    Your debt-to-income ratio (DTI) is the share of your gross monthly income that goes to required debt payments. Lenders use
+    it to judge whether you can afford a new loan. There are two versions:
+  </p>
+  <ul>
+    <li><strong>Front-end DTI</strong> (housing ratio) = housing payment ÷ gross monthly income.</li>
+    <li><strong>Back-end DTI</strong> (total ratio) = all monthly debt payments, including housing ÷ gross monthly income.</li>
+  </ul>
+  <div class="formula">Back-end DTI = (housing + car + student + card minimums + other loans + support) ÷ gross monthly income × 100</div>
+  <p>
+    When people say “DTI” without qualification, they almost always mean the back-end ratio — and it is the one that decides
+    most approvals.
+  </p>
+
+  <AdSlot slot="inContent" />
+
+  <h2 id="limits">DTI limits by loan type</h2>
+  <p>Limits vary by program, lender and the strength of the rest of your application (credit score, down payment, cash reserves). These are the typical benchmarks:</p>
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr><th>Loan type</th><th>Front-end</th><th>Back-end</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Conventional (Fannie Mae, automated)</td><td>—</td><td>Up to 50%</td><td>Desktop Underwriter can approve up to 50% with strong factors.</td></tr>
+        <tr><td>Conventional (manual underwriting)</td><td>—</td><td>36%, up to 45%</td><td>45% requires credit score and reserve requirements.</td></tr>
+        <tr><td>FHA</td><td>31%</td><td>43%</td><td>Can go higher with compensating factors or automated approval.</td></tr>
+        <tr><td>VA</td><td>—</td><td>41% guideline</td><td>Higher ratios allowed with enough residual income.</td></tr>
+        <tr><td>USDA</td><td>29%</td><td>41%</td><td>Exceptions possible through automated underwriting.</td></tr>
+        <tr><td>HELOC / home equity loan</td><td>—</td><td>Typically 43%–50%</td><td>Lender-specific; includes the new equity payment.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    You may still see “43%” described as the legal maximum. That comes from the original Qualified Mortgage (QM) rule, but the CFPB
+    replaced the 43% cap with a price-based test in 2021. Many lenders still use 43% as an internal benchmark.
+  </p>
+
+  <h2 id="what-counts">What counts (and doesn’t) in DTI</h2>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Included</th><th>Usually not included</th></tr></thead>
+      <tbody>
+        <tr><td>Rent or mortgage payment (PITI + HOA)</td><td>Utilities, phone and internet</td></tr>
+        <tr><td>Car loan and lease payments</td><td>Groceries, gas and other living costs</td></tr>
+        <tr><td>Student loan payments (even if deferred)</td><td>Health, car and life insurance premiums</td></tr>
+        <tr><td>Credit card minimum payments</td><td>Subscriptions and streaming services</td></tr>
+        <tr><td>Personal loans, BNPL loans on your report</td><td>Income taxes and payroll deductions</td></tr>
+        <tr><td>Child support and alimony you pay</td><td>Medical bills not in collections or on a payment plan</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="example">Worked example</h2>
+  <p>
+    Jordan earns <strong>$90,000</strong> a year, or <strong>$7,500</strong> a month before taxes. Rent is $2,100, the car payment is
+    $450, student loans are $300 and credit card minimums total $150.
+  </p>
+  <ul>
+    <li>Front-end DTI: $2,100 ÷ $7,500 = <strong>28%</strong> — right at the classic 28% guideline.</li>
+    <li>Back-end DTI: ($2,100 + $450 + $300 + $150) ÷ $7,500 = $3,000 ÷ $7,500 = <strong>40%</strong>.</li>
+  </ul>
+  <p>
+    At 40%, Jordan qualifies for most conventional and FHA loans but sits above the 36% comfort zone. To get back to 36%,
+    total debts would need to fall to $2,700 — a $300 cut — or the housing payment could be at most <strong>$1,800</strong>
+    with the other debts unchanged. Paying off the car loan early would drop the ratio to 34%.
+  </p>
+
+  <h2 id="lower-dti">How to lower your DTI</h2>
+  <ol>
+    <li><strong>Pay off small balances completely.</strong> Eliminating a debt removes its whole payment from the ratio. Our <a href="/debt-payoff-calculator/">debt payoff calculator</a> shows which debts you can clear fastest.</li>
+    <li><strong>Refinance or consolidate to lower payments.</strong> A longer term or lower rate cuts the monthly payment lenders count — see the <a href="/debt-consolidation-calculator/">debt consolidation calculator</a>.</li>
+    <li><strong>Pay credit cards down.</strong> Minimum payments fall as balances fall, and your credit score often rises too.</li>
+    <li><strong>Add documented income.</strong> A co-borrower, a raise or two years of documented side income increases the denominator.</li>
+    <li><strong>Avoid new debt before applying.</strong> Hold off on car purchases or financing furniture until after closing.</li>
+    <li><strong>Look at a cheaper home or bigger down payment.</strong> A smaller loan means a lower PITI and a lower front-end and back-end ratio.</li>
+  </ol>
+</ToolLayout>
+
+<script>
+  import { bindCalculator, outputs, verdict } from '../lib/ui/form';
+  import { money, percent } from '../lib/ui/format';
+  import { debtToIncome } from '../lib/calc/debt';
+
+  const out = outputs('dti');
+  const programs = [
+    { name: 'Conventional (automated)', back: 50, front: null },
+    { name: 'Conventional (manual)', back: 45, front: null },
+    { name: 'FHA', back: 43, front: 31 },
+    { name: 'VA (guideline)', back: 41, front: null },
+    { name: 'USDA', back: 41, front: 29 },
+    { name: 'Typical HELOC lender', back: 43, front: null },
+  ];
+
+  bindCalculator('dti', {
+    compute(f) {
+      const monthly = f.num('income') / 12 + f.num('otherIncome');
+      const housing = f.num('housing');
+      const other = f.num('auto') + f.num('student') + f.num('cards') + f.num('personal') + f.num('support');
+      const target = Number(f.str('target')) || 36;
+      const r = debtToIncome(monthly, housing, other, target);
+
+      out.text('monthly', money(monthly));
+      out.text('debts', money(r.total));
+      if (!(monthly > 0)) {
+        out.text('hero', '—');
+        out.text('heroSub', 'Enter your income to calculate your ratios.');
+        out.text('front', '—');
+        out.html('verdict', '');
+        out.html('programs', '');
+        return;
+      }
+      out.text('hero', percent(r.backEnd));
+      out.text('front', percent(r.frontEnd));
+      const labels: Record<string, string> = {
+        excellent: 'Excellent — lenders see very low risk.',
+        good: 'Good — within the healthy 36% guideline.',
+        stretched: 'Stretched — acceptable for most mortgages, but above 36%.',
+        high: 'High — only some programs will approve this.',
+        'very-high': 'Very high — most lenders will decline new credit.',
+      };
+      out.text('heroSub', labels[r.band ?? 'good']);
+      const marker = out.el('marker');
+      if (marker) marker.style.left = `${Math.min(100, (r.backEnd / 60) * 100)}%`;
+
+      const kind = r.backEnd <= 36 ? 'good' : r.backEnd <= 43 ? 'warn' : 'bad';
+      const msg =
+        r.reductionToTarget > 0
+          ? `To reach <strong>${target}%</strong>, cut monthly debt payments by <strong>${money(r.reductionToTarget)}</strong> or raise gross monthly income to <strong>${money(r.incomeNeededForTarget)}</strong>. At ${target}%, your housing payment could be at most <strong>${money(r.maxHousingAtTarget)}</strong> with your other debts unchanged.`
+          : `You're under your ${target}% target. With your other debts unchanged, your housing payment could be up to <strong>${money(r.maxHousingAtTarget)}</strong> a month at ${target}% DTI.`;
+      out.html('verdict', verdict(kind, msg));
+
+      const rows = programs
+        .map((p) => {
+          const okBack = r.backEnd <= p.back;
+          const okFront = p.front === null || r.frontEnd <= p.front;
+          const ok = okBack && okFront;
+          const limit = p.front ? `${p.front}% / ${p.back}%` : `${p.back}%`;
+          return `<tr><td>${p.name}</td><td>${limit}</td><td style="color:var(${ok ? '--success' : '--danger'});font-weight:650">${ok ? 'Within limit' : 'Over limit'}</td></tr>`;
+        })
+        .join('');
+      out.html(
+        'programs',
+        `<div class="table-wrap" style="max-height:none"><table class="data"><thead><tr><th>Program</th><th>Typical max</th><th>Your DTI</th></tr></thead><tbody>${rows}</tbody></table></div><p class="small muted" style="margin-top:8px">Benchmarks only — lenders weigh credit score, down payment and reserves too.</p>`,
+      );
+    },
+  });
+</script>

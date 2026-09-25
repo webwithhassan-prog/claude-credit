@@ -1,0 +1,241 @@
+---
+import ToolLayout from '../layouts/ToolLayout.astro';
+import Calc from '../components/calc/Calc.astro';
+import NumberField from '../components/calc/NumberField.astro';
+import SelectField from '../components/calc/SelectField.astro';
+import CheckField from '../components/calc/CheckField.astro';
+import AdSlot from '../components/AdSlot.astro';
+
+const sections = [
+  { id: 'how-to-use', title: 'How to use this calculator' },
+  { id: 'how-it-works', title: 'How equipment financing works' },
+  { id: 'example', title: 'Worked example' },
+  { id: 'tax', title: 'Section 179 and bonus depreciation' },
+  { id: 'loan-vs-lease', title: 'Equipment loan vs lease' },
+  { id: 'qualify', title: 'How to qualify and get a better rate' },
+];
+
+const faq = [
+  {
+    q: 'What is a typical equipment loan rate?',
+    a: 'Rates depend on your credit, time in business, the equipment and the lender. Banks and SBA lenders may offer rates close to prime for established businesses, while online and specialty lenders charge more for newer businesses or weaker credit. Always compare APRs, which include fees.',
+  },
+  {
+    q: 'How long are equipment loan terms?',
+    a: 'Terms usually match the equipment’s useful life — commonly 2 to 7 years, and longer for heavy machinery or SBA 504 financing of long-lived assets.',
+  },
+  {
+    q: 'Do I need a down payment?',
+    a: 'Often 0%–20%. Because the equipment secures the loan, some lenders finance 100% for strong borrowers. A larger down payment lowers your payment and total interest.',
+  },
+  {
+    q: 'Can I deduct the full cost of equipment in the first year?',
+    a: 'Often, yes. Section 179 lets businesses expense qualifying equipment up to an annual limit ($2.5 million for 2025, indexed for inflation after that), and 100% bonus depreciation was made permanent for property acquired after January 19, 2025. You can generally claim these deductions even when the equipment is financed. Confirm with your tax adviser.',
+  },
+  {
+    q: 'What is a balloon payment?',
+    a: 'A larger final payment that lowers your regular payments. It’s common in equipment finance and similar to the residual on some leases. Make sure you can afford — or refinance — the balloon when it’s due.',
+  },
+];
+
+const sources = [
+  {
+    title: 'Publication 946, How To Depreciate Property (Section 179 and bonus depreciation)',
+    url: 'https://www.irs.gov/publications/p946',
+    publisher: 'Internal Revenue Service',
+  },
+  {
+    title: '504 loans — financing for major fixed assets',
+    url: 'https://www.sba.gov/funding-programs/loans/504-loans',
+    publisher: 'U.S. Small Business Administration',
+  },
+  {
+    title: 'Loans — funding programs for small businesses',
+    url: 'https://www.sba.gov/funding-programs/loans',
+    publisher: 'U.S. Small Business Administration',
+  },
+];
+---
+
+<ToolLayout
+  slug="equipment-loan-calculator"
+  sections={sections}
+  faq={faq}
+  sources={sources}
+  related={['merchant-cash-advance-calculator', 'invoice-factoring-calculator', 'dscr-loan-calculator', 'car-loan-interest-deduction-calculator']}
+>
+  <p slot="intro">
+    Estimate the monthly payment on equipment financing with a down payment, sales tax, fees and an optional balloon — plus the
+    true APR, total cost, and how much a first-year Section 179 deduction could cut your taxes.
+  </p>
+
+  <Calc id="eq" slot="calculator" inputsTitle="Equipment & loan">
+    <Fragment slot="inputs">
+      <div class="field-row">
+        <NumberField name="cost" label="Equipment cost" value={120000} prefix="$" format="money" min={0} />
+        <NumberField name="down" label="Down payment" value={10} suffix="%" min={0} max={100} />
+      </div>
+      <div class="field-row">
+        <NumberField name="tax" label="Sales tax" value={7} suffix="%" min={0} max={20} />
+        <NumberField name="fees" label="Loan fees" value={500} prefix="$" format="money" min={0} />
+      </div>
+      <CheckField name="financeTax" label="Finance the sales tax" checked />
+      <div class="field-row">
+        <NumberField name="rate" label="Interest rate" value={8.5} suffix="%" min={0} max={40} />
+        <SelectField name="term" label="Term" value="60" options={[24, 36, 48, 60, 72, 84, 120].map((m) => ({ value: m, label: `${m} months` }))} />
+      </div>
+      <div class="field-row">
+        <NumberField name="balloon" label="Balloon at end" value={0} suffix="% of cost" min={0} max={50} />
+        <NumberField name="taxRate" label="Your marginal tax rate" value={26} suffix="%" min={0} max={60} hint="Federal + state." />
+      </div>
+    </Fragment>
+
+    <Fragment slot="results">
+      <div class="result-hero" aria-live="polite">
+        <p class="label">Monthly payment</p>
+        <p class="value" data-out="hero">—</p>
+        <p class="sub" data-out="heroSub"></p>
+      </div>
+      <div class="stats cols-3">
+        <div class="stat"><p class="label">Amount financed</p><p class="value" data-out="financed">—</p></div>
+        <div class="stat"><p class="label">Total interest</p><p class="value" data-out="interest">—</p></div>
+        <div class="stat"><p class="label">APR incl. fees</p><p class="value" data-out="apr">—</p></div>
+      </div>
+      <div data-out="verdict"></div>
+      <h3 class="results-heading">Total cost of ownership</h3>
+      <div data-out="split"></div>
+      <div data-out="table"></div>
+    </Fragment>
+  </Calc>
+
+  <h2 id="how-to-use">How to use this calculator</h2>
+  <ol>
+    <li><strong>Enter the equipment price</strong> and your down payment as a percentage.</li>
+    <li><strong>Add sales tax and loan fees.</strong> Choose whether to finance the tax or pay it upfront.</li>
+    <li><strong>Enter the rate and term</strong> from your quote. Add a balloon if the offer has a large final payment.</li>
+    <li><strong>Enter your marginal tax rate</strong> to estimate the value of expensing the equipment in year one.</li>
+  </ol>
+
+  <h2 id="how-it-works">How equipment financing works</h2>
+  <p>
+    An equipment loan lets you buy machinery, vehicles, technology or tools and repay the cost over time. The equipment itself
+    secures the loan, so rates are often lower and approval easier than for unsecured business loans. You own the equipment
+    from day one, and the lender holds a lien until the loan is repaid.
+  </p>
+
+  <AdSlot slot="inContent" />
+
+  <h2 id="example">Worked example</h2>
+  <p>
+    A contractor buys a <strong>$120,000</strong> excavator with <strong>10% down</strong>, 7% sales tax financed and a $500
+    documentation fee, at <strong>8.5%</strong> for <strong>60 months</strong>.
+  </p>
+  <ul>
+    <li>Amount financed: $120,000 − $12,000 + $8,400 tax + $500 fee = <strong>$116,900</strong>.</li>
+    <li>Monthly payment: <strong>$2,398.38</strong>; total interest <strong>$27,003</strong>.</li>
+    <li>APR including the fee: about <strong>8.68%</strong>.</li>
+    <li>If the full $128,400 cost (price plus tax) is expensed in year one at a 26% combined tax rate, the tax savings are about <strong>$33,400</strong> — more than a year of payments.</li>
+  </ul>
+
+  <h2 id="tax">Section 179 and bonus depreciation</h2>
+  <p>
+    Two tax rules let many businesses deduct the cost of equipment immediately instead of depreciating it over several years:
+  </p>
+  <ul>
+    <li><strong>Section 179 expensing</strong> — elect to deduct qualifying equipment placed in service during the year, up to an annual dollar limit. The 2025 tax law raised the limit to $2.5 million, with a phase-out beginning at $4 million of equipment purchases, both indexed for inflation after 2025. The deduction can’t exceed your business taxable income.</li>
+    <li><strong>Bonus depreciation</strong> — 100% first-year bonus depreciation was restored permanently for qualifying property acquired after January 19, 2025. Unlike Section 179, it isn’t capped by taxable income.</li>
+  </ul>
+  <div class="callout">
+    <span class="callout-title">An estimate, not tax advice</span>
+    The tax savings figure multiplies the cost basis by your tax rate. Actual savings depend on your income, entity type,
+    state rules and which method you use — confirm with a CPA before relying on it.
+  </div>
+
+  <h2 id="loan-vs-lease">Equipment loan vs lease</h2>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th></th><th>Equipment loan</th><th>$1 buyout lease</th><th>Fair-market-value lease</th></tr></thead>
+      <tbody>
+        <tr><td>Ownership</td><td>You own it now</td><td>You own it for $1 at the end</td><td>Return, renew or buy at market value</td></tr>
+        <tr><td>Monthly payment</td><td>Moderate</td><td>Similar to a loan</td><td>Lowest</td></tr>
+        <tr><td>Tax treatment</td><td>Depreciate or expense</td><td>Usually treated like a purchase</td><td>Payments usually deductible as rent</td></tr>
+        <tr><td>Best for</td><td>Long-lived equipment</td><td>Owning with low upfront cash</td><td>Tech that becomes obsolete quickly</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="qualify">How to qualify and get a better rate</h2>
+  <ul>
+    <li>Two or more years in business and steady revenue open up bank and SBA options.</li>
+    <li>Strong personal and business credit scores lower your rate.</li>
+    <li>A larger down payment and a shorter term reduce the lender’s risk.</li>
+    <li>Get quotes from your bank, the equipment manufacturer’s finance arm, and at least one independent lender — then compare APRs.</li>
+    <li>For large, long-lived assets, ask about the SBA 504 program.</li>
+  </ul>
+  <div class="formula">Amount financed = cost − down payment + financed tax + fees
+Payment = (P − B/(1+r)^n) · r / (1 − (1+r)^−n)      B = balloon, r = rate ÷ 12, n = months</div>
+</ToolLayout>
+
+<script>
+  import { bindCalculator, outputs, verdict } from '../lib/ui/form';
+  import { money, percent } from '../lib/ui/format';
+  import { splitBar } from '../lib/ui/chart';
+  import { equipmentLoan } from '../lib/calc/business';
+
+  const out = outputs('eq');
+
+  bindCalculator('eq', {
+    compute(f) {
+      const term = Number(f.str('term')) || 60;
+      const r = equipmentLoan({
+        cost: f.num('cost'),
+        downPercent: f.num('down'),
+        salesTaxPercent: f.num('tax'),
+        financeTax: f.bool('financeTax'),
+        fees: f.num('fees'),
+        rate: f.num('rate'),
+        termMonths: term,
+        balloonPercent: f.num('balloon'),
+        taxRate: f.num('taxRate'),
+      });
+      out.text('hero', money(r.payment, true));
+      out.text('heroSub', `${term} payments${r.balloon > 0 ? ` + ${money(r.balloon)} balloon` : ''}`);
+      out.text('financed', money(r.financed));
+      out.text('interest', money(r.totalInterest));
+      out.text('apr', percent(r.apr, 2));
+
+      if (!(r.financed > 0)) {
+        ['verdict', 'split', 'table'].forEach((k) => out.html(k, ''));
+        return;
+      }
+      out.html(
+        'verdict',
+        verdict(
+          'info',
+          `If you can expense the equipment in year one, the estimated tax savings of <strong>${money(r.taxSavings)}</strong> would bring your after-tax cost to about <strong>${money(r.netCostAfterTax)}</strong>.`,
+        ),
+      );
+      out.html(
+        'split',
+        splitBar(
+          [
+            { label: 'Equipment + tax', value: f.num('cost') + r.tax, color: 'var(--chart-1)' },
+            { label: 'Interest', value: r.totalInterest, color: 'var(--chart-2)' },
+            { label: 'Fees', value: f.num('fees'), color: 'var(--chart-3)' },
+          ],
+          (n) => money(n),
+        ),
+      );
+      out.html(
+        'table',
+        `<div class="table-wrap" style="max-height:none;margin-top:14px"><table class="data"><tbody>
+          <tr><td>Paid upfront</td><td>${money(r.upfront)}</td></tr>
+          <tr><td>Monthly payments (${term})</td><td>${money(r.payment * term)}</td></tr>
+          <tr><td>Balloon</td><td>${money(r.balloon)}</td></tr>
+          <tr><td>Total cost</td><td>${money(r.totalCost)}</td></tr>
+          <tr><td>Estimated year-one tax savings</td><td>${money(r.taxSavings)}</td></tr>
+        </tbody></table></div>`,
+      );
+    },
+  });
+</script>
