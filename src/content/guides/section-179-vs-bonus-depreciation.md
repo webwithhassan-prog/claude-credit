@@ -1,5 +1,6 @@
 ---
 title: 'Section 179 vs. Bonus Depreciation: Writing Off Equipment in 2026'
+seoTitle: 'Section 179 vs Bonus Depreciation in 2026: Which to Use'
 description: 'Both let a business deduct equipment in year one. How they differ after the 2025 tax law — limits, income caps, used equipment and financing — and which to use.'
 category: business-financing
 related: ['equipment-loan-calculator', 'invoice-factoring-calculator', 'new-tax-deductions-calculator']

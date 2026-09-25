@@ -1,7 +1,10 @@
 ---
 import Logo from './Logo.astro';
 import { categories } from '../data/categories';
+import { shortTitle, tools } from '../data/tools';
 import { site } from '../site.config';
+
+const popular = tools.filter((t) => t.featured);
 
 const year = new Date().getFullYear();
 const range = year > site.since ? `${site.since}–${year}` : `${year}`;
@@ -31,12 +34,26 @@ const range = year > site.since ? `${site.since}–${year}` : `${year}`;
         </ul>
       </div>
       <div>
-        <h2>Company</h2>
+        <h2>Popular calculators</h2>
         <ul>
-          <li><a href="/about/">About us</a></li>
+          {
+            popular.map((t) => (
+              <li>
+                <a href={`/${t.slug}/`}>{shortTitle(t).replace(/ Calculator\b/, '')}</a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+      <div>
+        <h2>Resources</h2>
+        <ul>
           <li><a href="/guides/">Guides</a></li>
+          <li><a href="/glossary/">Glossary</a></li>
+          <li><a href="/about/">About us</a></li>
           <li><a href="/editorial-policy/">Editorial policy</a></li>
           <li><a href="/contact/">Contact</a></li>
+          <li><a href="/sitemap/">Site map</a></li>
         </ul>
       </div>
       <div>

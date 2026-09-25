@@ -1,0 +1,103 @@
+---
+import ProseLayout from '../layouts/ProseLayout.astro';
+import { getCollection } from 'astro:content';
+import { glossary, glossarySorted, glossaryUpdated, termById } from '../data/glossary';
+import { shortTitle, toolBySlug } from '../data/tools';
+import { abs, ids } from '../lib/seo';
+
+const path = '/glossary/';
+const description = `Plain-English definitions of APR, DTI, HELOC, DSCR, factor rate, Section 179, MAGI, IRMAA, SSDI back pay and ${glossary.length - 9} more money terms.`;
+const guideTitles = new Map((await getCollection('guides')).map((g) => [g.id, g.data.title]));
+const initial = (term: string) => term[0].toUpperCase();
+const letters = [...new Set(glossarySorted.map((t) => initial(t.term)))];
+
+const jsonLd = [
+  {
+    '@type': 'DefinedTermSet',
+    '@id': ids.main(path),
+    name: 'Financial glossary',
+    description,
+    url: abs(path),
+    inLanguage: 'en-US',
+    hasDefinedTerm: glossarySorted.map((t) => ({
+      '@type': 'DefinedTerm',
+      '@id': `${abs(path)}#${t.id}`,
+      name: t.term,
+      description: t.definition,
+      url: `${abs(path)}#${t.id}`,
+      inDefinedTermSet: { '@id': ids.main(path) },
+    })),
+  },
+];
+---
+
+<ProseLayout
+  title="Financial glossary"
+  seoTitle="Financial Glossary: Debt, Home Equity, Tax & Benefits Terms"
+  description={description}
+  path={path}
+  updated={glossaryUpdated}
+  lede="Plain-English definitions of the terms used in our calculators and guides — from APR and amortization to IRMAA and SSDI back pay."
+  mainEntity={ids.main(path)}
+  jsonLd={jsonLd}
+>
+  <nav class="az-nav" aria-label="Glossary index">
+    {letters.map((l) => <a href={`#letter-${l.toLowerCase()}`}>{l}</a>)}
+  </nav>
+  {
+    letters.map((letter) => (
+      <section class="az-section">
+        <h2 id={`letter-${letter.toLowerCase()}`}>{letter}</h2>
+        <dl class="glossary">
+          {glossarySorted
+            .filter((t) => initial(t.term) === letter)
+            .map((t) => (
+              <div class="glossary-term" id={t.id}>
+                <dt>{t.term}</dt>
+                <dd>
+                  <p>{t.definition}</p>
+                  {t.tools && t.tools.length > 0 && (
+                    <p class="term-links">
+                      <span>{t.tools.length > 1 ? 'Calculators:' : 'Calculator:'}</span>
+                      {t.tools.slice(0, 3).map((slug, i) => (
+                        <>
+                          {i > 0 && ', '}
+                          <a href={`/${slug}/`}>{shortTitle(toolBySlug(slug))}</a>
+                        </>
+                      ))}
+                    </p>
+                  )}
+                  {t.guides && t.guides.length > 0 && (
+                    <p class="term-links">
+                      <span>{t.guides.length > 1 ? 'Guides:' : 'Guide:'}</span>
+                      {t.guides.slice(0, 2).map((slug, i) => (
+                        <>
+                          {i > 0 && ', '}
+                          <a href={`/guides/${slug}/`}>{guideTitles.get(slug)}</a>
+                        </>
+                      ))}
+                    </p>
+                  )}
+                  {t.see && t.see.length > 0 && (
+                    <p class="term-links">
+                      <span>See also:</span>
+                      {t.see.map((id, i) => (
+                        <>
+                          {i > 0 && ', '}
+                          <a href={`#${id}`}>{termById(id)?.term}</a>
+                        </>
+                      ))}
+                    </p>
+                  )}
+                </dd>
+              </div>
+            ))}
+        </dl>
+      </section>
+    ))
+  }
+  <p class="muted small" style="margin-top:2em">
+    Definitions are simplified for clarity and reflect U.S. rules as of the date above. For decisions, check the details that apply
+    to you with the lender, agency or a qualified professional. Spotted an error? <a href="/contact/">Let us know</a>.
+  </p>
+</ProseLayout>

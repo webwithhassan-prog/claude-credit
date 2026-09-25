@@ -1,5 +1,6 @@
 ---
 title: 'Balance Transfer vs. Personal Loan: Which Is Better for Credit Card Debt?'
+seoTitle: 'Balance Transfer vs Personal Loan for Credit Card Debt'
 description: 'A 0% balance transfer can be nearly free — or cost more than a loan if you miss the deadline. Compare real numbers and find the right fit for your debt.'
 category: debt-credit
 related: ['balance-transfer-calculator', 'debt-consolidation-calculator', 'credit-card-payoff-calculator']

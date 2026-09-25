@@ -1,5 +1,6 @@
 ---
 title: 'Schedule 1-A Explained: The Four New Tax Deductions for 2025–2028'
+seoTitle: 'Schedule 1-A Explained: 4 New Tax Deductions (2025–2028)'
 description: 'No tax on tips, no tax on overtime, car loan interest and the $6,000 senior deduction: who qualifies, the caps, the phase-outs and what you need to claim them.'
 category: taxes
 related: ['new-tax-deductions-calculator', 'no-tax-on-tips-calculator', 'no-tax-on-overtime-calculator', 'car-loan-interest-deduction-calculator', 'senior-deduction-calculator']

@@ -1,5 +1,6 @@
 ---
 title: 'Your HELOC Draw Period Is Ending: 6 Options Before the Payment Jumps'
+seoTitle: 'HELOC Draw Period Ending? 6 Options Before Payments Jump'
 description: 'When a HELOC moves from interest-only to repayment, the monthly bill can rise 20%–60% or more. Here are your options and how to compare them.'
 category: home-equity
 related: ['heloc-payment-calculator', 'cash-out-refinance-vs-heloc-calculator', 'home-equity-calculator']

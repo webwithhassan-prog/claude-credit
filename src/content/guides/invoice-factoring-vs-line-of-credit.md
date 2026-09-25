@@ -1,5 +1,6 @@
 ---
 title: 'Invoice Factoring vs. a Business Line of Credit: Cost, Speed and Fit'
+seoTitle: 'Invoice Factoring vs Line of Credit: Cost, Speed and Fit'
 description: 'Factoring turns unpaid invoices into cash fast; a line of credit is usually cheaper. Compare the real costs, approval requirements and when each makes sense.'
 category: business-financing
 related: ['invoice-factoring-calculator', 'merchant-cash-advance-calculator', 'equipment-loan-calculator']

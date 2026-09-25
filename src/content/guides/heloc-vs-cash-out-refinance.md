@@ -1,5 +1,6 @@
 ---
 title: 'HELOC vs. Cash-Out Refinance: How to Choose When Your Mortgage Rate Is Low'
+seoTitle: 'HELOC vs Cash-Out Refinance When Your Mortgage Rate Is Low'
 description: 'Refinancing a 3% mortgage to borrow $60,000 can cost far more than a HELOC. Learn the blended-rate test, break-even math and when a cash-out refi wins.'
 category: home-equity
 related: ['cash-out-refinance-vs-heloc-calculator', 'heloc-payment-calculator', 'home-equity-calculator']

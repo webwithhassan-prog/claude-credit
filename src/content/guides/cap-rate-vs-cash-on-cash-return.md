@@ -1,5 +1,6 @@
 ---
 title: 'Cap Rate vs. Cash-on-Cash Return: How to Analyze a Rental Property'
+seoTitle: 'Cap Rate vs Cash-on-Cash Return: Rental Property Analysis'
 description: 'Cap rate measures the property; cash-on-cash measures your deal. Learn both, how financing changes them, and the expense assumptions that make or break a rental.'
 category: home-equity
 related: ['rental-property-calculator', 'brrrr-calculator', 'dscr-loan-calculator']

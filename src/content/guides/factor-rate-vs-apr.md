@@ -1,5 +1,6 @@
 ---
 title: 'Factor Rate vs. APR: How to Compare Merchant Cash Advance Offers'
+seoTitle: 'Factor Rate vs APR: How to Compare Merchant Cash Advances'
 description: 'A 1.3 factor rate sounds like 30% interest, but over six months it is more than 100% APR. Here is how to convert factor rates and compare offers fairly.'
 category: business-financing
 related: ['merchant-cash-advance-calculator', 'invoice-factoring-calculator', 'equipment-loan-calculator']

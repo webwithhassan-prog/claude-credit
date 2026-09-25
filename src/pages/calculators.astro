@@ -5,13 +5,29 @@ import ToolCard from '../components/ToolCard.astro';
 import ToolSearch from '../components/ToolSearch.astro';
 import { categories } from '../data/categories';
 import { tools, toolsInCategory } from '../data/tools';
+import { abs, breadcrumbNode, ids, webPageNode } from '../lib/seo';
+
+const path = '/calculators/';
+const title = `All Financial Calculators: ${tools.length} Free Tools`;
+const description = `Browse all ${tools.length} free calculators for debt and credit, home equity and rentals, business financing, 2025–2026 tax deductions and health benefits.`;
+const ordered = categories.flatMap((c) => toolsInCategory(c.id));
+const jsonLd = [
+  webPageNode({ path, type: 'CollectionPage', name: title, description, dateModified: tools.map((t) => t.updated).sort().at(-1), mainEntity: ids.main(path) }),
+  {
+    '@type': 'ItemList',
+    '@id': ids.main(path),
+    name: 'All calculators',
+    numberOfItems: ordered.length,
+    itemListElement: ordered.map((t, i) => ({ '@type': 'ListItem', position: i + 1, url: abs(`/${t.slug}/`), name: t.title })),
+  },
+  breadcrumbNode(path, [
+    { name: 'Home', path: '/' },
+    { name: 'All calculators', path },
+  ]),
+];
 ---
 
-<BaseLayout
-  title="All Calculators"
-  description={`Browse all ${tools.length} free calculators for debt and credit, home equity, business financing, 2025–2026 tax deductions and health benefits.`}
-  path="/calculators/"
->
+<BaseLayout title={title} description={description} path={path} jsonLd={jsonLd}>
   <div class="container">
     <Breadcrumbs items={[{ name: 'Home', href: '/' }, { name: 'All calculators', href: '/calculators/' }]} />
     <header class="page-hero">
@@ -28,9 +44,7 @@ import { tools, toolsInCategory } from '../data/tools';
           <section class="category-block" data-search-group>
             <div class="category-head">
               <h2>
-                <a href={`/${c.id}/`} style="color:inherit;text-decoration:none">
-                  {c.name}
-                </a>
+                <a href={`/${c.id}/`} style="color:inherit;text-decoration:none">{c.name}</a>
               </h2>
             </div>
             <div class="card-grid">

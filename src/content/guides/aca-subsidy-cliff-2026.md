@@ -1,5 +1,6 @@
 ---
 title: 'The 2026 ACA Subsidy Cliff: Who Loses Help and How to Stay Under 400%'
+seoTitle: '2026 ACA Subsidy Cliff: Who Loses Help and How to Avoid It'
 description: 'The enhanced ACA credits expired, so earning $1 over 400% of the poverty line now ends your premium tax credit. Who is affected, and how to plan.'
 category: health-benefits
 related: ['aca-subsidy-calculator', 'irmaa-calculator', 'new-tax-deductions-calculator']

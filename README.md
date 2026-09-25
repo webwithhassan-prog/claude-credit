@@ -31,10 +31,12 @@ Plus **15 in-depth guides** in `src/content/guides/`, written in Markdown. Each 
 - Cap rate vs cash-on-cash return
 - Invoice factoring vs line of credit
 
+Plus a **financial glossary** of 64 plain-English terms at `/glossary/`, linked from every calculator and guide.
+
 Plus the trust pages AdSense reviewers look for:
 - **Company:** About, Editorial policy, Contact.
 - **Legal:** Privacy policy (with Google's required advertising-cookie disclosures), Cookie policy, Terms of use, Disclaimer.
-- **Navigation:** category hubs, an all-calculators index and a custom 404 page.
+- **Navigation:** category hubs, an all-calculators index, an HTML site map and a custom 404 page.
 
 These niches were chosen from the research in [`reports/AdSense tool site niches.md`](reports/AdSense%20tool%20site%20niches.md). The notes behind it are in `research_notes/`.
 
@@ -42,10 +44,12 @@ These niches were chosen from the research in [`reports/AdSense tool site niches
 
 - **Fast and light.** Pages are static HTML with no framework JavaScript and no chart library. Each calculator's script is small and bundled per page.
 - **Works everywhere.** Layouts are tested at 320, 375, 414, 768, 1024 and 1440 px wide, in light and dark mode.
-- **SEO.**
+- **SEO.** See [`docs/SEO-PLAYBOOK.md`](docs/SEO-PLAYBOOK.md) for what's built in and what to do after launch.
   - Each page has a unique title, description and canonical URL.
-  - Structured data: `WebApplication`, `BreadcrumbList`, `FAQPage`, `Organization` and `WebSite` (JSON-LD).
-  - Open Graph share image, `sitemap-index.xml` and `robots.txt`.
+  - One connected JSON-LD graph per page: `Organization`, `WebSite`, `WebPage`, `BreadcrumbList`, plus `WebApplication` and `FAQPage` for calculators, `Article` for guides and `DefinedTermSet` for the glossary.
+  - A sitemap with real per-page "last updated" dates, `robots.txt` and an RSS feed for guides.
+  - A share image for every page, dense internal linking, and `noindex` on the free `*.pages.dev` copies.
+  - `npm run seo` checks all of this on every build, and CI fails if something breaks.
 - **AdSense-ready.**
   - Add your publisher ID and the site automatically adds the AdSense verification tag and loader script, and generates `ads.txt`.
   - Manual ad slots sit well away from calculator buttons, per AdSense's accidental-click policy.
@@ -65,6 +69,8 @@ npm run dev      # local dev server at http://localhost:4321
 npm test         # unit tests for all calculation engines
 npm run check    # TypeScript / Astro type check
 npm run build    # production build into ./dist
+npm run seo      # SEO check of the build (titles, links, structured data, sitemap…)
+npm run og       # regenerate share images in public/og/ (needs Playwright; see the script)
 npm run preview  # serve the production build locally
 ```
 
@@ -81,8 +87,9 @@ Edit **`src/site.config.ts`**:
 | `adsense.client` | Your AdSense publisher ID, e.g. `ca-pub-1234567890123456` |
 | `adsense.slots` | Optional manual ad unit IDs. Leave empty to rely on Auto ads |
 | `googleSiteVerification` | Optional Search Console HTML-tag token |
+| `author`, `reviewer` | Optional real people shown in bylines, on the About page and in structured data. Never invent names or credentials |
 
-Then regenerate the social image and icons if you rename the brand. The logo is in `src/components/Logo.astro` and the icons are in `public/`.
+If you rename the brand, update the logo in `src/components/Logo.astro` and the icons in `public/`, then run `npm run build && npm run og && npm run build` to regenerate the share images.
 
 ## Deploy (free)
 
@@ -94,7 +101,7 @@ Any static host works. The build output is the `dist/` folder.
 3. Framework preset: **Astro**. Build command `npm run build`. Output `dist`.
 4. Add your custom domain under **Custom domains**. HTTPS is automatic.
 
-`public/_headers` adds security and caching headers on Cloudflare Pages and Netlify.
+`public/_headers` adds security and caching headers on Cloudflare Pages and Netlify. On Cloudflare Pages it also tells search engines not to index the free `*.pages.dev` address, so only your own domain appears in Google. For the www redirect, Search Console and Bing setup, follow [`docs/SEO-PLAYBOOK.md`](docs/SEO-PLAYBOOK.md).
 
 **Netlify / Vercel:** import the repo; both detect Astro automatically.
 
@@ -127,15 +134,21 @@ src/
   site.config.ts          ← brand, domain, email, AdSense IDs (edit me)
   data/categories.ts      ← categories and their intro text
   data/tools.ts           ← tool registry: slugs, titles, SEO meta, updated dates
+  data/glossary.ts        ← glossary terms and which calculators/guides they link to
+  content/guides/*.md     ← guides (Markdown)
+  lib/seo.ts              ← structured-data (JSON-LD) builders and share image lookup
   lib/calc/*.ts           ← pure calculation engines (unit tested)
   lib/ui/*.ts             ← browser helpers: form binding, formatting, charts, rows
   components/             ← header, footer, ad slot, FAQ, form fields…
-  layouts/                ← BaseLayout (SEO head), ToolLayout, ProseLayout
+  layouts/                ← BaseLayout (SEO head), ToolLayout, GuideLayout, ProseLayout
   pages/                  ← one .astro file per calculator + legal/company pages
   styles/global.css       ← design tokens (light/dark) and all styles
-tests/                    ← vitest suites for every engine
-public/                   ← icons, OG image, _headers
+tests/                    ← vitest suites for every engine and the glossary
+scripts/seo-check.mjs     ← SEO checker for the build (npm run seo)
+scripts/og-images.mjs     ← share image generator (npm run og)
+public/                   ← icons, share images (og/), _headers
 docs/DATA-SOURCES.md      ← every official figure used, with its source
+docs/SEO-PLAYBOOK.md      ← search setup after launch and ongoing SEO work
 reports/, research_notes/ ← the niche research behind this site
 ```
 
@@ -146,6 +159,7 @@ Create `src/content/guides/<slug>.md` with this frontmatter, then write the arti
 ```yaml
 ---
 title: 'Your title'
+seoTitle: 'Optional shorter title for Google (60 characters max)'
 description: 'A 140–160 character summary.'
 category: debt-credit          # a category id from src/data/categories.ts
 related: ['debt-payoff-calculator']   # tool slugs; the first gets a call-to-action box
@@ -154,13 +168,16 @@ updated: '2026-10-01'
 ---
 ```
 
+To link glossary terms from the guide, add its slug to those terms' `guides` lists in `src/data/glossary.ts`. Then run `npm run build && npm run og && npm run build` to create its share image, and `npm run seo` to check it.
+
 ## Adding a calculator
 
 1. Add an entry to `src/data/tools.ts` (slug, title, SEO title and description, category, icon, date).
 2. Put the math in `src/lib/calc/` and add tests in `tests/`.
 3. Create `src/pages/<slug>.astro` using `ToolLayout` and `Calc`. Copy a similar page as a starting point.
 4. Write at least 800–1,500 words of genuinely useful explanation: how to use it, how the rules work, a worked example, a FAQ and sources.
-5. Run `npm test && npm run check && npm run build`.
+5. Add its slug to the relevant terms' `tools` lists in `src/data/glossary.ts` (a test requires at least one).
+6. Run `npm test && npm run check && npm run build && npm run seo`, then `npm run og && npm run build` for its share image.
 
 ## Yearly update calendar
 

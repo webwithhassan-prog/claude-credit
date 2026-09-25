@@ -8,9 +8,10 @@ const law = site.jurisdiction
 
 <ProseLayout
   title="Terms of use"
-  description={`The terms that apply when you use ${site.name}’s calculators and content.`}
+  seoTitle={`Terms of Use | ${site.name}`}
+  description={`The terms that apply when you use ${site.name}’s free financial calculators, guides and other content, including disclaimers and limits of liability.`}
   path="/terms/"
-  updated="2026-09-25"
+  updated={site.legalUpdated}
   lede={`By using ${site.name}, you agree to these terms. Please read them — they’re short.`}
 >
   <h2>1. What we provide</h2>

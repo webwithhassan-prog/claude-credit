@@ -1,5 +1,6 @@
 ---
 title: 'DSCR Loans Explained: How Real Estate Investors Qualify Without Tax Returns'
+seoTitle: 'DSCR Loans Explained: Qualify Without Tax Returns'
 description: 'DSCR loans qualify rental properties on rent instead of your income. How the ratio is calculated, typical requirements, costs, and how to compare lenders.'
 category: home-equity
 related: ['dscr-loan-calculator', 'home-equity-calculator', 'cash-out-refinance-vs-heloc-calculator']

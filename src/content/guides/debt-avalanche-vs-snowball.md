@@ -1,5 +1,6 @@
 ---
 title: 'Debt Avalanche vs. Debt Snowball: What the Math and the Research Say'
+seoTitle: 'Debt Avalanche vs Snowball: What the Math and Research Say'
 description: 'The avalanche saves the most interest; the snowball keeps more people going. See the real dollar difference, what studies found, and a step-by-step plan.'
 category: debt-credit
 related: ['debt-payoff-calculator', 'credit-card-payoff-calculator', 'debt-consolidation-calculator']

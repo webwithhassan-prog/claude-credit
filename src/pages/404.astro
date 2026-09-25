@@ -6,7 +6,13 @@ import { tools } from '../data/tools';
 const popular = tools.filter((t) => t.featured).slice(0, 6);
 ---
 
-<BaseLayout title="Page not found" description="The page you were looking for doesn’t exist." path="/404/" noindex noAds>
+<BaseLayout
+  title="Page not found"
+  description="The page you were looking for doesn’t exist. Browse our free debt, home equity, business, tax and benefits calculators instead."
+  path="/404/"
+  noindex
+  noAds
+>
   <div class="container">
     <section class="hero" style="padding-bottom:24px">
       <span class="pill">Error 404</span>
@@ -14,6 +20,7 @@ const popular = tools.filter((t) => t.featured).slice(0, 6);
       <p class="lede">It may have moved, or the link may be mistyped. Try one of our most popular calculators, or browse them all.</p>
       <a class="btn btn-primary" href="/calculators/">Browse all calculators</a>
     </section>
+    <h2 style="text-align:center">Popular calculators</h2>
     <div class="card-grid">
       {popular.map((t) => <ToolCard tool={t} showCategory />)}
     </div>

@@ -7,7 +7,10 @@ import { site } from '../site.config';
 
 <ProseLayout
   title="About us"
-  description={`${site.name} builds free, transparent calculators for debt, home equity, business financing, taxes and benefits.`}
+  seoTitle={`About ${site.name}: Free Calculators That Show Their Work`}
+  description={`${site.name} builds free, transparent calculators and guides for debt, home equity, business financing, taxes and benefits — with formulas and official sources.`}
+  updated={site.legalUpdated}
+  pageType="AboutPage"
   path="/about/"
   lede={`${site.name} makes money math understandable. Our free calculators show not just the answer, but how it was reached.`}
 >
@@ -35,6 +38,49 @@ import { site } from '../site.config';
       ))
     }
   </ul>
+
+  <h2 id="team">Who we are</h2>
+  {
+    site.author.name ? (
+      <div class="author-box" style="margin:0 0 1.2em">
+        <div>
+          <strong>{site.author.name}</strong>
+          {site.author.jobTitle && <span> — {site.author.jobTitle}</span>}
+          {site.author.bio && <p style="margin:6px 0 0">{site.author.bio}</p>}
+          {site.author.url && (
+            <p style="margin:6px 0 0">
+              <a href={site.author.url} rel="noopener me" target="_blank">
+                Profile
+              </a>
+            </p>
+          )}
+        </div>
+      </div>
+    ) : (
+      <p>
+        {site.name} is an independent publisher. Our calculators and guides are researched, written and maintained by the
+        {site.name} editorial team, following the standards in our <a href="/editorial-policy/">editorial policy</a>.
+      </p>
+    )
+  }
+  {
+    site.reviewer.name && (
+      <div class="author-box" style="margin:0 0 1.2em">
+        <div>
+          <strong>Reviewed by {site.reviewer.name}</strong>
+          {site.reviewer.jobTitle && <span> — {site.reviewer.jobTitle}</span>}
+          {site.reviewer.bio && <p style="margin:6px 0 0">{site.reviewer.bio}</p>}
+          {site.reviewer.url && (
+            <p style="margin:6px 0 0">
+              <a href={site.reviewer.url} rel="noopener" target="_blank">
+                Profile
+              </a>
+            </p>
+          )}
+        </div>
+      </div>
+    )
+  }
 
   <h2>How we build and check our calculators</h2>
   <ul>

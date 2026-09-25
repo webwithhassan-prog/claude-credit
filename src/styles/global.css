@@ -486,9 +486,12 @@ main {
   flex-wrap: wrap;
   gap: 4px;
 }
+.breadcrumbs li {
+  display: flex;
+  gap: 6px;
+}
 .breadcrumbs li:not(:last-child)::after {
   content: '/';
-  margin-left: 6px;
   color: var(--border-strong);
 }
 .breadcrumbs a {
@@ -1532,12 +1535,23 @@ details.more > .more-body {
 }
 .footer-grid {
   display: grid;
-  gap: 28px;
-  grid-template-columns: 1fr;
+  gap: 28px 20px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.footer-grid > :first-child {
+  grid-column: 1 / -1;
 }
 @media (min-width: 720px) {
   .footer-grid {
-    grid-template-columns: 1.4fr repeat(3, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1100px) {
+  .footer-grid {
+    grid-template-columns: 1.3fr repeat(4, minmax(0, 1fr));
+  }
+  .footer-grid > :first-child {
+    grid-column: auto;
   }
 }
 .site-footer h2 {
@@ -1771,4 +1785,103 @@ table.data th:first-child {
   font-size: 0.8rem;
   color: var(--muted);
   font-weight: 600;
+}
+
+/* ==========================================================================
+   Glossary
+   ========================================================================== */
+.az-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 8px;
+}
+.az-nav a {
+  display: grid;
+  place-items: center;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 650;
+  text-decoration: none;
+}
+.az-nav a:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.prose .az-section h2 {
+  margin: 1.6em 0 0.4em;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+  font-size: 1.35rem;
+}
+.glossary {
+  margin: 0;
+}
+.glossary-term {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+.glossary-term:last-child {
+  border-bottom: 0;
+}
+.glossary-term:target {
+  background: var(--primary-soft);
+  border-radius: var(--radius-sm);
+  padding-inline: 12px;
+  margin-inline: -12px;
+}
+.glossary dt {
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin: 0 0 4px;
+}
+.glossary dd {
+  margin: 0;
+}
+.glossary dd p {
+  margin: 0 0 6px;
+}
+.glossary dd p:last-child {
+  margin-bottom: 0;
+}
+.term-links {
+  font-size: 0.92rem;
+  color: var(--text-2);
+}
+.term-links span {
+  font-weight: 650;
+  margin-right: 4px;
+}
+
+/* Key terms on calculator and guide pages */
+.term-chips,
+.prose .term-chips {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 1.4em;
+  padding: 0;
+}
+.prose .term-chips li {
+  margin: 0;
+}
+.term-chips a {
+  display: inline-block;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.92rem;
+  text-decoration: none;
+}
+.term-chips a:hover {
+  border-color: var(--primary);
+  color: var(--primary);
 }

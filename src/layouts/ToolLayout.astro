@@ -11,8 +11,10 @@ import Faq, { type FaqItem } from '../components/Faq.astro';
 import AdSlot from '../components/AdSlot.astro';
 import Icon from '../components/Icon.astro';
 import { categoryOf, relatedTools, toolBySlug } from '../data/tools';
+import { termsForTool } from '../data/glossary';
 import { site } from '../site.config';
 import { getCollection } from 'astro:content';
+import { authorRef, breadcrumbNode, ids, webPageNode } from '../lib/seo';
 
 export interface Source {
   title: string;
@@ -37,36 +39,46 @@ const updated = new Date(`${tool.updated}T12:00:00Z`);
 const updatedLabel = updated.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
 const relatedList = relatedTools(slug, related, 6);
 const guides = (await getCollection('guides')).filter((g) => g.data.related.includes(slug)).slice(0, 3);
+const terms = termsForTool(slug);
 
 const stripHtml = (s: string) => s.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
 
 const jsonLd = [
+  webPageNode({
+    path,
+    name: tool.metaTitle,
+    description: tool.metaDescription,
+    dateModified: tool.updated,
+    reviewed: true,
+    mainEntity: ids.main(path),
+  }),
   {
-    '@context': 'https://schema.org',
     '@type': 'WebApplication',
+    '@id': ids.main(path),
     name: tool.title,
     url,
     description: tool.metaDescription,
     applicationCategory: 'FinanceApplication',
     operatingSystem: 'Any (runs in your web browser)',
+    browserRequirements: 'Requires JavaScript',
     isAccessibleForFree: true,
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
     dateModified: tool.updated,
     inLanguage: 'en-US',
-    publisher: { '@id': `${site.url}/#organization` },
+    mainEntityOfPage: { '@id': ids.page(path) },
+    author: authorRef(),
+    publisher: { '@id': ids.organization },
   },
+  breadcrumbNode(path, [
+    { name: 'Home', path: '/' },
+    { name: category.name, path: `/${category.id}/` },
+    { name: tool.title, path },
+  ]),
   {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: `${site.url}/` },
-      { '@type': 'ListItem', position: 2, name: category.name, item: `${site.url}/${category.id}/` },
-      { '@type': 'ListItem', position: 3, name: tool.title, item: url },
-    ],
-  },
-  {
-    '@context': 'https://schema.org',
     '@type': 'FAQPage',
+    '@id': `${url}#faq`,
+    url,
+    isPartOf: { '@id': ids.website },
     mainEntity: faq.map((f) => ({
       '@type': 'Question',
       name: f.q,
@@ -76,7 +88,7 @@ const jsonLd = [
 ];
 ---
 
-<BaseLayout title={tool.metaTitle} description={tool.metaDescription} path={path} jsonLd={jsonLd} ogType="article">
+<BaseLayout title={tool.metaTitle} description={tool.metaDescription} path={path} jsonLd={jsonLd} ogType="article" modified={tool.updated}>
   <div class="container">
     <Breadcrumbs
       items={[
@@ -90,7 +102,18 @@ const jsonLd = [
       <div class="lede"><slot name="intro" /></div>
       <div class="meta-line">
         <span><Icon name="calendar" size={15} />Updated <time datetime={tool.updated}>{updatedLabel}</time></span>
-        <span><Icon name="user" size={15} />By the <a href="/about/">{site.name} editorial team</a></span>
+        {
+          site.author.name ? (
+            <span><Icon name="user" size={15} />By <a href="/about/#team">{site.author.name}</a></span>
+          ) : (
+            <span><Icon name="user" size={15} />By the <a href="/about/">{site.name} editorial team</a></span>
+          )
+        }
+        {
+          site.reviewer.name && (
+            <span><Icon name="shield" size={15} />Reviewed by <a href="/about/#team">{site.reviewer.name}</a>{site.reviewer.jobTitle && `, ${site.reviewer.jobTitle}`}</span>
+          )
+        }
         <span><Icon name="check-circle" size={15} /><a href="/editorial-policy/">How we build & check our calculators</a></span>
       </div>
     </header>
@@ -105,6 +128,7 @@ const jsonLd = [
             {sections.map((s) => <li><a href={`#${s.id}`}>{s.title}</a></li>)}
             <li><a href="#faq">Frequently asked questions</a></li>
             <li><a href="#sources">Sources</a></li>
+            {terms.length > 0 && <li><a href="#key-terms">Key terms</a></li>}
           </ol>
         </nav>
 
@@ -119,19 +143,32 @@ const jsonLd = [
           {
             sources.map((s) => (
               <li>
-                <a href={s.url} rel="noopener" target="_blank">
-                  {s.title}
-                </a>{' '}
-                — {s.publisher}
+                {/* Keep the link on one line: a line break inside it would render as an underlined space. */}
+                <a href={s.url} rel="noopener" target="_blank">{s.title}</a> — {s.publisher}
               </li>
             ))
           }
         </ul>
 
+        {
+          terms.length > 0 && (
+            <>
+              <h2 id="key-terms">Key terms</h2>
+              <ul class="term-chips">
+                {terms.map((t) => (
+                  <li>
+                    <a href={`/glossary/#${t.id}`}>{t.term}</a>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )
+        }
+
         <div class="author-box">
           <div class="avatar"><Icon name="shield" /></div>
           <div>
-            <strong>About this calculator.</strong> Written and maintained by the {site.name} editorial team and last
+            <strong>About this calculator.</strong> Written and maintained by {site.author.name || `the ${site.name} editorial team`}{site.reviewer.name && `, reviewed by ${site.reviewer.name}${site.reviewer.jobTitle ? `, ${site.reviewer.jobTitle}` : ''},`} and last
             reviewed on {updatedLabel}. Rules and figures are checked against the official sources listed above.
             Results are estimates for education — not financial, tax or legal advice. Found an error?
             <a href="/contact/">Tell us</a> and we'll fix it. Read our <a href="/editorial-policy/">editorial policy</a>.

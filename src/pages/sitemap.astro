@@ -1,0 +1,79 @@
+---
+import ProseLayout from '../layouts/ProseLayout.astro';
+import { getCollection } from 'astro:content';
+import { categories } from '../data/categories';
+import { toolsInCategory } from '../data/tools';
+import { site } from '../site.config';
+
+const guides = (await getCollection('guides')).sort((a, b) => a.data.title.localeCompare(b.data.title));
+const pages = [
+  { name: 'All calculators', href: '/calculators/' },
+  { name: 'All guides', href: '/guides/' },
+  { name: 'Financial glossary', href: '/glossary/' },
+  { name: `About ${site.name}`, href: '/about/' },
+  { name: 'Editorial policy', href: '/editorial-policy/' },
+  { name: 'Contact us', href: '/contact/' },
+  { name: 'Privacy policy', href: '/privacy-policy/' },
+  { name: 'Cookie policy', href: '/cookie-policy/' },
+  { name: 'Terms of use', href: '/terms/' },
+  { name: 'Disclaimer', href: '/disclaimer/' },
+];
+---
+
+<ProseLayout
+  title="Site map"
+  seoTitle={`Site Map: All ${site.name} Calculators, Guides and Pages`}
+  description={`Every page on ${site.name} in one place: all calculators and guides by topic — debt and credit, home equity, business financing, taxes and benefits — plus our policies.`}
+  path="/sitemap/"
+  lede="Every calculator, guide and page on the site, organized by topic."
+  noAds
+>
+  <h2 id="calculators">Calculators</h2>
+  {
+    categories.map((c) => (
+      <>
+        <h3>
+          <a href={`/${c.id}/`}>{c.name}</a>
+        </h3>
+        <ul>
+          {toolsInCategory(c.id).map((t) => (
+            <li>
+              <a href={`/${t.slug}/`}>{t.title}</a>
+            </li>
+          ))}
+        </ul>
+      </>
+    ))
+  }
+
+  <h2 id="guides">Guides</h2>
+  {
+    categories
+      .filter((c) => guides.some((g) => g.data.category === c.id))
+      .map((c) => (
+        <>
+          <h3>{c.name}</h3>
+          <ul>
+            {guides
+              .filter((g) => g.data.category === c.id)
+              .map((g) => (
+                <li>
+                  <a href={`/guides/${g.id}/`}>{g.data.title}</a>
+                </li>
+              ))}
+          </ul>
+        </>
+      ))
+  }
+
+  <h2 id="pages">More pages</h2>
+  <ul>
+    {
+      pages.map((p) => (
+        <li>
+          <a href={p.href}>{p.name}</a>
+        </li>
+      ))
+    }
+  </ul>
+</ProseLayout>

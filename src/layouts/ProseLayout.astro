@@ -1,24 +1,41 @@
 ---
-/** Simple long-form page: legal pages, about, editorial policy. */
+/** Simple long-form page: legal pages, about, editorial policy, glossary. */
 import BaseLayout from './BaseLayout.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { breadcrumbNode, webPageNode, type Node } from '../lib/seo';
 
 interface Props {
   title: string;
+  /** Optional <title> for search results when the H1 alone would be too short or generic. */
+  seoTitle?: string;
   description: string;
   path: string;
   /** ISO date shown as "Last updated". */
   updated?: string;
   lede?: string;
   noAds?: boolean;
+  /** schema.org page type, e.g. AboutPage or ContactPage. */
+  pageType?: string;
+  /** Extra JSON-LD nodes for this page. */
+  jsonLd?: Node[];
+  /** @id of the page's main entity, when one of the extra nodes is it. */
+  mainEntity?: string;
 }
-const { title, description, path, updated, lede, noAds = false } = Astro.props;
+const { title, seoTitle, description, path, updated, lede, noAds = false, pageType = 'WebPage', jsonLd = [], mainEntity } = Astro.props;
 const updatedLabel = updated
   ? new Date(`${updated}T12:00:00Z`).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' })
   : null;
+const nodes = [
+  webPageNode({ path, name: seoTitle ?? title, description, type: pageType, dateModified: updated, mainEntity }),
+  breadcrumbNode(path, [
+    { name: 'Home', path: '/' },
+    { name: title, path },
+  ]),
+  ...jsonLd,
+];
 ---
 
-<BaseLayout title={title} description={description} path={path} noAds={noAds}>
+<BaseLayout title={seoTitle ?? title} description={description} path={path} noAds={noAds} jsonLd={nodes}>
   <div class="container">
     <Breadcrumbs items={[{ name: 'Home', href: '/' }, { name: title, href: path }]} />
     <header class="page-hero">

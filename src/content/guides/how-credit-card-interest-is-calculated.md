@@ -1,5 +1,6 @@
 ---
 title: 'How Credit Card Interest Is Calculated: APR, Daily Rates and Grace Periods'
+seoTitle: 'How Credit Card Interest Is Calculated (APR and Daily Rate)'
 description: 'Your card’s APR is charged daily on your average balance. See the exact math, how the grace period works, and why paying in full sometimes still costs interest.'
 category: debt-credit
 related: ['credit-card-payoff-calculator', 'balance-transfer-calculator', 'debt-payoff-calculator']

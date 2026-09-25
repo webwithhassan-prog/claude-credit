@@ -3,27 +3,59 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import GuideCard from '../../components/GuideCard.astro';
+import { categories } from '../../data/categories';
 import { site } from '../../site.config';
+import { abs, breadcrumbNode, ids, webPageNode } from '../../lib/seo';
 
-const guides = (await getCollection('guides')).sort((a, b) => b.data.updated.localeCompare(a.data.updated) || a.data.title.localeCompare(b.data.title));
+const all = (await getCollection('guides')).sort((a, b) => a.data.title.localeCompare(b.data.title));
+const groups = categories.map((c) => ({ category: c, guides: all.filter((g) => g.data.category === c.id) })).filter((g) => g.guides.length);
+const ordered = groups.flatMap((g) => g.guides);
+
+const path = '/guides/';
+const title = 'Money Guides: Debt, Home Equity, Business, Taxes & Benefits';
+const description = `${all.length} in-depth, sourced guides from ${site.name} that explain the rules behind our calculators — from the 2026 ACA subsidy cliff to factor rates and IRMAA appeals.`;
+const jsonLd = [
+  webPageNode({ path, type: 'CollectionPage', name: title, description, dateModified: all.map((g) => g.data.updated).sort().at(-1), mainEntity: ids.main(path) }),
+  {
+    '@type': 'ItemList',
+    '@id': ids.main(path),
+    name: `${site.name} guides`,
+    numberOfItems: ordered.length,
+    itemListElement: ordered.map((g, i) => ({ '@type': 'ListItem', position: i + 1, url: abs(`/guides/${g.id}/`), name: g.data.title })),
+  },
+  breadcrumbNode(path, [
+    { name: 'Home', path: '/' },
+    { name: 'Guides', path },
+  ]),
+];
 ---
 
-<BaseLayout
-  title="Guides: Debt, Home Equity, Business Financing, Taxes & Benefits"
-  description={`In-depth, sourced guides from ${site.name} that explain the rules behind our calculators — from the 2026 ACA subsidy cliff to factor rates and IRMAA appeals.`}
-  path="/guides/"
->
+<BaseLayout title={title} description={description} path={path} jsonLd={jsonLd}>
   <div class="container">
-    <Breadcrumbs items={[{ name: 'Home', href: '/' }, { name: 'Guides', href: '/guides/' }]} />
+    <Breadcrumbs items={[{ name: 'Home', href: '/' }, { name: 'Guides', href: path }]} />
     <header class="page-hero">
       <h1>Guides</h1>
       <p class="lede">
         Plain-English explanations of the rules behind our calculators, with worked examples, checklists and links to official
-        sources.
+        sources. New to a term? Look it up in our <a href="/glossary/">financial glossary</a>.
       </p>
     </header>
-    <div class="guide-list" style="margin-top:10px">
-      {guides.map((g) => <GuideCard entry={g} />)}
-    </div>
+    {
+      groups.map(({ category, guides }) => (
+        <section class="category-block" style="margin-top:10px">
+          <div class="category-head">
+            <h2>{category.name}</h2>
+            <a href={`/${category.id}/`} class="btn btn-sm">
+              {category.nav} calculators
+            </a>
+          </div>
+          <div class="guide-list">
+            {guides.map((g) => (
+              <GuideCard entry={g} />
+            ))}
+          </div>
+        </section>
+      ))
+    }
   </div>
 </BaseLayout>

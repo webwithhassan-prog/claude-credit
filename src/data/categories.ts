@@ -3,6 +3,8 @@ export interface Category {
   name: string;
   /** Short nav label. */
   nav: string;
+  /** <title> for the category hub (≤ 60 chars). */
+  metaTitle: string;
   icon: string;
   description: string;
   /** Longer introduction (HTML) shown on the category hub page. */
@@ -17,6 +19,7 @@ export const categories: Category[] = [
     id: 'debt-credit',
     name: 'Debt & Credit',
     nav: 'Debt & Credit',
+    metaTitle: 'Debt & Credit Calculators: Payoff, DTI, Utilization & More',
     icon: 'credit-card',
     description:
       'Plan your way out of credit card and loan debt, compare avalanche and snowball strategies, and check the ratios lenders look at.',
@@ -29,6 +32,7 @@ export const categories: Category[] = [
     id: 'home-equity',
     name: 'Home Equity & Real Estate',
     nav: 'Home Equity',
+    metaTitle: 'Home Equity & Real Estate Calculators: HELOC, DSCR, BRRRR',
     icon: 'home',
     description:
       'Estimate HELOC payments and how much equity you can borrow, compare a cash-out refinance with a HELOC, and analyze rentals, BRRRR deals and DSCR loans.',
@@ -41,6 +45,7 @@ export const categories: Category[] = [
     id: 'business-financing',
     name: 'Business Financing',
     nav: 'Business',
+    metaTitle: 'Business Financing Calculators: MCA APR, Factoring, Loans',
     icon: 'briefcase',
     description:
       'See the true cost of merchant cash advances, invoice factoring and equipment loans — converted to APR so you can compare offers.',
@@ -53,6 +58,7 @@ export const categories: Category[] = [
     id: 'taxes',
     name: 'Tax Deductions 2025–2026',
     nav: 'Taxes',
+    metaTitle: 'Tax Deduction Calculators 2025–2026: Tips, Overtime & More',
     icon: 'receipt',
     description:
       'Estimate the new federal deductions for tips, overtime, car loan interest and seniors created by the 2025 tax law, with your real tax savings.',
@@ -65,6 +71,7 @@ export const categories: Category[] = [
     id: 'health-benefits',
     name: 'Health & Benefits',
     nav: 'Benefits',
+    metaTitle: 'ACA Subsidy, Medicare IRMAA & SSDI Calculators (2026)',
     icon: 'shield',
     description:
       'Estimate your 2026 ACA premium tax credit, Medicare IRMAA surcharges and Social Security disability (SSDI) back pay.',

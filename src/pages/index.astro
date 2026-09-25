@@ -8,34 +8,31 @@ import { tools, toolsInCategory } from '../data/tools';
 import { site } from '../site.config';
 import { getCollection } from 'astro:content';
 import GuideCard from '../components/GuideCard.astro';
+import { webPageNode } from '../lib/seo';
 
 const guides = (await getCollection('guides')).sort((a, b) => b.data.updated.localeCompare(a.data.updated) || a.data.title.localeCompare(b.data.title)).slice(0, 6);
 
 const featured = tools.filter((t) => t.featured);
+const guidesCount = (await getCollection('guides')).length;
+const description =
+  'Free, private calculators for credit card payoff, DTI, HELOCs, MCA APR, new tax deductions, ACA subsidies and IRMAA — with formulas and official sources.';
+const homeTitle = `${site.name}: Free Debt, Home Equity, Tax & Benefits Calculators`;
 const jsonLd = [
-  {
-    '@context': 'https://schema.org',
-    '@type': 'WebSite',
-    '@id': `${site.url}/#website`,
-    name: site.name,
-    url: `${site.url}/`,
-    description: site.tagline,
-    publisher: { '@id': `${site.url}/#organization` },
-    inLanguage: 'en-US',
-  },
+  webPageNode({
+    path: '/',
+    name: homeTitle,
+    description,
+    hasBreadcrumb: false,
+    dateModified: [...tools.map((t) => t.updated), ...guides.map((g) => g.data.updated)].sort().at(-1),
+  }),
 ];
 ---
 
-<BaseLayout
-  title={`${site.name} — Free Debt, Home Equity, Tax & Benefits Calculators`}
-  description={`Free, private calculators for credit card payoff, debt-to-income, HELOCs, merchant cash advance APR, 2025–2026 tax deductions, ACA subsidies and IRMAA. Clear formulas and official sources.`}
-  path="/"
-  jsonLd={jsonLd}
->
+<BaseLayout title={homeTitle} description={description} path="/" jsonLd={jsonLd}>
   <section class="hero">
     <div class="container">
       <span class="pill">Updated for 2026 rules</span>
-      <h1 style="margin-top:14px">Money calculators that show their work</h1>
+      <h1 style="margin-top:14px">Free financial calculators that show their work</h1>
       <p class="lede">
         Free tools for debt, home equity, business financing, taxes and benefits. Every calculator explains the formula,
         cites official sources, and runs privately in your browser.
@@ -71,7 +68,7 @@ const jsonLd = [
               <p>{c.description}</p>
             </div>
             <a href={`/${c.id}/`} class="btn btn-sm">
-              View all <Icon name="arrow-right" size={16} />
+              All {c.nav} tools <Icon name="arrow-right" size={16} />
             </a>
           </div>
           <div class="card-grid">
@@ -89,7 +86,7 @@ const jsonLd = [
           <h2>Guides</h2>
           <p>Plain-English explanations of the rules behind the numbers.</p>
         </div>
-        <a href="/guides/" class="btn btn-sm">All guides <Icon name="arrow-right" size={16} /></a>
+        <a href="/guides/" class="btn btn-sm">All {guidesCount} guides <Icon name="arrow-right" size={16} /></a>
       </div>
       <div class="guide-list">
         {guides.map((g) => <GuideCard entry={g} />)}

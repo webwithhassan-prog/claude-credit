@@ -39,7 +39,7 @@ export const tools: Tool[] = [
     short: 'Build a month-by-month plan for all your debts and compare the avalanche and snowball methods.',
     category: 'debt-credit',
     icon: 'layers',
-    metaTitle: 'Debt Avalanche vs Snowball Calculator (Payoff Planner)',
+    metaTitle: 'Debt Payoff Calculator: Avalanche vs Snowball Planner',
     metaDescription:
       'Compare the debt avalanche and debt snowball methods side by side. Enter up to 10 debts to see your payoff order, debt-free date and interest saved.',
     updated: '2026-09-25',
@@ -98,7 +98,7 @@ export const tools: Tool[] = [
     short: 'Estimate interest-only draw-period payments and the jump when repayment begins.',
     category: 'home-equity',
     icon: 'home',
-    metaTitle: 'HELOC Payment Calculator: Draw & Repayment Payments',
+    metaTitle: 'HELOC Payment Calculator: Interest-Only & Repayment',
     metaDescription:
       'Estimate your HELOC payment during the interest-only draw period and the higher principal-and-interest payment when repayment starts, plus total interest.',
     updated: '2026-09-25',
@@ -110,7 +110,7 @@ export const tools: Tool[] = [
     short: 'See your equity and how much a lender may let you borrow at 80%, 85% or 90% CLTV.',
     category: 'home-equity',
     icon: 'landmark',
-    metaTitle: 'Home Equity Calculator: How Much Equity Can I Borrow?',
+    metaTitle: 'Home Equity Calculator: How Much Can You Borrow?',
     metaDescription:
       'Calculate your home equity and how much you can borrow with a HELOC or home equity loan at 80%, 85% or 90% combined loan-to-value (CLTV).',
     updated: '2026-09-25',
@@ -226,7 +226,7 @@ export const tools: Tool[] = [
     short: 'Work out your qualified overtime and the federal tax the new deduction saves.',
     category: 'taxes',
     icon: 'clock',
-    metaTitle: 'No Tax on Overtime Calculator: Deduction & Savings',
+    metaTitle: 'No Tax on Overtime Calculator 2026: Deduction & Savings',
     metaDescription:
       'Estimate the overtime deduction: qualified overtime (the “half” in time-and-a-half), the $12,500/$25,000 cap, the income phase-out and your federal tax savings.',
     updated: '2026-09-25',
@@ -237,7 +237,7 @@ export const tools: Tool[] = [
     short: 'Estimate the deduction for qualified tips (up to $25,000) and your tax savings.',
     category: 'taxes',
     icon: 'gift',
-    metaTitle: 'No Tax on Tips Calculator: $25,000 Deduction Estimate',
+    metaTitle: 'No Tax on Tips Calculator 2026: $25,000 Deduction Estimate',
     metaDescription:
       'Estimate the no tax on tips deduction: qualified tips, the $25,000 cap, the phase-out above $150,000 of income and how much federal tax you save.',
     updated: '2026-09-25',
@@ -248,7 +248,7 @@ export const tools: Tool[] = [
     short: 'Estimate the new $6,000 deduction for people 65 and older, after the income phase-out.',
     category: 'taxes',
     icon: 'heart',
-    metaTitle: 'Senior Deduction Calculator: New $6,000 Deduction for 65+',
+    metaTitle: 'Senior Bonus Deduction Calculator: Extra $6,000 for 65+',
     metaDescription:
       'Estimate the new $6,000 senior deduction for taxpayers 65 and older (2025–2028), including the 6% income phase-out and your federal tax savings.',
     updated: '2026-09-25',
@@ -311,3 +311,6 @@ export const relatedTools = (slug: string, explicit: string[] = [], limit = 6): 
 };
 
 export const categoryOf = (tool: Tool) => categoryById(tool.category);
+
+/** Title without a subtitle after a colon or a trailing parenthetical, for compact link lists. */
+export const shortTitle = (tool: Tool) => tool.title.replace(/:.*$/, '').replace(/\s*\([^)]*\)$/, '');

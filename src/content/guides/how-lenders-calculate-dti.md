@@ -1,5 +1,6 @@
 ---
 title: 'How Lenders Calculate Debt-to-Income Ratio (and What They Leave Out)'
+seoTitle: 'How Lenders Calculate Your Debt-to-Income Ratio (DTI)'
 description: 'Mortgage lenders don’t calculate DTI the way most people expect. Which debts count, how student loans and self-employed income are treated, and how to prepare.'
 category: debt-credit
 related: ['debt-to-income-ratio-calculator', 'home-equity-calculator', 'debt-payoff-calculator']
