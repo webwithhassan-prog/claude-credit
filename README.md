@@ -14,7 +14,7 @@ A fast, static website of **23 free financial calculators**, built to rank in Go
 | **Tax Deductions 2025–2026** | Schedule 1-A (all four combined) · Car loan interest · No tax on overtime · No tax on tips · Senior $6,000 deduction |
 | **Health & Benefits** | ACA subsidy 2026 · IRMAA 2026 · SSDI back pay |
 
-Plus **15 in-depth guides** in `src/content/guides/`, written in Markdown. Each is linked from the home page, its category hub and its related calculators:
+Plus **23 in-depth guides** in `src/content/guides/`, written in Markdown. Each is linked from the home page, its category hub and its related calculators:
 - 2026 ACA subsidy cliff
 - Factor rate vs APR
 - HELOC vs cash-out refinance
@@ -30,8 +30,16 @@ Plus **15 in-depth guides** in `src/content/guides/`, written in Markdown. Each 
 - DSCR loans explained
 - Cap rate vs cash-on-cash return
 - Invoice factoring vs line of credit
+- HELOC requirements
+- What is a good DSCR?
+- Rental property expenses investors underestimate
+- Paying your card before the statement date
+- MCA stacking and consolidation
+- Equipment financing vs leasing
+- How to calculate qualified overtime
+- No tax on tips: which jobs qualify
 
-Plus a **financial glossary** of 64 plain-English terms at `/glossary/`, linked from every calculator and guide.
+Plus a **financial glossary** of 70 plain-English terms at `/glossary/`, linked from every calculator and guide.
 
 Plus the trust pages AdSense reviewers look for:
 - **Company:** About, Editorial policy, Contact.
@@ -71,6 +79,7 @@ npm run check    # TypeScript / Astro type check
 npm run build    # production build into ./dist
 npm run seo      # SEO check of the build (titles, links, structured data, sitemap…)
 npm run og       # regenerate share images in public/og/ (needs Playwright; see the script)
+                 # npm run og -- --missing  renders only pages without an image
 npm run preview  # serve the production build locally
 ```
 
@@ -168,7 +177,7 @@ updated: '2026-10-01'
 ---
 ```
 
-To link glossary terms from the guide, add its slug to those terms' `guides` lists in `src/data/glossary.ts`. Then run `npm run build && npm run og && npm run build` to create its share image, and `npm run seo` to check it.
+To link glossary terms from the guide, add its slug to those terms' `guides` lists in `src/data/glossary.ts`. Then run `npm run build && npm run og -- --missing && npm run build` to create its share image, and `npm run seo` to check it.
 
 ## Adding a calculator
 

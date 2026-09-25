@@ -6,6 +6,7 @@
  * ogImageUrl in src/lib/seo.ts), so new pages never break.
  *
  *   npm run build && npm run og && npm run build
+ *   npm run og -- --missing     (only pages that don't have an image yet)
  *
  * Re-run after changing page titles or adding pages, and commit public/og/.
  * Needs a Chromium that Playwright can drive. If you don't have one:
@@ -173,6 +174,8 @@ const pages = walk(DIST)
   .filter((f) => f.endsWith('index.html'))
   .map(pageData)
   .filter(Boolean);
+const onlyMissing = process.argv.includes('--missing');
+const todo = onlyMissing ? pages.filter((d) => !fs.existsSync(path.join(OUT, `${d.key}.jpg`))) : pages;
 
 /** Inter from Google Fonts, embedded as data URIs so every render uses the same font, offline or not. */
 async function loadFontCss() {
@@ -196,7 +199,7 @@ const fontCss = await loadFontCss();
 fs.mkdirSync(OUT, { recursive: true });
 const browser = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
 const page = await browser.newPage({ viewport: { width: 1200, height: 630 } });
-for (const d of pages) {
+for (const d of todo) {
   await page.setContent(template(d));
   await page.evaluate(() => document.fonts.ready);
   await page.evaluate(fit);
@@ -210,4 +213,5 @@ await browser.close();
 const keep = new Set(pages.map((d) => `${d.key}.jpg`));
 for (const f of fs.readdirSync(OUT)) if (f.endsWith('.jpg') && !keep.has(f)) fs.rmSync(path.join(OUT, f));
 
-console.log(`Wrote ${pages.length} share images to ${path.relative(process.cwd(), OUT)}/ and public/og-image.png. Rebuild the site to use them.`);
+const wroteFallback = todo.some((d) => d.key === 'home');
+console.log(`Wrote ${todo.length} share image(s) to ${path.relative(process.cwd(), OUT)}/${wroteFallback ? ' and public/og-image.png' : ''}. Rebuild the site to use them.`);

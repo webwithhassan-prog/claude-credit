@@ -65,6 +65,7 @@ export const glossary: GlossaryTerm[] = [
     definition:
       'The share of your available revolving credit you are using: total card balances divided by total credit limits. Credit scores consider both your overall ratio and each card’s ratio. Lower is better, and many experts suggest staying under 30%.',
     tools: ['credit-utilization-calculator'],
+    guides: ['pay-credit-card-before-statement-date'],
   },
   {
     id: 'daily-periodic-rate',
@@ -108,7 +109,7 @@ export const glossary: GlossaryTerm[] = [
     definition:
       'Your monthly debt payments divided by your gross (pre-tax) monthly income. Lenders look at the front-end ratio, which counts housing costs only, and the back-end ratio, which counts all debts including housing.',
     tools: ['debt-to-income-ratio-calculator'],
-    guides: ['how-lenders-calculate-dti'],
+    guides: ['how-lenders-calculate-dti', 'heloc-requirements'],
   },
   {
     id: 'grace-period',
@@ -116,7 +117,7 @@ export const glossary: GlossaryTerm[] = [
     definition:
       'For credit cards, the time between the end of a billing cycle and the payment due date — at least 21 days when a card offers one. If you pay the full statement balance by the due date, you usually owe no interest on new purchases.',
     tools: ['credit-card-payoff-calculator'],
-    guides: ['how-credit-card-interest-is-calculated'],
+    guides: ['how-credit-card-interest-is-calculated', 'pay-credit-card-before-statement-date'],
     see: ['average-daily-balance'],
   },
   {
@@ -144,6 +145,15 @@ export const glossary: GlossaryTerm[] = [
     see: ['amortization'],
   },
 
+  {
+    id: 'statement-closing-date',
+    term: 'Statement closing date',
+    definition:
+      'The last day of a credit card’s billing cycle. Your statement balance is calculated that day, and most issuers report it to the credit bureaus around then. The payment due date usually falls 21 to 25 days later.',
+    tools: ['credit-utilization-calculator', 'credit-card-payoff-calculator'],
+    guides: ['pay-credit-card-before-statement-date'],
+    see: ['credit-utilization', 'grace-period'],
+  },
   // Home equity & real estate
   {
     id: 'arv',
@@ -202,6 +212,7 @@ export const glossary: GlossaryTerm[] = [
     definition:
       'The total of all loans secured by a home — the first mortgage plus any home equity loan or HELOC — divided by the home’s value. Many lenders cap CLTV at 80% to 90% for home equity borrowing.',
     tools: ['home-equity-calculator', 'heloc-payment-calculator'],
+    guides: ['heloc-requirements'],
     see: ['ltv', 'home-equity'],
   },
   {
@@ -210,7 +221,7 @@ export const glossary: GlossaryTerm[] = [
     definition:
       'For rental property loans, the property’s rental income divided by its monthly payment of principal, interest, taxes, insurance and any association dues. A DSCR of 1.0 means the rent exactly covers the payment; many lenders look for 1.0 to 1.25 or higher.',
     tools: ['dscr-loan-calculator'],
-    guides: ['dscr-loans-explained'],
+    guides: ['dscr-loans-explained', 'what-is-a-good-dscr'],
     see: ['pitia', 'noi'],
   },
   {
@@ -228,7 +239,7 @@ export const glossary: GlossaryTerm[] = [
     definition:
       'A revolving credit line secured by your home. You borrow as needed during the draw period, then repay principal and interest during the repayment period. Rates are usually variable: the prime rate plus a margin.',
     tools: ['heloc-payment-calculator', 'home-equity-calculator', 'cash-out-refinance-vs-heloc-calculator'],
-    guides: ['heloc-vs-cash-out-refinance', 'heloc-draw-period-ending'],
+    guides: ['heloc-vs-cash-out-refinance', 'heloc-draw-period-ending', 'heloc-requirements'],
     see: ['draw-period', 'repayment-period', 'prime-rate', 'cltv'],
   },
   {
@@ -237,6 +248,7 @@ export const glossary: GlossaryTerm[] = [
     definition:
       'Your home’s market value minus everything you owe on loans secured by it. Lenders usually let you borrow only part of it, because they cap the combined loan-to-value ratio.',
     tools: ['home-equity-calculator'],
+    guides: ['heloc-requirements'],
     see: ['cltv', 'heloc'],
   },
   {
@@ -253,7 +265,7 @@ export const glossary: GlossaryTerm[] = [
     definition:
       'A rental property’s income after operating expenses such as vacancy, property taxes, insurance, repairs and management, but before mortgage payments and income taxes.',
     tools: ['rental-property-calculator'],
-    guides: ['cap-rate-vs-cash-on-cash-return'],
+    guides: ['cap-rate-vs-cash-on-cash-return', 'rental-property-expenses'],
     see: ['cap-rate'],
   },
   {
@@ -262,7 +274,7 @@ export const glossary: GlossaryTerm[] = [
     definition:
       'Principal, interest, taxes, insurance and association dues: the full monthly housing payment lenders use when calculating DSCR and debt-to-income ratios.',
     tools: ['dscr-loan-calculator', 'debt-to-income-ratio-calculator'],
-    guides: ['dscr-loans-explained'],
+    guides: ['dscr-loans-explained', 'what-is-a-good-dscr'],
     see: ['dscr', 'dti'],
   },
   {
@@ -271,6 +283,7 @@ export const glossary: GlossaryTerm[] = [
     definition:
       'The benchmark rate banks use to set many variable rates, including most HELOCs and credit cards. It moves with the Federal Reserve’s target for the federal funds rate and typically sits 3 percentage points above the top of that range.',
     tools: ['heloc-payment-calculator'],
+    guides: ['heloc-requirements'],
     see: ['heloc'],
   },
   {
@@ -291,6 +304,15 @@ export const glossary: GlossaryTerm[] = [
     see: ['brrrr', 'cash-out-refinance'],
   },
 
+  {
+    id: 'capex',
+    term: 'Capital expenditures (CapEx)',
+    definition:
+      'Spending on big, infrequent replacements or improvements to a property, such as a roof, HVAC system, water heater or flooring. Rental investors set aside a monthly CapEx reserve so these costs don’t wipe out years of cash flow.',
+    tools: ['rental-property-calculator', 'brrrr-calculator'],
+    guides: ['rental-property-expenses'],
+    see: ['noi'],
+  },
   // Business financing
   {
     id: 'advance-rate',
@@ -307,7 +329,7 @@ export const glossary: GlossaryTerm[] = [
     definition:
       'A tax rule that lets a business deduct a large share of the cost of qualifying equipment in the first year instead of spreading it over several years. The 2025 tax law permanently restored 100% bonus depreciation for qualifying property acquired after January 19, 2025.',
     tools: ['equipment-loan-calculator'],
-    guides: ['section-179-vs-bonus-depreciation'],
+    guides: ['section-179-vs-bonus-depreciation', 'equipment-financing-vs-leasing'],
     see: ['section-179'],
   },
   {
@@ -316,7 +338,7 @@ export const glossary: GlossaryTerm[] = [
     definition:
       'How merchant cash advances and some short-term business loans are priced: a multiplier, such as 1.3, applied to the amount advanced to get the total you repay. It is not an interest rate — because repayment is fast, the equivalent APR is usually far higher than the factor rate suggests.',
     tools: ['merchant-cash-advance-calculator'],
-    guides: ['factor-rate-vs-apr'],
+    guides: ['factor-rate-vs-apr', 'mca-stacking-and-consolidation'],
     see: ['mca', 'apr'],
   },
   {
@@ -325,7 +347,7 @@ export const glossary: GlossaryTerm[] = [
     definition:
       'The percentage of daily card sales or deposits a merchant cash advance provider collects until the advance is repaid. A higher holdback repays the advance faster, which raises its effective APR.',
     tools: ['merchant-cash-advance-calculator'],
-    guides: ['factor-rate-vs-apr'],
+    guides: ['factor-rate-vs-apr', 'mca-stacking-and-consolidation'],
     see: ['mca'],
   },
   {
@@ -343,7 +365,7 @@ export const glossary: GlossaryTerm[] = [
     definition:
       'A lump sum paid to a business in exchange for a share of its future sales, repaid through daily or weekly withdrawals. MCAs are usually structured as purchases of future receivables rather than loans, so they are priced with a factor rate instead of an interest rate — though some states, including California and New York, now require providers to disclose an estimated APR.',
     tools: ['merchant-cash-advance-calculator'],
-    guides: ['factor-rate-vs-apr'],
+    guides: ['factor-rate-vs-apr', 'mca-stacking-and-consolidation'],
     see: ['factor-rate', 'holdback'],
   },
   {
@@ -361,10 +383,37 @@ export const glossary: GlossaryTerm[] = [
     definition:
       'A tax election that lets a business deduct the full cost of qualifying equipment and software in the year it is placed in service, rather than depreciating it over time. The 2025 tax law raised the annual limit to $2.5 million, phasing out once equipment purchases exceed $4 million.',
     tools: ['equipment-loan-calculator'],
-    guides: ['section-179-vs-bonus-depreciation'],
+    guides: ['section-179-vs-bonus-depreciation', 'equipment-financing-vs-leasing'],
     see: ['bonus-depreciation'],
   },
 
+  {
+    id: 'dollar-buyout-lease',
+    term: 'Buyout lease ($1 buyout lease)',
+    definition:
+      'An equipment lease that transfers ownership to you for $1 at the end of the term. For tax purposes it is generally treated as a purchase, so you can depreciate the equipment or use the Section 179 deduction.',
+    tools: ['equipment-loan-calculator'],
+    guides: ['equipment-financing-vs-leasing'],
+    see: ['fmv-lease', 'section-179'],
+  },
+  {
+    id: 'fmv-lease',
+    term: 'Fair market value (FMV) lease',
+    definition:
+      'An equipment lease with lower payments where, at the end, you return the equipment, renew the lease or buy the equipment at its fair market value. A true lease is generally deducted as rent rather than depreciated.',
+    tools: ['equipment-loan-calculator'],
+    guides: ['equipment-financing-vs-leasing'],
+    see: ['dollar-buyout-lease', 'section-179'],
+  },
+  {
+    id: 'stacking',
+    term: 'Stacking (merchant cash advances)',
+    definition:
+      'Taking a second or third merchant cash advance while earlier ones are still being repaid. The daily or weekly debits add up quickly, and many MCA contracts prohibit it.',
+    tools: ['merchant-cash-advance-calculator'],
+    guides: ['mca-stacking-and-consolidation'],
+    see: ['mca', 'factor-rate'],
+  },
   // Taxes
   {
     id: 'agi',
@@ -397,7 +446,7 @@ export const glossary: GlossaryTerm[] = [
     definition:
       'An income range over which a tax benefit shrinks. For example, the tips and overtime deductions fall by $100 for every $1,000 of MAGI above $150,000 ($300,000 for joint filers).',
     tools: ['no-tax-on-overtime-calculator', 'no-tax-on-tips-calculator', 'senior-deduction-calculator', 'car-loan-interest-deduction-calculator'],
-    guides: ['schedule-1a-deductions-explained'],
+    guides: ['schedule-1a-deductions-explained', 'how-to-calculate-qualified-overtime', 'no-tax-on-tips-eligible-jobs'],
     see: ['magi'],
   },
   {
@@ -406,7 +455,7 @@ export const glossary: GlossaryTerm[] = [
     definition:
       'For the overtime deduction, only the premium portion of overtime pay required by the Fair Labor Standards Act — the “half” in time-and-a-half for hours over 40 in a workweek. Regular pay for those hours, and overtime required only by state law or a contract, doesn’t count. The deduction is capped at $12,500 ($25,000 for joint filers).',
     tools: ['no-tax-on-overtime-calculator', 'new-tax-deductions-calculator'],
-    guides: ['schedule-1a-deductions-explained'],
+    guides: ['schedule-1a-deductions-explained', 'how-to-calculate-qualified-overtime'],
     see: ['phase-out'],
   },
   {
@@ -415,7 +464,7 @@ export const glossary: GlossaryTerm[] = [
     definition:
       'For the tips deduction, voluntary cash or charged tips received in an occupation that customarily received tips on or before December 31, 2024, as listed by the Treasury. Mandatory service charges don’t qualify. The deduction is capped at $25,000.',
     tools: ['no-tax-on-tips-calculator', 'new-tax-deductions-calculator'],
-    guides: ['schedule-1a-deductions-explained'],
+    guides: ['schedule-1a-deductions-explained', 'no-tax-on-tips-eligible-jobs'],
     see: ['phase-out'],
   },
   {
@@ -424,7 +473,7 @@ export const glossary: GlossaryTerm[] = [
     definition:
       'The IRS form, new for 2025 returns, used to claim the four temporary deductions created by the 2025 tax law: qualified tips, qualified overtime, car loan interest and the senior deduction. You can claim them whether or not you itemize.',
     tools: ['new-tax-deductions-calculator', 'car-loan-interest-deduction-calculator'],
-    guides: ['schedule-1a-deductions-explained'],
+    guides: ['schedule-1a-deductions-explained', 'how-to-calculate-qualified-overtime', 'no-tax-on-tips-eligible-jobs'],
     see: ['qualified-tips', 'qualified-overtime', 'senior-deduction'],
   },
   {
@@ -453,6 +502,15 @@ export const glossary: GlossaryTerm[] = [
     see: ['marginal-tax-rate'],
   },
 
+  {
+    id: 'regular-rate',
+    term: 'Regular rate of pay',
+    definition:
+      'Under the Fair Labor Standards Act, the hourly rate used to calculate overtime. It generally includes hourly pay plus shift differentials, commissions and non-discretionary bonuses for the week, divided by the hours worked.',
+    tools: ['no-tax-on-overtime-calculator'],
+    guides: ['how-to-calculate-qualified-overtime'],
+    see: ['qualified-overtime'],
+  },
   // Health & benefits
   {
     id: 'applicable-percentage',

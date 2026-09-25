@@ -92,18 +92,20 @@ Search demand for these topics is highly seasonal. Update pages *before* each pe
 
 Each new guide should target a specific question and link to a calculator. Good next topics, drawn from the niche research:
 
-- HELOC requirements: credit score, CLTV and DTI limits.
-- What is a good DSCR? Lender tiers and how to improve the ratio.
-- No tax on tips: which occupations qualify.
-- How to find your qualified overtime on your W-2 or pay stubs.
-- Merchant cash advance consolidation and "stacking".
-- Does paying your card before the statement date help your credit score?
-- Next year's IRMAA brackets, published when CMS announces them.
-- Next year's ACA subsidy changes.
-- Rental property expenses investors forget (vacancy, capex, management).
-- Equipment financing vs leasing.
+- Next year's IRMAA brackets, published when CMS announces them (usually in the fall).
+- Next year's ACA subsidy rules and applicable percentages.
+- HELOC vs. home equity loan: fixed or variable?
+- How credit card minimum payments are calculated.
+- Hard money loans for flips and BRRRR deals.
+- Business line of credit requirements.
+- Which cars qualify for the car loan interest deduction (final assembly in the U.S.).
+- The senior deduction: who qualifies and how it interacts with Social Security.
+- How long SSDI back pay takes to arrive.
+- Recourse vs. non-recourse invoice factoring.
 
-After adding pages, run `npm run build && npm run og && npm run build` so the new pages get share images, and commit `public/og/`.
+Already published: HELOC requirements, what is a good DSCR, rental property expenses, paying before the statement date, MCA stacking and consolidation, equipment financing vs. leasing, qualified overtime, and which tipped jobs qualify.
+
+After adding pages, run `npm run build && npm run og -- --missing && npm run build` so the new pages get share images, and commit `public/og/`.
 
 ## 8. Earning links safely
 
