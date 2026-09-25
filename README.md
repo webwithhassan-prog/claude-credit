@@ -2,7 +2,7 @@
 
 A fast, static website of **23 free financial calculators**, built to rank in Google and to pass Google AdSense review. Every calculator runs in the visitor's browser, explains its formula with a worked example, cites official sources, and is backed by unit-tested math.
 
-> The brand name **Calcvera** and the domain `calcvera.com` are placeholders. Change them in one file, `src/site.config.ts`, before launch. Check that the domain is available first.
+> Live address: **https://www.calcvera.net**. The brand name, domain and contact email are all set in one file, `src/site.config.ts`.
 
 ## What's inside
 
@@ -81,7 +81,7 @@ Edit **`src/site.config.ts`**:
 | Setting | What to put there |
 |---|---|
 | `name`, `tagline` | Your brand name and tagline |
-| `url` | Your production URL, e.g. `https://www.yourdomain.com` (no trailing slash) |
+| `url` | The production URL, currently `https://www.calcvera.net` (no trailing slash) |
 | `email` | A real inbox you check. AdSense and users need to reach you |
 | `owner`, `jurisdiction` | Legal owner name and governing-law country for the Terms |
 | `adsense.client` | Your AdSense publisher ID, e.g. `ca-pub-1234567890123456` |
@@ -113,7 +113,7 @@ Follow these steps in order. They come from the research report's approval findi
 2. **Fill in `site.config.ts`** with a real contact email and owner name.
 3. **Verify the figures** in [`docs/DATA-SOURCES.md`](docs/DATA-SOURCES.md) against the official links. The build environment could not reach government websites.
 4. **Add a real person.** The site is "Your Money or Your Life" (YMYL) content. Put your real name, and ideally a qualified reviewer such as a CPA or financial planner, on the About page. Never invent credentials.
-5. **Deploy, then set up Google Search Console.** Add the site, submit `https://yourdomain.com/sitemap-index.xml`, and wait for pages to be indexed.
+5. **Deploy, then set up Google Search Console.** Add the site, submit `https://www.calcvera.net/sitemap-index.xml`, and wait for pages to be indexed.
 6. **Let it age a little.** Owners commonly report better approval odds once a site has some organic traffic and a few months of history. Publishing a few guide articles meanwhile helps too.
 7. **In AdSense:**
    - Add the site.

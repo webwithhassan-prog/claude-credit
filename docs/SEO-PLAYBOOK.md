@@ -32,23 +32,24 @@ Run it after every build: `npm run build && npm run seo`.
 
 ## 1. Before launch
 
-1. **Set your domain.** In `src/site.config.ts`, set `url` to the exact address you will use, for example `https://www.calcvera.net` (no trailing slash). Canonical URLs, the sitemap, structured data and share image links all come from this one setting. Update `email` to an inbox on the same domain.
-2. **Choose one version of the address.** Use either `www.yourdomain` or the bare `yourdomain`, never both. The config uses `www` by default. On Cloudflare Pages, `www` works with any DNS provider, and the bare domain requires your DNS to be on Cloudflare.
+1. **The domain is set.** `url` in `src/site.config.ts` is `https://www.calcvera.net`, and `email` is `hello@calcvera.net`. Canonical URLs, the sitemap, structured data and share image links all come from these settings. If the domain ever changes, change it there.
+2. **One version of the address.** The site lives at `www.calcvera.net`. The bare `calcvera.net` must redirect to it (section 2, step 3) and never serve a second copy of the site.
 3. **Build and check:** `npm run build && npm run seo` must report no errors.
 
 ## 2. Hosting and domain (Cloudflare Pages)
 
-1. Deploy as described in the README, then add your domain under **Custom domains** in the Pages project.
-2. **Recommended: move your DNS to Cloudflare** (free). Add the domain as a site in Cloudflare and change the nameservers at your registrar (for example, Sav) to the two Cloudflare gives you. This lets you use both `www` and the bare domain, and unlocks the settings below.
-3. **Redirect the other version** with a permanent (301) redirect. In **Rules → Redirect Rules**, create a rule that sends every request for `yourdomain.net/*` to `https://www.yourdomain.net/${1}` and keeps the query string. Cloudflare offers a ready-made template for this.
+1. **Move your DNS to Cloudflare** (free). In Cloudflare, add `calcvera.net` as a site on the Free plan. Cloudflare shows two nameservers. At Sav, replace the domain's nameservers with those two. Wait until Cloudflare marks the domain **Active**, usually within a few hours and at most 24.
+2. **Connect the domain to the site.** Deploy as described in the README. Then, in the Pages project under **Custom domains**, add `www.calcvera.net` and `calcvera.net`. Cloudflare creates the DNS records and HTTPS certificates for you.
+3. **Redirect the bare domain** with a permanent (301) redirect. In **Rules → Redirect Rules**, use the "Redirect from root to WWW" template, or create a rule that sends every request for `calcvera.net/*` to `https://www.calcvera.net/${1}` and keeps the query string.
 4. **Turn on HTTPS everywhere:** SSL/TLS → Edge Certificates → **Always Use HTTPS**.
-5. **Leave the `pages.dev` address alone.** It stays online but tells search engines not to index it. Never link to it.
-6. **AI crawlers are your call.** Cloudflare can block AI bots for new domains, and this never affects Googlebot. If you want the site to appear in AI search tools such as ChatGPT search or Perplexity, allow their search crawlers in Cloudflare's AI crawler settings (**AI Crawl Control**, or **Security → Bots** on older dashboards).
+5. **Make `hello@calcvera.net` work.** The address appears on the Contact, About and legal pages, and AdSense reviewers and readers may write to it. Under **Email → Email Routing**, create `hello@calcvera.net` and forward it to your personal inbox. It's free.
+6. **Leave the `pages.dev` address alone.** It stays online but tells search engines not to index it. Never link to it.
+7. **AI crawlers are your call.** Cloudflare can block AI bots for new domains, and this never affects Googlebot. If you want the site to appear in AI search tools such as ChatGPT search or Perplexity, allow their search crawlers in Cloudflare's AI crawler settings (**AI Crawl Control**, or **Security → Bots** on older dashboards).
 
 ## 3. Google Search Console (day 1)
 
 1. Go to [search.google.com/search-console](https://search.google.com/search-console) and add a **Domain** property. If your DNS is on Cloudflare, Google can verify it automatically. If you use a **URL prefix** property instead, paste the HTML-tag token into `googleSiteVerification` in `site.config.ts` and redeploy.
-2. Under **Sitemaps**, submit `https://www.yourdomain.net/sitemap-index.xml`.
+2. Under **Sitemaps**, submit `https://www.calcvera.net/sitemap-index.xml`.
 3. Use **URL Inspection → Request indexing** for your most important pages. There is a daily limit, so start with:
    - The home page.
    - The five category hubs.

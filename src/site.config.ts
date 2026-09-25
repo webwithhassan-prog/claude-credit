@@ -42,9 +42,9 @@ export const site: SiteConfig = {
   /** Short tagline used on the home page and in meta descriptions. */
   tagline: 'Free, accurate money calculators with clear explanations. No sign-up, and your numbers stay in your browser.',
   /** Production URL without a trailing slash. Must match `site` in astro.config.mjs. */
-  url: 'https://www.calcvera.com',
+  url: 'https://www.calcvera.net',
   /** Public contact address (shown on Contact / Privacy pages). */
-  email: 'hello@calcvera.com',
+  email: 'hello@calcvera.net',
   /** Legal entity or owner name used in the Terms and Privacy Policy. */
   owner: 'Calcvera',
   /** Country whose law governs the Terms of Use (e.g. 'Pakistan'). Empty = generic wording. */
