@@ -24,6 +24,7 @@
   --danger-soft: #fdecea;
   --success: #17803d;
   --focus: #2f6fe4;
+  --seg-active: #ffffff;
 
   --chart-1: #0b6b5f;
   --chart-2: #e07a1f;
@@ -69,6 +70,7 @@
     --danger-soft: rgb(242 139 130 / 0.12);
     --success: #5fd08a;
     --focus: #7aa7ff;
+    --seg-active: #2a3a52;
     --chart-1: #3cc7b1;
     --chart-2: #f0a45b;
     --chart-3: #8e9cff;
@@ -102,6 +104,7 @@
   --danger-soft: rgb(242 139 130 / 0.12);
   --success: #5fd08a;
   --focus: #7aa7ff;
+  --seg-active: #2a3a52;
   --chart-1: #3cc7b1;
   --chart-2: #f0a45b;
   --chart-3: #8e9cff;
@@ -709,7 +712,7 @@ fieldset.field {
   color: var(--text-2);
 }
 .seg input:checked + span {
-  background: var(--surface);
+  background: var(--seg-active);
   color: var(--text);
   box-shadow: var(--shadow-sm);
 }
