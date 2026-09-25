@@ -1,0 +1,328 @@
+---
+import ToolLayout from '../layouts/ToolLayout.astro';
+import Calc from '../components/calc/Calc.astro';
+import NumberField from '../components/calc/NumberField.astro';
+import SelectField from '../components/calc/SelectField.astro';
+import SegField from '../components/calc/SegField.astro';
+import AdSlot from '../components/AdSlot.astro';
+
+const sections = [
+  { id: 'how-to-use', title: 'How to use this calculator' },
+  { id: 'what-is-brrrr', title: 'What is the BRRRR method?' },
+  { id: 'example', title: 'Worked example' },
+  { id: 'seventy-percent', title: 'The 70% rule' },
+  { id: 'refinance', title: 'The refinance: LTV limits and seasoning' },
+  { id: 'risks', title: 'What can go wrong' },
+  { id: 'method', title: 'How the calculator works' },
+];
+
+const faq = [
+  {
+    q: 'What does BRRRR stand for?',
+    a: 'Buy, Rehab, Rent, Refinance, Repeat. You buy a property below its potential value, renovate it, rent it out, then refinance based on the higher after-repair value to pull out some or all of your cash — which you reuse for the next deal.',
+  },
+  {
+    q: 'What is a good BRRRR deal?',
+    a: 'Investors usually aim to recover most or all of their cash at the refinance while still cash flowing afterward. A deal that leaves little cash in and produces positive monthly cash flow can generate very high, even “infinite”, cash-on-cash returns. A deal that recovers your cash but loses money every month is not a win.',
+  },
+  {
+    q: 'How much can I borrow on the cash-out refinance?',
+    a: 'Conventional cash-out refinances on investment properties are commonly capped at about 75% of the appraised value for a single-unit home and 70% for 2–4 units; DSCR and other investor lenders often allow 70%–75%. Your rate, reserves and credit also matter.',
+  },
+  {
+    q: 'How long do I have to wait to refinance?',
+    a: 'Many lenders require a “seasoning” period — often 6 to 12 months of ownership — before they will lend against the new appraised value instead of your purchase price. Some investor lenders allow shorter seasoning. Ask before you buy, because the wait adds holding costs.',
+  },
+  {
+    q: 'Is hard money required for BRRRR?',
+    a: 'No. You can buy with cash, a home equity line, a private lender or a short-term renovation loan. Hard money is common because it’s fast and finances rehab costs, but it’s expensive — typically double-digit rates plus points — so a quick rehab and refinance matter.',
+  },
+  {
+    q: 'What does “infinite return” mean?',
+    a: 'If the refinance returns all the cash you invested (or more) and the property still produces positive cash flow, your cash-on-cash return is mathematically infinite, because you have no cash left in the deal. The calculator shows this when it happens.',
+  },
+];
+
+const sources = [
+  {
+    title: 'Fannie Mae Eligibility Matrix (cash-out refinance LTV limits)',
+    url: 'https://selling-guide.fanniemae.com/',
+    publisher: 'Fannie Mae',
+  },
+  {
+    title: 'Publication 527, Residential Rental Property',
+    url: 'https://www.irs.gov/publications/p527',
+    publisher: 'Internal Revenue Service',
+  },
+  {
+    title: 'Mortgages — consumer tools',
+    url: 'https://www.consumerfinance.gov/consumer-tools/mortgages/',
+    publisher: 'Consumer Financial Protection Bureau',
+  },
+];
+---
+
+<ToolLayout
+  slug="brrrr-calculator"
+  sections={sections}
+  faq={faq}
+  sources={sources}
+  related={['rental-property-calculator', 'dscr-loan-calculator', 'cash-out-refinance-vs-heloc-calculator', 'home-equity-calculator']}
+>
+  <p slot="intro">
+    Model a BRRRR deal from purchase to refinance: your all-in cost including rehab, holding and hard money costs, the cash you
+    get back from a cash-out refinance at the after-repair value, how much cash stays in the deal, and the cash flow and return
+    once it’s rented.
+  </p>
+
+  <Calc id="br" slot="calculator" inputsTitle="Your deal">
+    <Fragment slot="inputs">
+      <p class="calc-title">Buy &amp; rehab</p>
+      <div class="field-row">
+        <NumberField name="price" label="Purchase price" value={130000} prefix="$" format="money" min={0} />
+        <NumberField name="closing" label="Purchase closing costs" value={3500} prefix="$" format="money" min={0} />
+      </div>
+      <div class="field-row">
+        <NumberField name="rehab" label="Rehab budget" value={35000} prefix="$" format="money" min={0} />
+        <NumberField name="months" label="Months until refinance" value={6} suffix="months" min={0} max={36} />
+      </div>
+      <NumberField name="holding" label="Holding costs while vacant" value={550} prefix="$" format="money" suffix="/mo" min={0} hint="Taxes, insurance, utilities and lawn care before it’s rented." />
+      <SegField
+        name="financing"
+        label="Buy with"
+        value="hard-money"
+        options={[
+          { value: 'hard-money', label: 'Hard money loan' },
+          { value: 'cash', label: 'Cash' },
+        ]}
+      />
+      <div data-when="financing=hard-money">
+        <div class="field-row">
+          <NumberField name="ltc" label="Loan-to-cost" value={85} suffix="%" min={0} max={100} hint="Share of price + rehab financed." />
+          <NumberField name="hmRate" label="Interest rate" value={11} suffix="%" min={0} max={30} />
+        </div>
+        <NumberField name="points" label="Points" value={2} suffix="% of loan" min={0} max={10} />
+      </div>
+      <p class="calc-title" style="margin-top:8px">Refinance</p>
+      <div class="field-row">
+        <NumberField name="arv" label="After-repair value (ARV)" value={240000} prefix="$" format="money" min={0} />
+        <NumberField name="ltv" label="Cash-out LTV" value={75} suffix="%" min={0} max={100} />
+      </div>
+      <div class="field-row">
+        <NumberField name="refiRate" label="Refinance rate" value={7.25} suffix="%" min={0} max={20} />
+        <SelectField name="refiTerm" label="Term" value="30" options={[15, 20, 25, 30, 40].map((y) => ({ value: y, label: `${y} years` }))} />
+      </div>
+      <NumberField name="refiCosts" label="Refinance closing costs" value={3} suffix="% of loan" min={0} max={10} />
+      <p class="calc-title" style="margin-top:8px">Rent &amp; expenses</p>
+      <div class="field-row">
+        <NumberField name="rent" label="Monthly rent" value={2200} prefix="$" format="money" min={0} />
+        <NumberField name="vacancy" label="Vacancy" value={5} suffix="%" min={0} max={50} />
+      </div>
+      <div class="field-row">
+        <NumberField name="taxes" label="Property taxes (yearly)" value={2700} prefix="$" format="money" min={0} />
+        <NumberField name="insurance" label="Insurance (yearly)" value={1400} prefix="$" format="money" min={0} />
+      </div>
+      <div class="field-row">
+        <NumberField name="maint" label="Maintenance" value={8} suffix="% of rent" min={0} max={50} />
+        <NumberField name="mgmt" label="Management" value={8} suffix="% of rent" min={0} max={50} />
+      </div>
+      <div class="field-row">
+        <NumberField name="capex" label="CapEx reserve" value={5} suffix="% of rent" min={0} max={50} />
+        <NumberField name="hoa" label="HOA dues (monthly)" value={0} prefix="$" format="money" min={0} />
+      </div>
+    </Fragment>
+
+    <Fragment slot="results">
+      <div class="result-hero" aria-live="polite">
+        <p class="label" data-out="heroLabel">Cash left in the deal</p>
+        <p class="value" data-out="hero">—</p>
+        <p class="sub" data-out="heroSub"></p>
+      </div>
+      <div class="stats cols-3">
+        <div class="stat"><p class="label">Cash back at refinance</p><p class="value" data-out="back">—</p></div>
+        <div class="stat"><p class="label">Monthly cash flow after refi</p><p class="value" data-out="cf">—</p></div>
+        <div class="stat"><p class="label">Cash-on-cash return</p><p class="value" data-out="coc">—</p></div>
+      </div>
+      <div data-out="verdict"></div>
+      <h3 class="results-heading">Your cash: recovered vs. left in</h3>
+      <div data-out="split"></div>
+      <div data-out="table"></div>
+    </Fragment>
+  </Calc>
+
+  <h2 id="how-to-use">How to use this calculator</h2>
+  <ol>
+    <li><strong>Buy &amp; rehab:</strong> enter the purchase price, closing costs, rehab budget and how many months until you can refinance (rehab, lease-up and any lender seasoning period), plus monthly holding costs while the property is vacant.</li>
+    <li><strong>Initial financing:</strong> choose cash or a hard money loan. For hard money, enter the loan-to-cost, rate and points; interest is modeled as interest-only until the refinance.</li>
+    <li><strong>Refinance:</strong> enter a conservative after-repair value (ARV), the lender’s cash-out LTV, rate, term and closing costs.</li>
+    <li><strong>Rent &amp; expenses:</strong> enter realistic rent and reserves for vacancy, maintenance, management and capital expenditures.</li>
+    <li><strong>Read the results:</strong> cash left in the deal, cash flow after the refinance and your cash-on-cash return.</li>
+  </ol>
+
+  <h2 id="what-is-brrrr">What is the BRRRR method?</h2>
+  <p>BRRRR is a strategy for building a rental portfolio while recycling the same pool of cash:</p>
+  <ol>
+    <li><strong>Buy</strong> a distressed or under-valued property below what it will be worth after renovation.</li>
+    <li><strong>Rehab</strong> it to raise its value and rent.</li>
+    <li><strong>Rent</strong> it to a qualified tenant — lenders want to see a lease or market rent.</li>
+    <li><strong>Refinance</strong> into a long-term mortgage based on the new, higher appraised value, paying off the short-term loan and returning some or all of your cash.</li>
+    <li><strong>Repeat</strong> with the recovered cash.</li>
+  </ol>
+  <p>
+    The whole strategy hinges on the gap between your all-in cost and the after-repair value. The bigger that gap, the more cash the
+    refinance returns.
+  </p>
+
+  <AdSlot slot="inContent" />
+
+  <h2 id="example">Worked example</h2>
+  <p>
+    An investor buys a house for <strong>$130,000</strong> with <strong>$3,500</strong> in closing costs and a
+    <strong>$35,000</strong> rehab, using a hard money loan for 85% of price + rehab ($140,250) at 11% with 2 points. It takes
+    <strong>6 months</strong> to renovate, rent and refinance, with $550 a month of holding costs.
+  </p>
+  <ul>
+    <li>Hard money interest: <strong>$7,714</strong>; points <strong>$2,805</strong>; holding costs <strong>$3,300</strong>.</li>
+    <li>All-in cost: <strong>$182,319</strong>. Cash the investor put in before the refinance: <strong>$42,069</strong>.</li>
+    <li>The house appraises at <strong>$240,000</strong>. A 75% cash-out refinance gives a <strong>$180,000</strong> loan; after repaying the hard money and $5,400 of closing costs, <strong>$34,350</strong> comes back.</li>
+    <li>Cash left in the deal: <strong>$7,719</strong> — about 82% of the investor’s cash recovered.</li>
+    <li>At $2,200 rent, cash flow after the new $1,227.92 payment is about <strong>$58 a month</strong>, a cash-on-cash return of about <strong>9%</strong> on the cash left in — plus $60,000 of equity.</li>
+  </ul>
+
+  <h2 id="seventy-percent">The 70% rule</h2>
+  <p>
+    A popular screening rule for flips and BRRRR deals: pay no more than <strong>70% of the after-repair value minus the rehab
+    cost</strong>. For the example, 70% × $240,000 − $35,000 = <strong>$133,000</strong>, so the $130,000 price passes. The 30% cushion
+    covers closing, holding and financing costs and protects against surprises. In expensive markets, investors sometimes stretch to
+    75%–80%, but then less cash comes back at the refinance.
+  </p>
+
+  <h2 id="refinance">The refinance: LTV limits and seasoning</h2>
+  <ul>
+    <li><strong>LTV caps:</strong> conventional cash-out refinances on investment properties are typically limited to about 75% of value for one-unit homes and 70% for 2–4 units. DSCR lenders commonly allow 70%–75%.</li>
+    <li><strong>Seasoning:</strong> many lenders won’t use the new appraised value until you’ve owned the property for a set period — often 6–12 months. Until then, they may lend only against your purchase price. Confirm this before you buy.</li>
+    <li><strong>Appraisal risk:</strong> if the appraisal comes in below your ARV estimate, less cash comes back. Use comparable sales of renovated homes, and run a lower-ARV scenario.</li>
+    <li><strong>Rate risk:</strong> your refinance rate isn’t known when you buy. Test a rate 0.5–1 point higher to be safe.</li>
+  </ul>
+
+  <h2 id="risks">What can go wrong</h2>
+  <ul>
+    <li><strong>Rehab overruns and delays</strong> — every extra month adds hard money interest and holding costs. Budget a 10%–20% contingency.</li>
+    <li><strong>A low appraisal</strong> can leave far more cash in the deal than planned.</li>
+    <li><strong>Negative cash flow after the refinance</strong> — pulling out all your cash means a larger loan and payment. A deal that recovers your cash but loses money monthly isn’t sustainable; check with the <a href="/rental-property-calculator/">rental property calculator</a>.</li>
+    <li><strong>Over-leverage across several properties</strong> — keep reserves for vacancies and repairs on every property.</li>
+  </ul>
+
+  <h2 id="method">How the calculator works</h2>
+  <div class="formula">Hard money loan = LTC × (price + rehab);  interest = loan × rate ÷ 12 × months;  points = loan × points %
+All-in cost = price + closing + rehab + holding + hard money interest + points
+Cash in before refi = all-in cost − hard money loan
+Refi loan = ARV × LTV;  cash back = refi loan − hard money payoff − refi closing costs
+Cash left in deal = cash in before refi − cash back
+Cash-on-cash = annual cash flow after refi ÷ cash left in deal</div>
+  <p>
+    Cash flow after the refinance is rent minus vacancy, operating expenses and the new principal-and-interest payment. The model assumes
+    the hard money loan is interest-only and fully drawn at purchase; real rehab loans often fund repairs in draws, which lowers interest.
+  </p>
+</ToolLayout>
+
+<script>
+  import { bindCalculator, outputs, verdict } from '../lib/ui/form';
+  import { money, percent } from '../lib/ui/format';
+  import { splitBar } from '../lib/ui/chart';
+  import { brrrr } from '../lib/calc/realestate';
+
+  const out = outputs('br');
+
+  bindCalculator('br', {
+    compute(f) {
+      const financing = f.str('financing') === 'cash' ? 'cash' : 'hard-money';
+      const r = brrrr({
+        price: f.num('price'),
+        purchaseClosing: f.num('closing'),
+        rehab: f.num('rehab'),
+        holdMonths: f.num('months'),
+        holdingMonthly: f.num('holding'),
+        financing,
+        hmLtc: f.num('ltc'),
+        hmRate: f.num('hmRate'),
+        hmPoints: f.num('points'),
+        arv: f.num('arv'),
+        refiLtv: f.num('ltv'),
+        refiRate: f.num('refiRate'),
+        refiTermYears: Number(f.str('refiTerm')) || 30,
+        refiCostsPercent: f.num('refiCosts'),
+        rent: f.num('rent'),
+        otherIncome: 0,
+        vacancyPercent: f.num('vacancy'),
+        taxes: f.num('taxes'),
+        insurance: f.num('insurance'),
+        hoa: f.num('hoa'),
+        utilities: 0,
+        maintenancePercent: f.num('maint'),
+        managementPercent: f.num('mgmt'),
+        capexPercent: f.num('capex'),
+      });
+
+      if (r.cashLeftInDeal <= 0) {
+        out.text('heroLabel', 'All your cash back, plus');
+        out.text('hero', money(-r.cashLeftInDeal));
+        out.text('heroSub', 'The refinance returns more than you invested');
+      } else {
+        out.text('heroLabel', 'Cash left in the deal');
+        out.text('hero', money(r.cashLeftInDeal));
+        out.text('heroSub', `${percent(r.cashRecoveredPercent, 0)} of your ${money(r.cashBeforeRefi)} recovered at refinance`);
+      }
+      out.text('back', money(r.cashBack));
+      out.text('cf', money(r.cashFlowMonthly));
+      out.text('coc', r.cashOnCash === Infinity ? 'Infinite' : r.cashOnCash === -Infinity ? '—' : percent(r.cashOnCash, 1));
+
+      const passes70 = f.num('price') <= r.seventyPercentMax;
+      let kind: 'good' | 'warn' | 'bad' = 'good';
+      const notes: string[] = [];
+      if (r.cashFlowMonthly < 0) {
+        kind = 'bad';
+        notes.push(`After the refinance the property loses <strong>${money(-r.cashFlowMonthly)}</strong> a month — consider a lower LTV, a better rate or higher rent.`);
+      }
+      if (r.cashBack < 0) {
+        kind = 'bad';
+        notes.push(`The refinance wouldn’t even pay off the hard money loan — you’d need <strong>${money(-r.cashBack)}</strong> more at closing.`);
+      }
+      notes.push(
+        passes70
+          ? `Passes the 70% rule (max price about <strong>${money(r.seventyPercentMax)}</strong>).`
+          : `Fails the 70% rule — the max price would be about <strong>${money(r.seventyPercentMax)}</strong>.`,
+      );
+      if (!passes70 && kind === 'good') kind = 'warn';
+      if (kind === 'good') notes.unshift(`Positive cash flow of <strong>${money(r.cashFlowMonthly)}</strong> a month with <strong>${money(r.equityAfterRefi)}</strong> of equity after the refinance.`);
+      out.html('verdict', verdict(kind, notes.join(' ')));
+
+      out.html(
+        'split',
+        r.cashBeforeRefi > 0
+          ? splitBar(
+              [
+                { label: 'Recovered', value: Math.max(0, Math.min(r.cashBack, r.cashBeforeRefi)), color: 'var(--chart-1)' },
+                { label: 'Left in the deal', value: Math.max(0, r.cashLeftInDeal), color: 'var(--chart-2)' },
+              ],
+              (n) => money(n),
+            )
+          : '',
+      );
+      out.html(
+        'table',
+        `<div class="table-wrap" style="max-height:none;margin-top:14px"><table class="data"><tbody>
+          <tr><td>All-in cost</td><td>${money(r.allInCost)}</td></tr>
+          <tr><td>Hard money loan</td><td>${money(r.hmLoan)}</td></tr>
+          <tr><td>Hard money interest + points</td><td>${money(r.hmInterest + r.hmPoints)}</td></tr>
+          <tr><td>Holding costs</td><td>${money(r.holding)}</td></tr>
+          <tr><td>Refinance loan</td><td>${money(r.refiLoan)}</td></tr>
+          <tr><td>Refinance closing costs</td><td>${money(r.refiCosts)}</td></tr>
+          <tr><td>New monthly payment (P&amp;I)</td><td>${money(r.payment, true)}</td></tr>
+          <tr><td>Equity after refinance</td><td>${money(r.equityAfterRefi)}</td></tr>
+          <tr><td>DSCR (rent ÷ PITIA)</td><td>${Number.isFinite(r.dscr) ? r.dscr.toFixed(2) : '—'}</td></tr>
+        </tbody></table></div>`,
+      );
+    },
+  });
+</script>

@@ -5,7 +5,7 @@ import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import GuideCard from '../../components/GuideCard.astro';
 import { site } from '../../site.config';
 
-const guides = (await getCollection('guides')).sort((a, b) => b.data.updated.localeCompare(a.data.updated));
+const guides = (await getCollection('guides')).sort((a, b) => b.data.updated.localeCompare(a.data.updated) || a.data.title.localeCompare(b.data.title));
 ---
 
 <BaseLayout

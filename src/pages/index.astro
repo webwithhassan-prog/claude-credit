@@ -9,7 +9,7 @@ import { site } from '../site.config';
 import { getCollection } from 'astro:content';
 import GuideCard from '../components/GuideCard.astro';
 
-const guides = (await getCollection('guides')).sort((a, b) => b.data.updated.localeCompare(a.data.updated)).slice(0, 6);
+const guides = (await getCollection('guides')).sort((a, b) => b.data.updated.localeCompare(a.data.updated) || a.data.title.localeCompare(b.data.title)).slice(0, 6);
 
 const featured = tools.filter((t) => t.featured);
 const jsonLd = [

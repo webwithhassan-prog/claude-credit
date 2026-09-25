@@ -1,6 +1,6 @@
 # Calcvera — money calculators that show their work
 
-A fast, static website of **21 free financial calculators**, built to rank in Google and to pass Google AdSense review. Every calculator runs in the visitor's browser, explains its formula with a worked example, cites official sources, and is backed by unit-tested math.
+A fast, static website of **23 free financial calculators**, built to rank in Google and to pass Google AdSense review. Every calculator runs in the visitor's browser, explains its formula with a worked example, cites official sources, and is backed by unit-tested math.
 
 > The brand name **Calcvera** and the domain `calcvera.com` are placeholders. Change them in one file, `src/site.config.ts`, before launch. Check that the domain is available first.
 
@@ -9,20 +9,27 @@ A fast, static website of **21 free financial calculators**, built to rank in Go
 | Category | Calculators |
 |---|---|
 | **Debt & Credit** | Credit card payoff · Debt payoff (avalanche vs snowball) · Debt-to-income ratio · Credit utilization · Balance transfer · Debt consolidation |
-| **Home Equity & Real Estate** | HELOC payment · Home equity (how much can I borrow) · Cash-out refinance vs HELOC · DSCR loan |
+| **Home Equity & Real Estate** | HELOC payment · Home equity (how much can I borrow) · Cash-out refinance vs HELOC · DSCR loan · Rental property (cash flow, cap rate) · BRRRR |
 | **Business Financing** | Merchant cash advance (factor rate → APR) · Invoice factoring · Equipment loan |
 | **Tax Deductions 2025–2026** | Schedule 1-A (all four combined) · Car loan interest · No tax on overtime · No tax on tips · Senior $6,000 deduction |
 | **Health & Benefits** | ACA subsidy 2026 · IRMAA 2026 · SSDI back pay |
 
-Plus **8 in-depth guides** in `src/content/guides/`, written in Markdown. Each is linked from the home page, its category hub and its related calculators:
+Plus **15 in-depth guides** in `src/content/guides/`, written in Markdown. Each is linked from the home page, its category hub and its related calculators:
 - 2026 ACA subsidy cliff
 - Factor rate vs APR
 - HELOC vs cash-out refinance
+- HELOC draw period ending
 - Schedule 1-A explained
+- Section 179 vs bonus depreciation
 - Avalanche vs snowball
+- Balance transfer vs personal loan
+- How credit card interest is calculated
 - How to appeal IRMAA
+- After SSDI approval
 - How lenders calculate DTI
 - DSCR loans explained
+- Cap rate vs cash-on-cash return
+- Invoice factoring vs line of credit
 
 Plus the trust pages AdSense reviewers look for:
 - **Company:** About, Editorial policy, Contact.
@@ -174,7 +181,7 @@ The 2025–2028 deductions (tips, overtime, car loan interest, seniors) expire a
 These come from the research report's backlog:
 - **v1.1:**
   - A reverse mortgage (HECM) calculator. It needs HUD's principal limit factor tables, which you download from HUD and load as JSON.
-  - More guides, for 15–20 in total.
+  - A few more guides, for about 20 in total.
 - **v2:**
   - Legal cost estimators (divorce, DUI, alimony).
   - Heat pump vs gas and EV vs gas savings.

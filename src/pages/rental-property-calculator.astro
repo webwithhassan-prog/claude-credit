@@ -1,0 +1,310 @@
+---
+import ToolLayout from '../layouts/ToolLayout.astro';
+import Calc from '../components/calc/Calc.astro';
+import NumberField from '../components/calc/NumberField.astro';
+import SelectField from '../components/calc/SelectField.astro';
+import AdSlot from '../components/AdSlot.astro';
+
+const sections = [
+  { id: 'how-to-use', title: 'How to use this calculator' },
+  { id: 'metrics', title: 'The key rental property metrics' },
+  { id: 'expenses', title: 'Estimating expenses realistically' },
+  { id: 'example', title: 'Worked examples' },
+  { id: 'leverage', title: 'Positive vs. negative leverage' },
+  { id: 'improve', title: 'How to improve a rental’s numbers' },
+];
+
+const faq = [
+  {
+    q: 'What is a good cash-on-cash return for a rental property?',
+    a: 'Many investors look for 8%–12% or more, but it depends on your market, risk tolerance and how much you value appreciation and loan paydown. In expensive markets, cash-on-cash returns of 2%–5% are common, and investors rely more on long-term appreciation. Compare the return with what your cash could earn elsewhere with less work and risk.',
+  },
+  {
+    q: 'What is a good cap rate?',
+    a: 'Cap rates vary by market and property type — often around 4%–6% in high-cost, high-demand areas and 7%–10% or more in lower-cost markets. A higher cap rate means more income per dollar of price, but usually comes with more risk, more management or less appreciation.',
+  },
+  {
+    q: 'Does the 1% rule still work?',
+    a: 'The 1% rule — monthly rent of at least 1% of the purchase price — is a quick screening test, not a decision rule. Many good properties in expensive markets fail it, and some properties that pass it have high expenses. Always run the full cash flow with realistic expenses.',
+  },
+  {
+    q: 'What is the 50% rule?',
+    a: 'A rule of thumb that operating expenses (excluding the mortgage) will average about 50% of gross rent over time, including vacancy, repairs, capital expenditures and management. The calculator shows your expense ratio so you can compare your estimate with that benchmark.',
+  },
+  {
+    q: 'Is cash flow the only return from a rental?',
+    a: 'No. Total return also includes principal paydown (tenants help pay off your loan), appreciation and tax benefits such as depreciation. This calculator focuses on cash flow, which pays the bills and protects you in downturns; the other returns are real but less certain.',
+  },
+  {
+    q: 'How do lenders look at rental income?',
+    a: 'Conventional lenders often count about 75% of rent toward your income. DSCR lenders instead divide rent by the payment (PITIA). The calculator shows the DSCR; see our <a href="/dscr-loan-calculator/">DSCR loan calculator</a> for loan sizing.',
+  },
+];
+
+const sources = [
+  {
+    title: 'Publication 527, Residential Rental Property',
+    url: 'https://www.irs.gov/publications/p527',
+    publisher: 'Internal Revenue Service',
+  },
+  {
+    title: 'Publication 946, How To Depreciate Property',
+    url: 'https://www.irs.gov/publications/p946',
+    publisher: 'Internal Revenue Service',
+  },
+  {
+    title: 'Mortgages — consumer tools',
+    url: 'https://www.consumerfinance.gov/consumer-tools/mortgages/',
+    publisher: 'Consumer Financial Protection Bureau',
+  },
+];
+---
+
+<ToolLayout
+  slug="rental-property-calculator"
+  sections={sections}
+  faq={faq}
+  sources={sources}
+  related={['brrrr-calculator', 'dscr-loan-calculator', 'home-equity-calculator', 'cash-out-refinance-vs-heloc-calculator']}
+>
+  <p slot="intro">
+    Analyze a rental property before you buy. Enter the price, financing, rent and expenses to see monthly cash flow, net
+    operating income, cap rate, cash-on-cash return, DSCR and break-even occupancy — with realistic allowances for vacancy,
+    repairs, management and capital expenditures.
+  </p>
+
+  <Calc id="rp" slot="calculator" inputsTitle="Property, loan & income">
+    <Fragment slot="inputs">
+      <div class="field-row">
+        <NumberField name="price" label="Purchase price" value={220000} prefix="$" format="money" min={0} />
+        <NumberField name="down" label="Down payment" value={25} suffix="%" min={0} max={100} />
+      </div>
+      <div class="field-row">
+        <NumberField name="closing" label="Closing costs" value={5500} prefix="$" format="money" min={0} />
+        <NumberField name="repairs" label="Up-front repairs" value={0} prefix="$" format="money" min={0} />
+      </div>
+      <div class="field-row">
+        <NumberField name="rate" label="Mortgage rate" value={7} suffix="%" min={0} max={20} />
+        <SelectField name="term" label="Loan term" value="30" options={[15, 20, 25, 30].map((y) => ({ value: y, label: `${y} years` }))} />
+      </div>
+      <p class="calc-title" style="margin-top:8px">Income</p>
+      <div class="field-row">
+        <NumberField name="rent" label="Monthly rent" value={2200} prefix="$" format="money" min={0} />
+        <NumberField name="vacancy" label="Vacancy" value={5} suffix="%" min={0} max={50} />
+      </div>
+      <p class="calc-title" style="margin-top:8px">Expenses</p>
+      <div class="field-row">
+        <NumberField name="taxes" label="Property taxes (yearly)" value={2800} prefix="$" format="money" min={0} />
+        <NumberField name="insurance" label="Insurance (yearly)" value={1500} prefix="$" format="money" min={0} />
+      </div>
+      <div class="field-row">
+        <NumberField name="hoa" label="HOA dues (monthly)" value={0} prefix="$" format="money" min={0} />
+        <NumberField name="utilities" label="Owner-paid utilities (monthly)" value={0} prefix="$" format="money" min={0} />
+      </div>
+      <div class="field-row">
+        <NumberField name="maint" label="Repairs & maintenance" value={8} suffix="% of rent" min={0} max={50} />
+        <NumberField name="mgmt" label="Property management" value={8} suffix="% of rent" min={0} max={50} />
+      </div>
+      <NumberField name="capex" label="Capital expenditures reserve" value={5} suffix="% of rent" min={0} max={50} hint="Future roof, HVAC, water heater and appliance replacements." />
+    </Fragment>
+
+    <Fragment slot="results">
+      <div class="result-hero" aria-live="polite">
+        <p class="label">Monthly cash flow</p>
+        <p class="value" data-out="hero">—</p>
+        <p class="sub" data-out="heroSub"></p>
+      </div>
+      <div class="stats cols-3">
+        <div class="stat"><p class="label">Cap rate</p><p class="value" data-out="cap">—</p></div>
+        <div class="stat"><p class="label">Cash-on-cash return</p><p class="value" data-out="coc">—</p></div>
+        <div class="stat"><p class="label">Cash invested</p><p class="value" data-out="invested">—</p></div>
+      </div>
+      <div data-out="verdict"></div>
+      <h3 class="results-heading">Where each month’s rent goes</h3>
+      <div data-out="split"></div>
+      <div data-out="table"></div>
+    </Fragment>
+  </Calc>
+
+  <h2 id="how-to-use">How to use this calculator</h2>
+  <ol>
+    <li><strong>Enter the purchase</strong>: price, down payment, closing costs and any repairs needed before the first tenant moves in.</li>
+    <li><strong>Enter the loan</strong> rate and term. For an all-cash purchase, set the down payment to 100%.</li>
+    <li><strong>Enter the rent</strong> you can realistically achieve — check comparable listings — and a vacancy allowance.</li>
+    <li><strong>Enter expenses.</strong> Use actual tax and insurance quotes where possible, and percentage reserves for maintenance, management and capital expenditures.</li>
+    <li><strong>Read the metrics</strong> and test scenarios: a lower rent, a higher rate, or self-managing (management at 0%).</li>
+  </ol>
+
+  <h2 id="metrics">The key rental property metrics</h2>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Metric</th><th>Formula</th><th>What it tells you</th></tr></thead>
+      <tbody>
+        <tr><td>Net operating income (NOI)</td><td>Rent − vacancy − operating expenses</td><td>What the property earns before any mortgage</td></tr>
+        <tr><td>Cap rate</td><td>Annual NOI ÷ price</td><td>The property’s yield if bought with cash; compares properties</td></tr>
+        <tr><td>Cash flow</td><td>NOI − mortgage payment</td><td>What actually lands in your pocket each month</td></tr>
+        <tr><td>Cash-on-cash return</td><td>Annual cash flow ÷ cash invested</td><td>The yield on the cash you put in</td></tr>
+        <tr><td>DSCR</td><td>Rent ÷ PITIA</td><td>How lenders judge whether rent covers the loan</td></tr>
+        <tr><td>Break-even occupancy</td><td>(Expenses + mortgage) ÷ gross rent</td><td>How full the property must be to not lose money</td></tr>
+        <tr><td>Gross rent multiplier</td><td>Price ÷ annual rent</td><td>A quick price-to-rent comparison</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <AdSlot slot="inContent" />
+
+  <h2 id="expenses">Estimating expenses realistically</h2>
+  <p>
+    New investors most often go wrong by underestimating expenses. Taxes, insurance and the mortgage are easy to see; the costs
+    that sink deals are irregular: vacancies, repairs, turnovers and big-ticket replacements. Common planning ranges:
+  </p>
+  <ul>
+    <li><strong>Vacancy:</strong> 5%–8% of rent (about three to four weeks a year), more in weak rental markets.</li>
+    <li><strong>Repairs and maintenance:</strong> 5%–10% of rent; older homes need more.</li>
+    <li><strong>Capital expenditures:</strong> 5%–10% of rent set aside for roofs, HVAC, water heaters and appliances.</li>
+    <li><strong>Property management:</strong> commonly 8%–10% of collected rent, plus leasing fees. Include it even if you self-manage — your time has value, and you may hire a manager later.</li>
+  </ul>
+  <p>
+    Together, operating expenses often reach 35%–50% of rent before the mortgage, which is why the “50% rule” is a useful sanity
+    check.
+  </p>
+
+  <h2 id="example">Worked examples</h2>
+  <p>
+    <strong>A deal that cash flows.</strong> A $220,000 single-family home rents for $2,200 (exactly the 1% rule). With 25% down
+    ($55,000), $5,500 of closing costs, a 7% 30-year loan, 5% vacancy, $2,800 of taxes, $1,500 of insurance and 21% of rent for
+    maintenance, management and capex:
+  </p>
+  <ul>
+    <li>NOI: about <strong>$1,270 a month</strong> ($15,236 a year) → cap rate <strong>6.9%</strong>.</li>
+    <li>Mortgage payment: <strong>$1,097.75</strong> → cash flow about <strong>$172 a month</strong>.</li>
+    <li>Cash-on-cash return: about <strong>3.4%</strong> on $60,500 invested; DSCR <strong>1.51</strong>; break-even occupancy about <strong>87%</strong>.</li>
+  </ul>
+  <p>
+    It cash flows, but only thanks to the 25% down payment: the 6.9% cap rate sits just below the loan’s roughly 8% mortgage
+    constant, so the calculator flags mild negative leverage.
+  </p>
+  <p>
+    <strong>A deal that doesn’t.</strong> The same rent on a $250,000 purchase at 7.25% produces a cap rate of about 6.0% — below the
+    mortgage rate — and cash flow of about <strong>−$26 a month</strong>, even with 25% down. That’s negative leverage, explained next.
+  </p>
+
+  <h2 id="leverage">Positive vs. negative leverage</h2>
+  <p>
+    Borrowing boosts your return only when the property earns more than the loan costs. A quick test compares the <strong>cap rate</strong>
+    with the loan’s <strong>mortgage constant</strong> — annual principal and interest divided by the loan amount (about 8% for a
+    7% 30-year loan).
+  </p>
+  <ul>
+    <li><strong>Cap rate above the mortgage constant:</strong> positive leverage — financing raises your cash-on-cash return.</li>
+    <li><strong>Cap rate below it:</strong> negative leverage — every borrowed dollar lowers your cash flow. With mortgage rates around
+      6%–7%, many properties bought at today’s prices only cash flow with large down payments.</li>
+  </ul>
+  <p>
+    Negative leverage doesn’t automatically make a deal bad — loan paydown and appreciation still build wealth — but it means you’re
+    betting on those, not on cash flow.
+  </p>
+
+  <h2 id="improve">How to improve a rental’s numbers</h2>
+  <ol>
+    <li><strong>Negotiate the price</strong> — the only input that improves every metric at once.</li>
+    <li><strong>Add value</strong> with renovations that raise rent more than they cost; model it with the <a href="/brrrr-calculator/">BRRRR calculator</a>.</li>
+    <li><strong>Shop insurance and appeal taxes</strong> — both hit cash flow directly.</li>
+    <li><strong>Reduce turnover</strong> with good tenant screening and fair renewals; vacancy and make-ready costs add up.</li>
+    <li><strong>Consider financing options</strong>: a lower rate, rate buydown or a different loan type — compare DSCR loans with the <a href="/dscr-loan-calculator/">DSCR calculator</a>.</li>
+    <li><strong>Add income</strong>: storage, parking, pet rent or utility bill-backs where local rules allow.</li>
+  </ol>
+  <div class="callout">
+    <span class="callout-title">Taxes are part of the return</span>
+    Rental income is taxable, but you can deduct expenses and depreciate the building (not the land) over 27.5 years for residential
+    property. Depreciation often shelters much of the cash flow from tax. See IRS Publication 527 and a tax professional.
+  </div>
+</ToolLayout>
+
+<script>
+  import { bindCalculator, outputs, verdict } from '../lib/ui/form';
+  import { money, percent } from '../lib/ui/format';
+  import { splitBar } from '../lib/ui/chart';
+  import { rentalAnalysis } from '../lib/calc/realestate';
+
+  const out = outputs('rp');
+
+  bindCalculator('rp', {
+    compute(f) {
+      const r = rentalAnalysis({
+        price: f.num('price'),
+        downPercent: f.num('down'),
+        closingCosts: f.num('closing'),
+        repairs: f.num('repairs'),
+        rate: f.num('rate'),
+        termYears: Number(f.str('term')) || 30,
+        rent: f.num('rent'),
+        otherIncome: 0,
+        vacancyPercent: f.num('vacancy'),
+        taxes: f.num('taxes'),
+        insurance: f.num('insurance'),
+        hoa: f.num('hoa'),
+        utilities: f.num('utilities'),
+        maintenancePercent: f.num('maint'),
+        managementPercent: f.num('mgmt'),
+        capexPercent: f.num('capex'),
+      });
+
+      out.text('hero', money(r.cashFlowMonthly));
+      out.text('heroSub', `${money(r.annualCashFlow)} a year · NOI ${money(r.noiMonthly)}/mo`);
+      out.tone('hero', null);
+      out.text('cap', percent(r.capRate, 2));
+      out.text('coc', percent(r.cashOnCash, 2));
+      out.text('invested', money(r.cashInvested));
+
+      if (!(r.gross > 0)) {
+        out.html('verdict', '');
+        out.html('split', '');
+        out.html('table', '');
+        return;
+      }
+      const constant = r.loan > 0 ? ((r.payment * 12) / r.loan) * 100 : 0;
+      let kind: 'good' | 'warn' | 'bad' = 'good';
+      let msg: string;
+      if (r.cashFlowMonthly < 0) {
+        kind = 'bad';
+        msg = `This property loses <strong>${money(-r.cashFlowMonthly)}</strong> a month. ${
+          r.loan > 0 && r.capRate < constant
+            ? `Its ${percent(r.capRate, 1)} cap rate is below the loan’s ${percent(constant, 1)} mortgage constant (negative leverage) — a lower price, higher rent or bigger down payment is needed.`
+            : 'Expenses and debt exceed the rent.'
+        }`;
+      } else if (r.loan > 0 && r.capRate < constant) {
+        kind = 'warn';
+        msg = `Positive cash flow, but the ${percent(r.capRate, 1)} cap rate is below the ${percent(constant, 1)} mortgage constant, so borrowing is reducing your return (negative leverage).`;
+      } else {
+        msg = `Cash flow is positive and the ${percent(r.capRate, 1)} cap rate ${r.loan > 0 ? `beats the ${percent(constant, 1)} mortgage constant (positive leverage)` : 'is your all-cash yield'}. Break-even occupancy is <strong>${percent(r.breakEvenOccupancy, 0)}</strong>.`;
+      }
+      out.html('verdict', verdict(kind, msg));
+
+      out.html(
+        'split',
+        splitBar(
+          [
+            { label: 'Operating expenses', value: r.expenses, color: 'var(--chart-2)' },
+            { label: 'Vacancy', value: r.vacancy, color: 'var(--chart-4)' },
+            { label: 'Mortgage', value: Math.min(r.payment, Math.max(0, r.gross - r.expenses - r.vacancy)), color: 'var(--chart-3)' },
+            { label: 'Cash flow', value: Math.max(0, r.cashFlowMonthly), color: 'var(--chart-1)' },
+          ],
+          (n) => money(n),
+        ),
+      );
+      out.html(
+        'table',
+        `<div class="table-wrap" style="max-height:none;margin-top:14px"><table class="data"><tbody>
+          <tr><td>Mortgage payment (P&amp;I)</td><td>${money(r.payment, true)}</td></tr>
+          <tr><td>Net operating income (yearly)</td><td>${money(r.noiAnnual)}</td></tr>
+          <tr><td>DSCR (rent ÷ PITIA)</td><td>${Number.isFinite(r.dscr) ? r.dscr.toFixed(2) : '—'}</td></tr>
+          <tr><td>Break-even occupancy</td><td>${percent(r.breakEvenOccupancy, 0)}</td></tr>
+          <tr><td>Rent as % of price (1% rule)</td><td>${percent(r.onePercentRule, 2)}</td></tr>
+          <tr><td>Expense ratio (vs 50% rule)</td><td>${percent(r.expenseRatio, 0)}</td></tr>
+          <tr><td>Gross rent multiplier</td><td>${Number.isFinite(r.grossRentMultiplier) ? r.grossRentMultiplier.toFixed(1) : '—'}</td></tr>
+        </tbody></table></div>`,
+      );
+    },
+  });
+</script>

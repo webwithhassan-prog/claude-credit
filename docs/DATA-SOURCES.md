@@ -83,6 +83,8 @@ Confirm these load:
 - `https://consumer.ftc.gov/articles/how-get-out-debt` (debt payoff, consolidation)
 - `https://www.irs.gov/newsroom/irs-releases-tax-inflation-adjustments-for-tax-year-2026-including-amendments-from-the-one-big-beautiful-bill` (tax pages)
 - `https://www.cms.gov/newsroom/fact-sheets/2026-medicare-parts-b-premiums-and-deductibles` (IRMAA)
+- `https://www.hud.gov/counseling` (HELOC draw-period guide)
+- `https://www.irs.gov/businesses/small-businesses-self-employed/tangible-property-final-regulations` (Section 179 guide)
 
 You can list every external link with:
 
@@ -98,3 +100,6 @@ grep -rhoE "url: '[^']+'" src/pages | sort -u
 - DTI guide, student loan payments used when no payment is reported: FHA 0.5% of balance, Freddie Mac 0.5%, Fannie Mae 1% (or a calculated payment); VA uses its own threshold. Check the current seller/servicer guides.
 - IRMAA guide: SSA-44 life-changing events list; SSA-561 for reconsideration.
 - Debt guide research citations: Gal & McShane (2012), *Journal of Marketing Research*; Trudel (2016), *Harvard Business Review*.
+- Section 179 guide: 2025 limit $2.5M / phase-out $4M (indexed after 2025); 100% bonus for property acquired after Jan 19, 2025; the pre-OBBBA bonus rate for 2025 was 40%; the >50% business-use requirement; the $2,500 de minimis safe harbor.
+- SSDI guide: Medicare after 24 months of entitlement; auxiliary benefits for children and spouses; 2026 SGA of $1,690 ($2,830 blind); fee cap $9,200.
+- Real-estate pages: conventional investment cash-out LTV of 75% (1 unit) / 70% (2–4 units); seasoning periods commonly 6–12 months (lender-specific).

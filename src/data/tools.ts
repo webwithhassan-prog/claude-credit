@@ -138,6 +138,28 @@ export const tools: Tool[] = [
     updated: '2026-09-25',
   },
 
+  {
+    slug: 'rental-property-calculator',
+    title: 'Rental Property Calculator',
+    short: 'Cash flow, cap rate, cash-on-cash return and DSCR for a rental property.',
+    category: 'home-equity',
+    icon: 'chart',
+    metaTitle: 'Rental Property Calculator: Cash Flow, Cap Rate & ROI',
+    metaDescription:
+      'Analyze a rental property: monthly cash flow, NOI, cap rate, cash-on-cash return, DSCR and break-even occupancy, with realistic expense estimates.',
+    updated: '2026-09-25',
+  },
+  {
+    slug: 'brrrr-calculator',
+    title: 'BRRRR Calculator',
+    short: 'Buy, rehab, rent, refinance, repeat: cash left in the deal, cash flow and returns.',
+    category: 'home-equity',
+    icon: 'refresh',
+    metaTitle: 'BRRRR Calculator: Cash Left in the Deal, Cash Flow & ROI',
+    metaDescription:
+      'Model a BRRRR deal: all-in cost, hard money costs, cash-out refinance at ARV, cash left in the deal, monthly cash flow and cash-on-cash return.',
+    updated: '2026-09-25',
+  },
   // Business financing
   {
     slug: 'merchant-cash-advance-calculator',
